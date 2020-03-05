@@ -1,0 +1,48 @@
+head	1.1;
+access;
+symbols;
+locks
+	frank:1.1; strict;
+comment	@# @;
+
+
+1.1
+date	2020.03.05.11.25.33;	author frank;	state Exp;
+branches;
+next	;
+
+
+desc
+@starting verion.
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="main.css">
+    <title>Frank-247 Home page</title>
+  </head>
+  <body>
+    <h1>Franky-247 Home page</h1>
+
+    <h2>Willkommen!</h2>
+
+    <p>Ich freue mich, daß Sie auf meiner Seite vorbeischauen.</p>
+
+    <p>Sie können sich ruhig etwas umsehen. 
+    <br>Viel Spass.</p>
+
+    <img src="frank.jpg" alt="Foto von mir">
+
+    <p>Frank</p>
+
+  </body>
+</html>
+@
