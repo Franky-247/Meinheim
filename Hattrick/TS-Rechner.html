@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>TS Predictor v6</title>
+
+<style>
+body { font-family: Arial; }
+table { border-collapse: collapse; margin-top: 10px; }
+td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
+
+.good { background: #c8f7c5; }
+.mid  { background: #fff3a6; }
+.bad  { background: #ffb3b3; }
+</style>
+</head>
+
+<body>
+
+<h2>Hattrick TS Predictor (v6 – kalibriert)</h2>
+
+<label>Start-TS:</label>
+<input type="number" id="startTS" value="4.5" step="0.1">
+
+<label>FQ (1–7):</label>
+<input type="number" id="fq" value="3" min="1" max="7">
+
+<label>Sportpsychologe (0–5):</label>
+<input type="number" id="psy" value="0" min="0" max="5">
+
+<p><b>32 Spiele (16 Wochen × 2 Spiele)</b></p>
+
+<table border="1">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Typ</th>
+            <th>Aktion</th>
+            <th>Before</th>
+            <th>After</th>
+        </tr>
+    </thead>
+    <tbody id="table-body"></tbody>
+</table>
+
+<script>
+const tbody = document.getElementById("table-body");
+
+for (let i = 0; i < 32; i++) {
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+        <td>${i + 1}</td>
+
+        <td>
+            <select class="type">
+                <option value="Liga">Liga</option>
+                <option value="Pokal">Pokal</option>
+                <option value="Friendly">Friendly</option>
+                <option value="Relegation">Relegation</option>
+            </select>
+        </td>
+
+        <td>
+            <select class="action">
+                <option value="NORMAL">NORMAL</option>
+                <option value="PIC">PIC</option>
+                <option value="MOTS">MOTS</option>
+            </select>
+        </td>
+
+        <td class="before">-</td>
+        <td class="after">-</td>
+    `;
+
+    tbody.appendChild(row);
+}
+</script>
+
+</body>
+</html>
+
+// -------------------------
+
+</table>
+
+<script>
+
+// Inputs
+const startTS = document.getElementById("startTS");
+const fqInput = document.getElementById("fq");
+const psyInput = document.getElementById("psy");
+
+// --- Parameter (kalibriert auf mpn-Tabelle) ---
+function fqFactor(fq) {
+    fq = Math.min(fq, 6); // Cap bei 6
+
+    return Math.max(0.02, 0.055 + (3 - fq) * 0.01);
+}
+
+function getRuhewert(psy) {
+    return Math.min(5.0, 4.5 + psy * 0.1);
+}
+
+// Drift pro Update
+function applyUpdate(ts, ruhe, factor) {
+    return ts + (ruhe - ts) * factor;
+}
+
+// Mehrere Updates
+function applyUpdates(ts, ruhe, factor, count) {
+    for (let i = 0; i < count; i++) {
+        ts = applyUpdate(ts, ruhe, factor);
+    }
+    return ts;
+}
+
+// Spieleffekte (bewusst klassisch gehalten)
+function applyMatch(ts, action) {
+    if (action === "PIC") {
+        ts = ts * 1.33;
+    } else if (action === "MOTS") {
+        ts = ts / 2;
+    }
+    return ts;
+}
+
+// Realistischere Update-Anzahl
+function getUpdates(type) {
+    if (type === "Friendly") return 4;
+    if (type === "Liga") return 3;
+    if (type === "Pokal") return 3;
+    if (type === "Relegation") return 3;
+    return 3;
+}
+
+// Hauptberechnung
+function calc() {
+
+    let ts = parseFloat(startTS.value);
+    let fq = parseInt(fqInput.value);
+    let psy = parseInt(psyInput.value);
+
+    const types = document.querySelectorAll(".type");
+    const actions = document.querySelectorAll(".action");
+
+    const beforeCells = document.querySelectorAll(".before");
+    const afterCells = document.querySelectorAll(".after");
+
+    let ruhe = getRuhewert(psy);
+    let factor = fqFactor(fq);
+
+    for (let i = 0; i < 32; i++) {
+
+        // Drift vor Spiel
+        let updates = getUpdates(types[i].value);
+        ts = applyUpdates(ts, ruhe, factor, updates);
+
+        let tsBefore = ts;
+
+        let action = actions[i].value;
+        let type = types[i].value;
+
+        // Friendly → immer NORMAL
+        let effectiveAction = (type === "Friendly") ? "NORMAL" : action;
+
+        // Spiel anwenden
+        ts = applyMatch(ts, effectiveAction);
+
+        // Clamp
+        ts = Math.max(0.5, Math.min(8.0, ts));
+
+        let tsAfter = ts;
+
+        // Ausgabe
+        beforeCells[i].innerText = tsBefore.toFixed(2);
+        afterCells[i].innerText = tsAfter.toFixed(2);
+
+        // Farbe
+        afterCells[i].className = "after";
+
+        if (ts >= 4 && ts <= 6) afterCells[i].classList.add("good");
+        else if (ts >= 3) afterCells[i].classList.add("mid");
+        else afterCells[i].classList.add("bad");
+    }
+}
+
+// Events
+document.querySelectorAll("select").forEach(el => el.addEventListener("change", calc));
+startTS.addEventListener("input", calc);
+fqInput.addEventListener("input", calc);
+psyInput.addEventListener("input", calc);
+
+// Initial
+calc();
+
+</script>
+
+</body>
+</html>
