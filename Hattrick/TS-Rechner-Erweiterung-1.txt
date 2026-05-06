@@ -1,0 +1,103 @@
+function baseDecay($fq) {
+    // FQ3 = „Referenz“
+    // schlechtere FQ = stärkerer Zerfall
+    return 0.03 + (($fq - 3) * 0.015);
+}
+
+function psyEffect($psy) {
+    return $psy ? -0.01 : 0; // reduziert effektiven Zerfall leicht
+}
+
+function actionEffect($action) {
+    return match($action) {
+        "PIC" => 0.20,
+        "MOTS" => -0.30,
+        default => 0.00
+    };
+}
+
+function typeEffect($type) {
+    return match($type) {
+        "Friendly" => 0.05,
+        "Pokal" => -0.02,
+        "Relegation" => -0.05,
+        default => 0
+    };
+}
+
+$ts = 5.0;
+
+$fq = $_POST['fq'] ?? 3;
+$psy = isset($_POST['psy']);
+
+echo "<h3>TS Verlauf</h3>";
+
+for ($i = 0; $i < 16; $i++) {
+
+    $action = $_POST['action'][$i] ?? "NORMAL";
+    $type   = $_POST['type'][$i] ?? "Liga";
+
+    // Zerfall
+    $decay = baseDecay($fq) + psyEffect($psy);
+
+    // Match + Typ Effekte
+    $ts += actionEffect($action);
+    $ts += typeEffect($type);
+
+    // natürlicher Zerfall pro Spiel
+    $ts -= $decay;
+
+    // Grenzen
+    $ts = max(0.5, min(8.0, $ts));
+
+    echo "Spiel ".($i+1)." → TS: ".round($ts,2)."<br>";
+}
+
+<form method="post">
+
+FQ Level:
+<input type="number" name="fq" value="3" min="1" max="5">
+
+Sportpsychologe:
+<input type="checkbox" name="psy">
+
+<br><br>
+
+<table border="1">
+<tr>
+    <th>#</th>
+    <th>Typ</th>
+    <th>Einsatz</th>
+</tr>
+
+<?php for ($i=0; $i<16; $i++): ?>
+<tr>
+    <td><?= $i+1 ?></td>
+
+    <td>
+        <select name="type[]">
+            <option>Liga</option>
+            <option>Pokal</option>
+            <option>Friendly</option>
+            <option>Relegation</option>
+        </select>
+    </td>
+
+    <td>
+        <select name="action[]">
+            <option>NORMAL</option>
+            <option>PIC</option>
+            <option>MOTS</option>
+        </select>
+    </td>
+</tr>
+<?php endfor; ?>
+
+</table>
+
+<br>
+<button type="submit">TS berechnen</button>
+
+</form>
+
+

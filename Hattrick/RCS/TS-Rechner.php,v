@@ -1,0 +1,185 @@
+head	1.1;
+access;
+symbols;
+locks
+	frank:1.1; strict;
+comment	@# @;
+
+
+1.1
+date	2026.05.06.08.48.13;	author frank;	state Exp;
+branches;
+next	;
+
+
+desc
+@Version von /var/www/html/Formula-HT
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>TS Predictor v5</title>
+
+<style>
+body { font-family: Arial; }
+table { border-collapse: collapse; margin-top: 10px; }
+td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
+
+.good { background: #c8f7c5; }
+.mid  { background: #fff3a6; }
+.bad  { background: #ffb3b3; }
+</style>
+</head>
+
+<body>
+
+<h2>Hattrick TS Predictor (v5)</h2>
+
+<label>Start-TS:</label>
+<input type="number" id="startTS" value="5.0" step="0.1">
+
+<label>FQ (1–7):</label>
+<input type="number" id="fq" value="3" min="1" max="7">
+
+<label>Sportpsychologe (0–5):</label>
+<input type="number" id="psy" value="0" min="0" max="5">
+
+<p><b>32 Spiele (16 Wochen × 2 Spiele)</b></p>
+
+<table>
+<tr>
+    <th>#</th>
+    <th>Typ</th>
+    <th>Einsatz</th>
+    <th>TS vorher</th>
+    <th>TS nachher</th>
+</tr>
+
+<?php for ($i=0; $i<32; $i++): ?>
+<tr>
+    <td><?= $i+1 ?></td>
+
+    <td>
+        <select class="type">
+            <option value="Liga">Liga</option>
+            <option value="Pokal">Pokal</option>
+            <option value="Friendly">Friendly</option>
+            <option value="Relegation">Relegation</option>
+        </select>
+    </td>
+
+    <td>
+        <select class="action">
+            <option value="NORMAL">NORMAL</option>
+            <option value="PIC">PIC</option>
+            <option value="MOTS">MOTS</option>
+        </select>
+    </td>
+
+    <td class="before">-</td>
+    <td class="after">-</td>
+</tr>
+<?php endfor; ?>
+
+</table>
+
+<script>
+
+// Inputs
+const startTS = document.getElementById("startTS");
+const fqInput = document.getElementById("fq");
+const psyInput = document.getElementById("psy");
+
+// FQ beeinflusst Geschwindigkeit Richtung Ruhewert
+function fqFactor(fq) {
+
+    // return 0.15 - (fq - 3) * 0.03;
+    return 0.08 + (3 - fq) * 0.02;
+}
+
+function applyUpdates(ts, ruhe, factor, updates) {
+    for (let i = 0; i < updates; i++) {
+        ts += (ruhe - ts) * factor;
+    }
+    return ts;
+}
+
+function calc() {
+
+    let ts = parseFloat(startTS.value);
+    let fq = parseInt(fqInput.value);
+    let psy = parseInt(psyInput.value);
+
+    const types = document.querySelectorAll(".type");
+    const actions = document.querySelectorAll(".action");
+
+    const beforeCells = document.querySelectorAll(".before");
+    const afterCells = document.querySelectorAll(".after");
+
+    let ruhe = 4.5 + (psy * 0.1);
+    let factor = fqFactor(fq);
+
+    let updatesBetweenMatches = 2; // 🔧 Stellschraube!
+
+    for (let i = 0; i < 32; i++) {
+
+        // 🔁 TS driftet zwischen Spielen
+        ts = applyUpdates(ts, ruhe, factor, updatesBetweenMatches);
+
+        let tsBefore = ts;
+
+        let action = actions[i].value;
+        let type = types[i].value;
+
+        // Friendly → immer NORMAL
+        if (type === "Friendly") {
+            action = "NORMAL";
+        }
+
+        // ⚽ Einsatz
+        if (action === "PIC") {
+            ts = ts * 1.33;
+        } 
+        else if (action === "MOTS") {
+            ts = ts / 2;
+        }
+
+        let tsAfter = ts;
+
+        // Grenzen
+        ts = Math.max(0.5, Math.min(8.0, ts));
+
+        // Ausgabe
+        beforeCells[i].innerText = tsBefore.toFixed(2);
+        afterCells[i].innerText = tsAfter.toFixed(2);
+
+        // Farbe
+        afterCells[i].className = "after";
+
+        if (ts >= 4 && ts <= 6) afterCells[i].classList.add("good");
+        else if (ts >= 3) afterCells[i].classList.add("mid");
+        else afterCells[i].classList.add("bad");
+    }
+}
+// Events
+document.querySelectorAll("select").forEach(el => el.addEventListener("change", calc));
+startTS.addEventListener("input", calc);
+fqInput.addEventListener("input", calc);
+psyInput.addEventListener("input", calc);
+
+// Initial
+calc();
+
+</script>
+
+</body>
+</html>
+@
