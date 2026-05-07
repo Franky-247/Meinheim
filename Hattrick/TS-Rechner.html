@@ -23,7 +23,7 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
 <input type="number" id="startTS" value="4.5" step="0.1">
 
 <label>FQ (1–7):</label>
-<input type="number" id="fq" value="3" min="1" max="7">
+<input type="number" id="fq" value="3" min="0" max="7">
 
 <label>Sportpsychologe (0–5):</label>
 <input type="number" id="psy" value="0" min="0" max="5">
@@ -80,8 +80,6 @@ for (let i = 0; i < 32; i++) {
 </body>
 </html>
 
-// -------------------------
-
 </table>
 
 <script>
@@ -92,27 +90,68 @@ const fqInput = document.getElementById("fq");
 const psyInput = document.getElementById("psy");
 
 // --- Parameter (kalibriert auf mpn-Tabelle) ---
-function fqFactor(fq) {
-    fq = Math.min(fq, 6); // Cap bei 6
 
-    return Math.max(0.02, 0.055 + (3 - fq) * 0.01);
+function fqFactor(fq) {
+
+    fq = Math.min(fq, 6);
+
+console.log("fq ist:", fq);
+    return {
+        high: 0.07 - fq * 0.005, // hohe FQ bremst Zerfall
+        low:  0.02 + fq * 0.005  // hohe FQ beschleunigt Erholung
+    };
 }
 
 function getRuhewert(psy) {
     return Math.min(5.0, 4.5 + psy * 0.1);
 }
 
-// Drift pro Update
-function applyUpdate(ts, ruhe, factor) {
-    return ts + (ruhe - ts) * factor;
+function getHighFactor(fq) {
+
+    const table = {
+        1: 0.09,
+        2: 0.075,
+        3: 0.055,
+        4: 0.045,
+        5: 0.035,
+        6: 0.03
+    };
+
+    return table[Math.min(fq, 6)];
 }
 
-// Mehrere Updates
-function applyUpdates(ts, ruhe, factor, count) {
-    for (let i = 0; i < count; i++) {
-        ts = applyUpdate(ts, ruhe, factor);
+function getLowFactor(fq) {
+
+    const table = {
+        1: 0.02,
+        2: 0.03,
+        3: 0.04,
+        4: 0.05,
+        5: 0.06,
+        6: 0.07
+    };
+
+    return table[Math.min(fq, 6)];
+}
+
+// Drift pro Update
+
+function applyUpdate(ts, ruhe, fq) {
+
+    let factor;
+
+    if (ts > ruhe) {
+
+        // Zerfall von oben
+        factor = getHighFactor(fq);
+
+    } else {
+
+        // Erholung von unten
+        factor = getLowFactor(fq);
     }
-    return ts;
+
+    return ts + (ruhe - ts) * factor;
 }
 
 // Spieleffekte (bewusst klassisch gehalten)
@@ -147,6 +186,8 @@ function calc() {
     const beforeCells = document.querySelectorAll(".before");
     const afterCells = document.querySelectorAll(".after");
 
+	console.log(beforeCells.length, afterCells.length);
+
     let ruhe = getRuhewert(psy);
     let factor = fqFactor(fq);
 
@@ -154,7 +195,10 @@ function calc() {
 
         // Drift vor Spiel
         let updates = getUpdates(types[i].value);
-        ts = applyUpdates(ts, ruhe, factor, updates);
+
+	    for (let j = 0; j < updates; j++) {
+		    ts = applyUpdate(ts, ruhe, fq);
+	}
 
         let tsBefore = ts;
 
@@ -183,6 +227,7 @@ function calc() {
         else if (ts >= 3) afterCells[i].classList.add("mid");
         else afterCells[i].classList.add("bad");
     }
+
 }
 
 // Events
