@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>TS Predictor v6</title>
+<title>TS Predictor v0.14alpha</title>
 
 <style>
 body { font-family: Arial; }
@@ -17,7 +17,7 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
 
 <body>
 
-<h2>Hattrick TS Predictor (v0.2605071 – noch nicht kalibriert)</h2>
+<h2>Hattrick Team spirit (TS) Predictor (v0.2605072 – noch nicht kalibriert)</h2>
 
 <label>Start-TS:</label>
 <input type="number" id="startTS" value="4.5" step="0.1">
@@ -28,12 +28,27 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
 <label>Sportpsychologe (0–5):</label>
 <input type="number" id="psy" value="0" min="0" max="5">
 
-<p><b>32 Spiele (16 Wochen × 2 Spiele)</b></p>
+<br>
+<br>
+<label>Pokal-Aus ab:</label>
+<select id="cupExit">
+    <option value="0">Noch im Pokal</option>
+    <option value="1">Runde 1</option>
+    <option value="2">Runde 2</option>
+    <option value="3">Runde 3</option>
+    <option value="4">Runde 4</option>
+    <option value="5">Runde 5</option>
+    <option value="6">Achtelfinale</option>
+    <option value="7">Viertelfinale</option>
+    <option value="8">Halbfinale</option>
+    <option value="9">Finale</option>
+</select>
+
+
+<p><b>1 Saison: 32 Spiele (16 Wochen × 2 Spiele)</b></p>
 
 <table border="1">
-    <thead>
-        <tr>
-            <th># Spiel</th>
+    <thead> <tr> <th># Spiel</th>
             <th>Spieltyp</th>
             <th>TS Einsatz</th>
             <th>TS vorher</th>
@@ -72,8 +87,8 @@ for (let i = 0; i < 32; i++) {
         <td class="before">-</td>
         <td class="after">-</td>
     `;
-
     tbody.appendChild(row);
+
 }
 </script>
 
@@ -88,6 +103,7 @@ for (let i = 0; i < 32; i++) {
 const startTS = document.getElementById("startTS");
 const fqInput = document.getElementById("fq");
 const psyInput = document.getElementById("psy");
+const cupExit = document.getElementById("cup");
 
 // --- Parameter (kalibriert auf mpn-Tabelle) ---
 
@@ -179,9 +195,11 @@ function calc() {
     let ts = parseFloat(startTS.value);
     let fq = parseInt(fqInput.value);
     let psy = parseInt(psyInput.value);
+    // let cupExits = parseInt(cupExit.value);	
 
     const types = document.querySelectorAll(".type");
     const actions = document.querySelectorAll(".action");
+    const cupExits = document.querySelectorAll(".cupExit");
 
     const beforeCells = document.querySelectorAll(".before");
     const afterCells = document.querySelectorAll(".after");
@@ -192,6 +210,26 @@ function calc() {
     let factor = fqFactor(fq);
 
     for (let i = 0; i < 32; i++) {
+
+	// console.log(cupExits);
+	    if (i % 2 === 0) {
+		    if ( cupExits > i  )
+		    {
+			// Midweek
+			types[i].value = "Friendly";
+		    }
+		    else
+		    {
+			types[i].value = "Pokal";
+		    }
+	    } else {
+		// Wochenende
+		types[i].value = "Liga";
+	    }
+		types[28].value = "Friendly";
+		types[29].value = "Relegation";
+		types[30].value = "Friendly";
+		types[31].value = "Friendly";
 
         // Drift vor Spiel
         let updates = getUpdates(types[i].value);
@@ -212,7 +250,7 @@ function calc() {
         ts = applyMatch(ts, effectiveAction);
 
         // Clamp
-        ts = Math.max(0.5, Math.min(8.0, ts));
+        ts = Math.max(0.5, Math.min(10.0, ts));
 
         let tsAfter = ts;
 
@@ -229,6 +267,7 @@ function calc() {
     }
 
 }
+    // let cupExit = cupExit[i].value;
 
 // Events
 document.querySelectorAll("select").forEach(el => el.addEventListener("change", calc));
@@ -240,6 +279,13 @@ psyInput.addEventListener("input", calc);
 calc();
 
 </script>
+<br>
+<br>
+<br>
+Hattrick Masters gibt es in der Pro-Version.
+<br>
+<br>
+<br>
 
 </body>
 </html>
