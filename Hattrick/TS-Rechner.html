@@ -17,7 +17,7 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
 
 <body>
 
-<h2>Hattrick Team spirit (TS) Predictor (v0.2605072 – noch nicht kalibriert)</h2>
+<h2>Hattrick Team Spirit (TS) Predictor (v0.2605081 – noch nicht kalibriert)</h2>
 
 <label>Start-TS:</label>
 <input type="number" id="startTS" value="4.5" step="0.1">
@@ -211,26 +211,6 @@ function calc() {
 
     for (let i = 0; i < 32; i++) {
 
-	// console.log(cupExits);
-	    if (i % 2 === 0) {
-		    if ( cupExits > i  )
-		    {
-			// Midweek
-			types[i].value = "Friendly";
-		    }
-		    else
-		    {
-			types[i].value = "Pokal";
-		    }
-	    } else {
-		// Wochenende
-		types[i].value = "Liga";
-	    }
-		types[28].value = "Friendly";
-		types[29].value = "Relegation";
-		types[30].value = "Friendly";
-		types[31].value = "Friendly";
-
         // Drift vor Spiel
         let updates = getUpdates(types[i].value);
 
@@ -278,11 +258,29 @@ psyInput.addEventListener("input", calc);
 // Initial
 calc();
 
+    for (let i = 0; i < 32; i++) {
+
+	    if (i % 2 === 0) {
+		    if ( cupExits > i  )
+		    {
+			// Midweek
+			types[i].value = "Friendly";
+		    }
+		    else
+		    {
+			types[i].value = "Pokal";
+		    }
+	    } else {
+		// Wochenende
+		types[i].value = "Liga";
+	    }
+		types[28].value = "Friendly";
+		types[29].value = "Relegation";
+		types[30].value = "Friendly";
+		types[31].value = "Friendly";
+    }
 </script>
 <br>
-<br>
-<br>
-Hattrick Masters gibt es in der Pro-Version.
 <br>
 <br>
 <br>
