@@ -17,7 +17,7 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
 
 <body>
 
-<h2>Hattrick Team Spirit (TS) Predictor (v0.2605083 – noch nicht kalibriert)</h2>
+<h2>Hattrick Team Spirit (TS) Predictor (v0.2605084 – noch nicht kalibriert)</h2>
 
 <label>Start-TS:</label>
 <input type="number" id="startTS" value="4.5" step="0.1" min="0.1" max="12">
@@ -267,7 +267,7 @@ function calc() {
         ts = applyMatch(ts, effectiveAction);
 
         // Clamp
-        ts = Math.max(0.5, Math.min(11.9, ts));
+        ts = Math.max(0.5, Math.min(11.99, ts));
 
         let tsAfter = ts;
 
