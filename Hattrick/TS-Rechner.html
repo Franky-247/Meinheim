@@ -40,10 +40,13 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
     <option value="5">Runde 5</option>
     <option value="6">Runde 6</option>
     <option value="7">Runde 7</option>
-    <option value="8">Achtelfinale</option>
-    <option value="9">Viertelfinale</option>
-    <option value="10">Halbfinale</option>
-    <option value="11">Finale</option>
+    <option value="8">Runde 8</option>
+    <option value="9">Runde 9</option>
+    <option value="10">Runde 10</option>
+    <option value="11">Achtelfinale</option>
+    <option value="12">Viertelfinale</option>
+    <option value="13">Halbfinale</option>
+    <option value="14">Finale</option>
 </select>
 
 
@@ -188,8 +191,8 @@ function applySeasonDefaults() {
 
             cupRound++;
 
-            if (cupRound > cupExit && cupExit > 0) {
-// 	    if (cupRound > cupExit) {
+//             if (cupRound > cupExit && cupExit > 0) {
+ 	    if (cupRound > cupExit) {
                 types[i].value = "Friendly";
             } else {
                 types[i].value = "Pokal";
@@ -206,8 +209,9 @@ function applySeasonDefaults() {
         }
     }
 
-    // Spiel 31 optional Relegation
-    types[30].value = "Relegation";
+    // Spiel 30 optional Relegation
+    types[29].value = "Relegation";
+    types[30].value = "Friendly";
 }
 
 // Spieleffekte (bewusst klassisch gehalten)
