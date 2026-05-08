@@ -17,13 +17,13 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
 
 <body>
 
-<h2>Hattrick Team Spirit (TS) Predictor (v0.2605082 – noch nicht kalibriert)</h2>
+<h2>Hattrick Team Spirit (TS) Predictor (v0.2605083 – noch nicht kalibriert)</h2>
 
 <label>Start-TS:</label>
-<input type="number" id="startTS" value="4.5" step="0.1">
+<input type="number" id="startTS" value="4.5" step="0.1" min="0.1" max="11">
 
 <label>FQ (1–7):</label>
-<input type="number" id="fq" value="3" min="0" max="7">
+<input type="number" id="fq" value="5.0" step="0.1" min="1" max="7">
 
 <label>Sportpsychologe (0–5):</label>
 <input type="number" id="psy" value="0" min="0" max="5">
@@ -116,7 +116,7 @@ function fqFactor(fq) {
 
     fq = Math.min(fq, 6);
 
-console.log("fq ist:", fq);
+// console.log("fq ist:", fq);
     return {
         high: 0.07 - fq * 0.005, // hohe FQ bremst Zerfall
         low:  0.02 + fq * 0.005  // hohe FQ beschleunigt Erholung
@@ -129,30 +129,16 @@ function getRuhewert(psy) {
 
 function getHighFactor(fq) {
 
-    const table = {
-        1: 0.09,
-        2: 0.075,
-        3: 0.055,
-        4: 0.045,
-        5: 0.035,
-        6: 0.03
-    };
+    fq = Math.min(fq, 6);
 
-    return table[Math.min(fq, 6)];
+    return 0.09 - (fq - 1) * 0.012;
 }
 
 function getLowFactor(fq) {
 
-    const table = {
-        1: 0.02,
-        2: 0.03,
-        3: 0.04,
-        4: 0.05,
-        5: 0.06,
-        6: 0.07
-    };
+    fq = Math.min(fq, 6);
 
-    return table[Math.min(fq, 6)];
+    return 0.02 + (fq - 1) * 0.01;
 }
 
 // Drift pro Update
@@ -237,7 +223,7 @@ function getUpdates(type) {
 function calc() {
 
     let ts = parseFloat(startTS.value);
-    let fq = parseInt(fqInput.value);
+    let fq = parseFloat(fqInput.value);
     let psy = parseInt(psyInput.value);
     // let cupExits = parseInt(cupExit.value);	
 
