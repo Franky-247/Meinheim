@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>TS Predictor v0.51010alpha</title>
+<title>TS Predictor v0.51011alpha</title>
 
 <style>
 body { font-family: Arial; }
@@ -17,7 +17,7 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
 
 <body>
 
-<h2>Hattrick Team Spirit (TS) Predictor (v0.2026051010 – noch nicht kalibriert)</h2>
+<h2>Hattrick Team Spirit (TS) Predictor (v0.2026051040 – noch nicht kalibriert)</h2>
 
 <label>Start-TS:</label>
 <input type="number" id="startTS" value="4.5" step="0.1" min="0.1" max="12">
@@ -334,6 +334,103 @@ calc();
 
 <b>Pokal-Aus ab</b><br>
 • Runde auswählen, ab der dein Team im Hauptpokal ausgeschieden ist oder voraussichtlich ausscheidet.
+
+<br>
+<h2>Teamstimmung (TS)</h2>
+
+<hr>
+
+<p>
+Die Teamstimmung (TS) beeinflusst direkt die Stärke des Mittelfelds und gehört damit zu den wichtigsten Faktoren für die Gesamtleistung einer Mannschaft.
+Der Ausgangswert zu Saisonbeginn liegt standardmäßig bei <strong>ruhig (TS 4,5)</strong>.
+Mit einem Sportpsychologen kann dieser Ruhewert dauerhaft auf bis zu <strong>TS 5,0</strong> erhöht werden.
+</p>
+
+<p>
+Die TS wirkt sich auf die Spielaufbau-Leistung aller Spieler aus, die zum Mittelfeld beitragen.
+Je höher die Teamstimmung, desto stärker fällt das Mittelfeldrating aus.
+</p>
+
+<p>Als grobe Orientierung gilt:</p>
+
+<ul>
+    <li>Jede TS-Stufe über „ruhig“ bringt etwa <strong>+7 %</strong> auf die Mittelfeldratings.</li>
+    <li>Jede TS-Stufe unter „ruhig“ verursacht etwas mehr als <strong>-7 %</strong> Abzug.</li>
+</ul>
+
+<p>Die Teamstimmung verändert sich durch verschiedene Einflüsse:</p>
+
+<ul>
+    <li>
+        <strong>Führungsqualitäten des Trainers</strong><br>
+        Ein Trainer mit hoher Führungsqualität stabilisiert die Teamstimmung und sorgt dafür, dass sie langsamer sinkt.
+    </li>
+
+    <li>
+        <strong>Spieleinstellung</strong><br>
+        Die gewählte Match-Taktik hat großen Einfluss:
+        <ul>
+            <li><strong>Kraft sparen (PIC)</strong> erhöht die TS um ca. 33 %.</li>
+            <li><strong>Spiel des Jahres (MOTS)</strong> senkt die TS um ca. 50 %.</li>
+        </ul>
+    </li>
+
+    <li>
+        <strong>Transfers</strong><br>
+        Spielertransfers können die Teamstimmung negativ beeinflussen.
+    </li>
+
+    <li>
+        <strong>Sportpsychologen</strong><br>
+        Sportpsychologen helfen dabei, die TS auf einem höheren Niveau zu halten.
+    </li>
+</ul>
+
+<h3>TI-Schraube (Trainingsintensität)</h3>
+
+<p>
+Eine kurzfristige Möglichkeit zur Erhöhung der Teamstimmung ist das Senken der Trainingsintensität (TI).
+Grundsätzlich gilt:
+</p>
+
+<ul>
+    <li>Niedrigere Trainingsintensität → höhere Teamstimmung</li>
+    <li>Höhere Trainingsintensität → niedrigere Teamstimmung</li>
+</ul>
+
+<p>
+Diese Methode wird häufig für besonders wichtige Spiele genutzt, beispielsweise Relegationsspiele oder entscheidende Pokalpartien.
+</p>
+
+<p><strong>Wichtige Nachteile:</strong></p>
+
+<ul>
+    <li>Verlust von Trainingseffektivität</li>
+    <li>Risiko eines Formeinbruchs</li>
+    <li>Negative Auswirkungen auf die langfristige Hintergrundform</li>
+</ul>
+
+<p>
+Die TI-Schraube sollte daher nur in Ausnahmefällen eingesetzt werden.
+</p>
+
+<h3>Zeitpunkt der Anpassung</h3>
+
+<p>
+Damit die Maßnahme wirkt, muss die Trainingsintensität
+<u>vor dem letzten täglichen Update vor dem Trainingsupdate</u>
+gesenkt werden.
+Um Trainingsverluste möglichst gering zu halten, empfiehlt es sich,
+die Intensität direkt nach dem Spiel wieder anzuheben.
+</p>
+
+<h3>Weiterführende Rechner &amp; Informationen</h3>
+
+<ul>
+        <li><a class='nav-link' href='http://www.ht-links.de/TISchrauber.php'>TI-Schrauber zur Berechnung der optimalen Trainingsintensität</a></li>
+        <li><a class='nav-link' href='/hattrick/ht-stamina'>Hattrick Konditionstabelle</a></li>
+        <li><a class='nav-link' href='/hattrick/ts-rechner'>Hattrick TS-Rechner</a></li>
+</ul>
 
 <br>
 
