@@ -147,10 +147,10 @@ function applyUpdate(ts, ruhe, fq) {
 
     let factor;
 
-    if (ts > 11.0) {
+    if (ts > 10.0) {
 
         // Cap beim ersten täglichen TS Update
-	ts = 10.99;
+	ts = 9.99;
 
     } 
     if (ts > ruhe) {
@@ -213,6 +213,13 @@ function applyMatch(ts, action) {
     } else if (action === "MOTS") {
         ts = ts / 2;
     }
+	    if (ts > 11.0) {
+
+        // Cap beim ersten täglichen TS Update
+        ts = 10.99;
+
+    }
+
     return ts;
 }
 
@@ -301,9 +308,33 @@ applySeasonDefaults();
 calc();
 
 </script>
+
 <br>
-<br>
-<br>
+<b>Spielmodi</b><br>
+• <b>PIC</b> = Play It Cool → kraftsparend<br>
+• <b>NORMAL</b> = normale Einstellung<br>
+• <b>MOTS</b> = Match Of The Season → Spiel des Jahres<br><br>
+
+<b>Einfluss auf Teamstimmung (TS)</b><br>
+• <b>Liga / Pokal / Relegation</b><br>
+&nbsp;&nbsp;- PIC: TS steigt um <b>+1/3</b><br>
+&nbsp;&nbsp;- MOTS: TS wird <b>halbiert</b><br><br>
+
+• <b>Friendly / Challenger-Pokal / Trost-Pokal</b><br>
+&nbsp;&nbsp;- PIC & MOTS haben <b>keine TS-Auswirkung</b><br>
+&nbsp;&nbsp;- Friendlies werden bei Hattrick immer als <b>NORMAL</b> gespielt<br><br>
+
+<b>Wichtig zu Pokalspielen</b><br>
+• Auswirkungen auf <b>TS, Selbstvertrauen & Fanstimmung</b> gibt es nur im:<br>
+&nbsp;&nbsp;- nationalen Pokal<br>
+&nbsp;&nbsp;- Ligapokal<br><br>
+
+• Andere Pokalwettbewerbe zählen wie Friendlies.<br>
+• Daher bei <b>Challenger- & Trost-Pokal</b> immer Spieltyp <b>„Friendly“</b> wählen.<br><br>
+
+<b>Pokal-Aus ab</b><br>
+• Runde auswählen, ab der dein Team im Hauptpokal ausgeschieden ist oder voraussichtlich ausscheidet.
+
 <br>
 
 </body>
