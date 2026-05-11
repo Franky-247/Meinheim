@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>TS Predictor v0.2026051123-alpha</title>
+<title>TS Predictor v0.202605110910-alpha</title>
 
 <style>
 body { font-family: Arial; }
@@ -17,7 +17,7 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
 
 <body>
 
-<h2>Hattrick Team Spirit (TS) Predictor (v0.2026051123-alpha – noch nicht kalibriert)</h2>
+<h2>Hattrick Team Spirit (TS) Predictor (v0.202605110910-alpha – noch nicht kalibriert)</h2>
 
 <label>Start-TS:</label>
 <input type="number" id="startTS" value="4.5" step="0.1" min="0.1" max="12">
@@ -116,7 +116,6 @@ function fqFactor(fq) {
 
     fq = Math.min(fq, 6);
 
-// console.log("fq ist:", fq);
     return {
         high: 0.07 - fq * 0.005, // hohe FQ bremst Zerfall
         low:  0.02 + fq * 0.005  // hohe FQ beschleunigt Erholung
@@ -147,10 +146,10 @@ function applyUpdate(ts, ruhe, fq) {
 
     let factor;
 
-    if (ts > 10.0) {
+    if (ts > 9.75) {
 
         // Cap beim ersten täglichen TS Update
-	ts = 9.99;
+	ts = 9.34;
 
     } 
     if (ts > ruhe) {
@@ -213,10 +212,10 @@ function applyMatch(ts, action) {
     } else if (action === "MOTS") {
         ts = ts / 2;
     }
-	    if (ts > 11.0) {
+	    if (ts > 10.9) {
 
         // Cap beim ersten täglichen TS Update
-        ts = 10.99;
+        ts = 10.9;
 
     }
 
@@ -274,7 +273,7 @@ function calc() {
         ts = applyMatch(ts, effectiveAction);
 
         // Clamp
-        ts = Math.max(0.5, Math.min(11.99, ts));
+        ts = Math.max(0.5, Math.min(10.99, ts));
 
         let tsAfter = ts;
 
@@ -291,7 +290,6 @@ function calc() {
     }
 
 }
-    // let cupExit = cupExit[i].value;
 
 // Events
 document.querySelectorAll("select").forEach(el => el.addEventListener("change", calc));
@@ -361,6 +359,14 @@ Je höher die Teamstimmung, desto stärker fällt das Mittelfeldrating aus.
 </ul>
 
 <p>Die Teamstimmung verändert sich durch verschiedene Einflüsse:</p>
+
+<br>
+Hinweis:
+<br>
+Die tatsächlich erreichbare TS vor Liga-/Pokalspielen
+<br>
+kann je nach Land, Updatezeiten und Transfers leicht abweichen.
+<br>
 
 <ul>
     <li>
