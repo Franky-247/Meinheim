@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>TS Predictor v0.202605111426-alpha</title>
+<title>TS Predictor v0.202605111610-alpha</title>
 
 <style>
 body { font-family: Arial; }
@@ -17,7 +17,7 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
 
 <body>
 
-<h2>Hattrick Team Spirit (TS) Predictor (v0.202605111426-alpha – noch nicht kalibriert)</h2>
+<h2>Hattrick Team Spirit (TS) Predictor (v0.202605111610-alpha – noch nicht kalibriert)</h2>
 
 <label>Start-TS:</label>
 <input type="number" id="startTS" value="4.5" step="0.1" min="0.1" max="12">
@@ -52,7 +52,7 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
 
 <p><b>1 Saison: 32 Spiele (16 Wochen × 2 Spiele)</b></p>
 
-<table border="1">
+<table id="tsTable" border="1">
     <thead> <tr> <th>Woche</th>
             <th>Spiel</th>
             <th>Spieltyp</th>
@@ -71,8 +71,8 @@ for (let i = 0; i < 32; i++) {
     const row = document.createElement("tr");
 
     row.innerHTML = `
-	<td>${Math.ceil((i + 1) / 2)}</td>
-        <td>${i + 1}</td>
+        <td class="weak">${Math.ceil((i + 1) / 2)}</td>
+        <td class="match">${i + 1}</td>
 
         <td>
             <select class="type">
@@ -103,6 +103,8 @@ for (let i = 0; i < 32; i++) {
 </html>
 
 </table>
+
+<button id="csvBtn">CSV Export</button>
 
 <script>
 
@@ -184,7 +186,6 @@ function applySeasonDefaults() {
 
             cupRound++;
 
-//             if (cupRound > cupExit && cupExit > 0) {
  	    if (cupRound > cupExit) {
                 types[i].value = "Friendly";
             } else {
@@ -233,6 +234,57 @@ function getUpdates(type) {
     return 3;
 }
 
+function exportCSV() {
+
+    const table = document.getElementById("tsTable");
+
+    let csv = [];
+
+    // Header
+    const headers = Array.from(
+        table.querySelectorAll("thead th")
+    ).map(th => th.textContent.trim());
+
+    csv.push(headers.join(";"));
+
+    // Zeilen
+    const rows = table.querySelectorAll("tbody tr");
+
+    rows.forEach(row => {
+
+        const cols = row.querySelectorAll("td");
+
+        const rowData = Array.from(cols).map(col => {
+
+            const select = col.querySelector("select");
+
+            if (select) {
+                return select.value;
+            }
+
+            return col.textContent.trim();
+        });
+
+        csv.push(rowData.join(";"));
+    });
+
+    // CSV-Datei erzeugen
+    const blob = new Blob(
+        [csv.join("\n")],
+        { type: "text/csv;charset=utf-8;" }
+    );
+
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+
+    a.href = url;
+    a.download = "ts-export.csv";
+
+    a.click();
+
+    URL.revokeObjectURL(url);
+}
 // Hauptberechnung
 function calc() {
 
@@ -295,6 +347,9 @@ function calc() {
 
 // Events
 document.querySelectorAll("select").forEach(el => el.addEventListener("change", calc));
+document.getElementById("csvBtn")
+    .addEventListener("click", exportCSV);
+
 startTS.addEventListener("input", calc);
 fqInput.addEventListener("input", calc);
 psyInput.addEventListener("input", calc);
