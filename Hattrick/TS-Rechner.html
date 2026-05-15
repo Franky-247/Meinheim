@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="description" content="Hier könnt ihr die Hattrick Teamstimmung vorhersagen lassen."/>
-<meta name="keywords" content="hattrick, managertool, kostenlos, club, Teamstimmung"/>
+<meta name="keywords" content="hattrick, managertool, kostenlos, club, Teamstimmung, TS-Rechner. TS Predictor"/>
 
-<title>TS Predictor v0.202605140927-alpha</title>
+<title>TS Predictor v0.202605152102-alpha</title>
 
 <style>
 body { font-family: Arial; }
@@ -23,7 +23,7 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
             <div style="float: left; width:1000px;background: #75b777 ;background-repeat: no-repeat;">
                 <div style="text-align:left;">
 
-<h2>Hattrick Team Spirit (TS) Predictor (v0.202605140927-alpha )</h2>
+<h2>Hattrick Team Spirit (TS) Predictor (v0.202605152102-alpha )</h2>
 
 <label>Start-TS:</label>
 <input type="number" id="startTS" value="4.5" step="0.1" min="0.1" max="12">
@@ -156,10 +156,10 @@ function applyUpdate(ts, ruhe, fq) {
 
     let factor;
 
-    if (ts > 9.75) {
+    if (ts > 9.53) {
 
         // Cap beim ersten täglichen TS Update
-	ts = 9.34;
+	ts = 9.53;
 
     } 
     if (ts > ruhe) {
@@ -233,10 +233,10 @@ function applyMatch(ts, action) {
 
 // Realistischere Update-Anzahl
 function getUpdates(type) {
-    if (type === "Friendly") return 4;
-    if (type === "Liga") return 3;
+    if (type === "Friendly") return 3;
+    if (type === "Liga") return 4;
     if (type === "Pokal") return 3;
-    if (type === "Relegation") return 3;
+    if (type === "Relegation") return 4;
     return 3;
 }
 
@@ -422,15 +422,6 @@ Je höher die Teamstimmung, desto stärker fällt das Mittelfeldrating aus.
 </ul>
 
 <p>Die Teamstimmung verändert sich durch verschiedene Einflüsse:</p>
-
-<br>
-Hinweis:
-<br>
-Die tatsächlich erreichbare TS vor Liga-/Pokalspielen
-<br>
-kann je nach Land, Updatezeiten und Transfers leicht abweichen.
-<br>
-
 <ul>
     <li>
         <strong>Führungsqualitäten des Trainers</strong><br>
@@ -456,6 +447,13 @@ kann je nach Land, Updatezeiten und Transfers leicht abweichen.
         Sportpsychologen helfen dabei, die TS auf einem höheren Niveau zu halten.
     </li>
 </ul>
+Hinweis:
+<br>
+Die tatsächlich erreichbare TS vor Liga-/Pokalspielen
+<br>
+kann je nach Land, Updatezeiten und Transfers leicht abweichen.
+<br>
+
 <br>
 Stimmung in der Mannschaft
 <br>
@@ -483,8 +481,68 @@ Stimmung in der Mannschaft
 <br>
  0 - wie im Kalten Krieg (like the Cold War)
 <br>
+<br>
 
-<h3>TI-Schraube (Trainingsintensität)</h3>
+<section class="doc-example">
+  <h2>Beispiel zur Berechnung der versteckten Teamstimmung (TS)</h2>
+
+  <p>
+    Im Aufstellungssimulator werden nur ganzzahlige TS-Werte zur Auswahl angezeigt.
+    Intern arbeitet Hattrick jedoch mit genaueren Zwischenwerten. Diese können über
+    die Änderung des Mittelfeldratings (MF) näherungsweise berechnet werden.
+  </p>
+
+  <h3>Beispiel</h3>
+
+  <ul>
+    <li><strong>TS „gut“</strong> = 6,5 → MF = 10,50</li>
+    <li><strong>TS „ausgezeichnet“</strong> = 7,5 → MF = 11,25</li>
+  </ul>
+
+  <p>
+    Der Unterschied von <strong>1,0 TS-Punkt</strong> bewirkt also eine Änderung von
+    <strong>0,75 MF-Punkten</strong>.
+  </p>
+
+  <p>
+    Wird im Sandbox-Modus für die aktuelle Fähigkeitsstufe ein MF-Wert von
+    <strong>10,75</strong> angezeigt, ergibt sich:
+  </p>
+
+  <h4>1. Differenz berechnen</h4>
+
+  <div class="formula">
+    10,75 − 10,50 = 0,25
+  </div>
+
+  <h4>2. TS-Anteil per Dreisatz berechnen</h4>
+
+  <div class="formula">
+    TS-Anteil = 0,25 / 0,75 = 0,333
+  </div>
+
+  <h4>3. Anteil zur Ausgangs-TS addieren</h4>
+
+  <div class="formula">
+    6,5 + 0,333 = 6,83
+  </div>
+
+  <h4>Ergebnis</h4>
+
+  <div class="result">
+    TS ≈ 6,83
+  </div>
+
+  <p class="note">
+    Diese Berechnung basiert auf linearer Interpolation zwischen zwei bekannten
+    TS-/MF-Werten.
+  </p>
+</section>
+
+<br>
+<br>
+<hr>
+<h2>TI-Schraube (Trainingsintensität)</h2>
 
 <p>
 Eine kurzfristige Möglichkeit zur Erhöhung der Teamstimmung ist das Senken der Trainingsintensität (TI).
