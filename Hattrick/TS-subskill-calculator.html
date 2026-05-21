@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="description" content="Hier könnt ihr die Hattrick Teamstimmung vorhersagen lassen."/>
+<meta name="keywords" content="hattrick, managertool, kostenlos, club, Teamstimmung, TS-Rechner. TS Predictor"/>
+
+<title>TS Subskill Calculator v0.202605211713-alpha</title>
+
+<style>
+body { font-family: Arial; }
+table { border-collapse: collapse; margin-top: 10px; }
+td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
+
+.good { background: #c8f7c5; }
+.mid  { background: #fff3a6; }
+.bad  { background: #ffb3b3; }
+</style>
+</head>
+    <body style="background: #75b677 repeat-x; height: 100%;">
+        <div style="width:100%;">
+        <div id="mainwindow" style="width:1170px;margin:auto;">
+            <div style="float: left; width:1000px;background: #75b777 ;background-repeat: no-repeat;">
+                <div style="text-align:left;">
+
+<title>TS-subskill-calculator</title>
+
+<style>
+    body{
+        font-family: Arial, sans-serif;
+        padding:20px;
+        max-width:600px;
+    }
+
+    input{
+        width:100px;
+        padding:5px;
+        margin:5px;
+    }
+
+    button{
+        padding:8px 14px;
+        cursor:pointer;
+    }
+
+    .result{
+        margin-top:20px;
+        font-size:20px;
+        font-weight:bold;
+    }
+</style>
+</head>
+<body>
+
+<h2>Versteckte Teamstimmung berechnen</h2>
+
+<p>
+Bekannte Ausgangswerte eingeben:
+</p>
+
+<div>
+    TS Ausgang:
+    <input type="number" id="tsBase" step="0.1" value="6.5">
+</div>
+
+<div>
+    MF Ausgang:
+    <input type="number" id="mfBase" step="0.01" value="10.50">
+</div>
+
+<div>
+    TS Vergleich:
+    <input type="number" id="tsNext" step="0.1" value="7.5">
+</div>
+
+<div>
+    MF Vergleich:
+    <input type="number" id="mfNext" step="0.01" value="11.25">
+</div>
+
+<hr>
+
+<div>
+    Gemessener MF-Wert:
+    <input type="number" id="mfCurrent" step="0.01" value="10.75">
+</div>
+
+<button onclick="calculateTS()">TS berechnen</button>
+
+<div class="result" id="result"></div>
+
+<script>
+function calculateTS(){
+
+    const tsBase = parseFloat(document.getElementById("tsBase").value);
+    const mfBase = parseFloat(document.getElementById("mfBase").value);
+
+    const tsNext = parseFloat(document.getElementById("tsNext").value);
+    const mfNext = parseFloat(document.getElementById("mfNext").value);
+
+    const mfCurrent = parseFloat(document.getElementById("mfCurrent").value);
+
+    // Differenzen
+    const tsDiff = tsNext - tsBase;
+    const mfDiff = mfNext - mfBase;
+
+    // Anteil berechnen
+    const mfCurrentDiff = mfCurrent - mfBase;
+
+    const tsShare = (mfCurrentDiff / mfDiff) * tsDiff;
+
+    // Endergebnis
+    const tsResult = tsBase + tsShare;
+
+    document.getElementById("result").innerHTML =
+        "Versteckte TS ≈ " + tsResult.toFixed(2);
+}
+</script>
+
+<hr>
+
+<section class="doc-example">
+  <h2>Beispiel zur Berechnung der versteckten Teamstimmung (TS)</h2>
+
+  <p>
+    Im Aufstellungssimulator werden nur ganzzahlige TS-Werte zur Auswahl angezeigt.
+    Intern arbeitet Hattrick jedoch mit genaueren Zwischenwerten. Diese können über
+    die Änderung des Mittelfeldratings (MF) näherungsweise berechnet werden.
+  </p>
+
+  <h3>Beispiel</h3>
+
+  <ul>
+    <li><strong>TS „gut“</strong> = 6,5 → MF = 10,50</li>
+    <li><strong>TS „ausgezeichnet“</strong> = 7,5 → MF = 11,25</li>
+  </ul>
+
+  <p>
+    Der Unterschied von <strong>1,0 TS-Punkt</strong> bewirkt also eine Änderung von
+    <strong>0,75 MF-Punkten</strong>.
+  </p>
+
+  <p>
+    Wird im Sandbox-Modus für die aktuelle Fähigkeitsstufe ein MF-Wert von
+    <strong>10,75</strong> angezeigt, ergibt sich:
+  </p>
+
+  <h4>1. Differenz berechnen</h4>
+
+  <div class="formula">
+    10,75 − 10,50 = 0,25
+  </div>
+
+  <h4>2. TS-Anteil per Dreisatz berechnen</h4>
+
+  <div class="formula">
+    TS-Anteil = 0,25 / 0,75 = 0,333
+  </div>
+
+  <h4>3. Anteil zur Ausgangs-TS addieren</h4>
+
+  <div class="formula">
+    6,5 + 0,333 = 6,83
+  </div>
+
+  <h4>Ergebnis</h4>
+
+  <div class="result">
+    TS ≈ 6,83
+  </div>
+
+  <p class="note">
+    Diese Berechnung basiert auf linearer Interpolation zwischen zwei bekannten
+    TS-/MF-Werten.
+  </p>
+  <br>
+  - kleine Rundungsabweichungen durch Hattricks internes Ratingsystem sind möglich.
+  <br>
+  - die Genauigkeit hängt stark von identischen Rahmenbedingungen ab.
+(gleiche Aufstellung, gleiche Form, gleiche Erfahrung usw.)
+  <br>
+</section>
+
+<h3>Weiterführende Rechner &amp; Informationen</h3>
+
+<ul>
+        <li><a class='nav-link' href='http://www.ht-links.de/TISchrauber.php'>TI-Schrauber zur Berechnung der optimalen Trainingsintensität</a></li>
+        <li><a class='nav-link' href='/hattrick/ht-stamina'>Hattrick Konditionstabelle</a></li>
+        <li><a class='nav-link' href='/hattrick/TS-Rechner.html'>Hattrick Team Spirit (TS) Predictor</a></li>
+</ul>
+
+</body>
+</html>
