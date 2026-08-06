@@ -2,10 +2,10 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="description" content="Hier könnt ihr die Hattrick Teamstimmung vorhersagen lassen."/>
-<meta name="keywords" content="hattrick, managertool, kostenlos, club, Teamstimmung, TS-Rechner. TS Predictor"/>
+<meta name="description" content="Hier könnt ihr das Hattrick Selbstvertrauen vorhersagen lassen."/>
+<meta name="keywords" content="hattrick, managertool, kostenlos, club, Selbstvertrauen, SV-Rechner. SV Predictor"/>
 
-<title>TS Subskill Calculator v0.202605211713-alpha</title>
+<title>SV Subskill Calculator v0.202608031311-alpha</title>
 
 <style>
 body { font-family: Arial; }
@@ -23,7 +23,7 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
             <div style="float: left; width:1000px;background: #75b777 ;background-repeat: no-repeat;">
                 <div style="text-align:left;">
 
-<title>TS-subskill-calculator</title>
+<title>SV-subskill-calculator</title>
 
 <style>
     body{
@@ -52,96 +52,96 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
 </head>
 <body>
 
-<h2>Versteckte Teamstimmung berechnen</h2>
+<h2>Verstecktes Selbstvertrauen berechnen</h2>
 
 <p>
 Bekannte Ausgangswerte eingeben:
 </p>
 
 <div>
-    TS Ausgang:
-    <input type="number" id="tsBase" step="0.1" value="6.5">
+    SV Ausgang:
+    <input type="number" id="svBase" step="0.1" value="6.5">
 </div>
 
 <div>
-    MF Ausgang:
-    <input type="number" id="mfBase" step="0.01" value="10.50">
+    Angriffsratings Ausgang:
+    <input type="number" id="attackBase" step="0.01" value="10.50">
 </div>
 
 <div>
-    TS Vergleich:
-    <input type="number" id="tsNext" step="0.1" value="7.5">
+    SV Vergleich:
+    <input type="number" id="svNext" step="0.1" value="7.5">
 </div>
 
 <div>
-    MF Vergleich:
-    <input type="number" id="mfNext" step="0.01" value="11.25">
+    Angriffsratings Vergleich:
+    <input type="number" id="attackNext" step="0.01" value="11.25">
 </div>
 
 <hr>
 
 <div>
-    Gemessener MF-Wert:
-    <input type="number" id="mfCurrent" step="0.01" value="10.75">
+    Gemessene Angriffsratings mit aktueller Fähigkeit ( als HatStats oder Hattrick-Werte ):
+    <input type="number" id="attackCurrent" step="0.01" value="10.75">
 </div>
 
-<button onclick="calculateTS()">TS berechnen</button>
+<button onclick="calculateSV()">SV berechnen</button>
 
 <div class="result" id="result"></div>
 
 <script>
-function calculateTS(){
+function calculateSV(){
 
-    const tsBase = parseFloat(document.getElementById("tsBase").value);
-    const mfBase = parseFloat(document.getElementById("mfBase").value);
+    const svBase = parseFloat(document.getElementById("svBase").value);
+    const attackBase = parseFloat(document.getElementById("attackBase").value);
 
-    const tsNext = parseFloat(document.getElementById("tsNext").value);
-    const mfNext = parseFloat(document.getElementById("mfNext").value);
+    const svNext = parseFloat(document.getElementById("svNext").value);
+    const attackNext = parseFloat(document.getElementById("attackNext").value);
 
-    const mfCurrent = parseFloat(document.getElementById("mfCurrent").value);
+    const attackCurrent = parseFloat(document.getElementById("attackCurrent").value);
 
     // Differenzen
-    const tsDiff = tsNext - tsBase;
-    const mfDiff = mfNext - mfBase;
+    const svDiff = svNext - svBase;
+    const attackDiff = attackNext - attackBase;
 
     // Anteil berechnen
-    const mfCurrentDiff = mfCurrent - mfBase;
+    const attackCurrentDiff = attackCurrent - attackBase;
 
-    const tsShare = (mfCurrentDiff / mfDiff) * tsDiff;
+    const svShare = (attackCurrentDiff / attackDiff) * svDiff;
 
     // Endergebnis
-    const tsResult = tsBase + tsShare;
+    const svResult = svBase + svShare;
 
     document.getElementById("result").innerHTML =
-        "Versteckte TS ≈ " + tsResult.toFixed(2);
+        "Verstecktes SV ≈ " + svResult.toFixed(2);
 }
 </script>
 
 <hr>
 
 <section class="doc-example">
-  <h2>Beispiel zur Berechnung der versteckten Teamstimmung (TS)</h2>
+  <h2>Beispiel zur Berechnung des versteckten Selbstvertrauens (SV)</h2>
 
   <p>
-    Im Aufstellungssimulator werden nur ganzzahlige TS-Werte zur Auswahl angezeigt.
+    Im Aufstellungssimulator werden nur ganzzahlige SV-Werte zur Auswahl angezeigt.
     Intern arbeitet Hattrick jedoch mit genaueren Zwischenwerten. Diese können über
-    die Änderung des Mittelfeldratings (MF) näherungsweise berechnet werden.
+    die Änderung der Angriffsratings (AR) näherungsweise berechnet werden.
   </p>
 
   <h3>Beispiel</h3>
 
   <ul>
-    <li><strong>TS „gut“</strong> = 6,5 → MF = 10,50</li>
-    <li><strong>TS „ausgezeichnet“</strong> = 7,5 → MF = 11,25</li>
+    <li><strong>SV „gut“</strong> = 6,5 → Angriff = 10,50</li>
+    <li><strong>SV „ausgezeichnet“</strong> = 7,5 → Angriff = 11,25</li>
   </ul>
 
   <p>
-    Der Unterschied von <strong>1,0 TS-Punkt</strong> bewirkt also eine Änderung von
-    <strong>0,75 MF-Punkten</strong>.
+    Der Unterschied von <strong>1,0 SV-Punkt</strong> bewirkt also eine Änderung von
+    <strong>0,75 Angriff-Punkten</strong>.
   </p>
 
   <p>
-    Wird im Sandbox-Modus für die aktuelle Fähigkeitsstufe ein MF-Wert von
+    Wird im Sandbox-Modus für die aktuelle Fähigkeitsstufe ein Angriffs-Wert von
     <strong>10,75</strong> angezeigt, ergibt sich:
   </p>
 
@@ -151,13 +151,13 @@ function calculateTS(){
     10,75 − 10,50 = 0,25
   </div>
 
-  <h4>2. TS-Anteil per Dreisatz berechnen</h4>
+  <h4>2. SV-Anteil per Dreisatz berechnen</h4>
 
   <div class="formula">
-    TS-Anteil = 0,25 / 0,75 = 0,333
+    SV-Anteil = 0,25 / 0,75 = 0,333
   </div>
 
-  <h4>3. Anteil zur Ausgangs-TS addieren</h4>
+  <h4>3. Anteil zur Ausgangs-SV addieren</h4>
 
   <div class="formula">
     6,5 + 0,333 = 6,83
@@ -166,12 +166,12 @@ function calculateTS(){
   <h4>Ergebnis</h4>
 
   <div class="result">
-    TS ≈ 6,83
+    SV ≈ 6,83
   </div>
 
   <p class="note">
     Diese Berechnung basiert auf linearer Interpolation zwischen zwei bekannten
-    TS-/MF-Werten.
+    SV-/Angriffs-Werten.
   </p>
   <br>
   - kleine Rundungsabweichungen durch Hattricks internes Ratingsystem sind möglich.
