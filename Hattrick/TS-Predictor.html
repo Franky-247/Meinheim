@@ -5,7 +5,7 @@
 <meta name="description" content="Hier könnt ihr die Hattrick Teamstimmung vorhersagen lassen."/>
 <meta name="keywords" content="hattrick, managertool, kostenlos, club, Teamstimmung, TS-Rechner. TS Predictor"/>
 
-<title>TS Predictor v0.202608060954-alpha</title>
+<title>TS Predictor v0.202608100731-alpha</title>
 
 <style>
 body { font-family: Arial; }
@@ -23,13 +23,13 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
             <div style="float: left; width:1000px;background: #75b777 ;background-repeat: no-repeat;">
                 <div style="text-align:left;">
 
-<h2>Hattrick Team Spirit (TS) Predictor (v0.202608060954-alpha )</h2>
+<h2>Hattrick Team Spirit (TS) Predictor (v0.202608100731-alpha )</h2>
 
 <label>Start-TS:</label>
 <input type="number" id="startTS" value="4.5" step="0.1" min="0.1" max="12">
 
 <label>FQ (1–7):</label>
-<input type="number" id="fq" value="3.0" step="0.1" min="1" max="7">
+<input type="number" id="fq" value="3.5" step="0.01" min="1" max="7.99">
 
 <label>Sportpsychologe (0–5):</label>
 <input type="number" id="psy" value="0" min="0" max="5">
@@ -40,7 +40,7 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
        value="10.0"
        step="0.25"
        min="0"
-       max="50.0">
+       max="100.0">
 
 <br>
 <br>
@@ -49,26 +49,26 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
 <label>Drift High :</label>
 <input type="number"
        id="drift_high"
-       value="0.12"
+       value="0.3"
        step="0.001"
        min="0"
-       max="0.2">
+       max="2">
 
 <label>Drift Low:</label>
 <input type="number"
        id="drift_low"
-       value="0.02"
+       value="0.2"
        step="0.001"
        min="0"
-       max="0.1">
+       max="2">
 
 <label>FQ Drift:</label>
 <input type="number"
        id="fq_drift"
-       value="0.005"
-       step="0.001"
+       value="1"
+       step="0.1"
        min="0"
-       max="0.01">
+       max="3.0">
 </div>
 
 <br>
@@ -145,6 +145,7 @@ for (let i = 0; i < 32; i++) {
                 <option value="Pokal">Pokal</option>
                 <option value="Friendly">Friendly</option>
                 <option value="Relegation">Relegation</option>
+                <option value="Update">Update</option>
             </select>
         </td>
 
@@ -201,8 +202,10 @@ function fqFactor(fq) {
 //      high: 0.07 - fq * 0.005, // hohe FQ bremst Zerfall
 //      low:  0.02 + fq * 0.005  // hohe FQ beschleunigt Erholung
 
-        high: drift_high - fq * fq_drift  ,
-        low: drift_low + fq * fq_drift  ,
+        // high: drift_high - fq * fq_drift  ,
+        // high: 3.0 / (10.0 * (fq - 1.0)),
+        high: drift_high / (fq - fq_drift),
+        low: drift_low / (fq - fq_drift),
     };
 
     log(1,"FQ:", fq);
@@ -223,9 +226,9 @@ function getRuhewert(psy) {
 
 function applyUpdate(ts, ruhe, factors) {
 
-    if (ts > 9.49) {
+    if (ts > 9.99) {
         // Cap beim ersten täglichen TS-Update
-        ts = 9.5;
+        ts = 9.99;
     }
 
     let factor;
@@ -238,6 +241,7 @@ function applyUpdate(ts, ruhe, factors) {
         factor = factors.low;
     }
 
+	// ts = ts + (ruhe - ts) * (  drift_high - fq * fq_drift );
     return ts + (ruhe - ts) * factor;
 }
 
@@ -285,7 +289,7 @@ function applyMatch(ts, action) {
 	    } else if (action === "MOTS") {
 		ts = ts / 2;
 	}
-	if (ts > 11.99) {
+	if (ts > 15.99) {
 
         // Cap beim ersten täglichen TS Update
         ts = 11.99;
@@ -301,7 +305,7 @@ function getUpdates(type) {
     if (type === "Liga") return 4;
     if (type === "Pokal") return 3;
     if (type === "Relegation") return 4;
-    return 3;
+    return 1;
 }
 
 function importCSV() {
@@ -411,7 +415,7 @@ function calc() {
         ts = applyMatch(ts, effectiveAction);
 
         // Clamp
-        ts = Math.max(0.5, Math.min(10.99, ts));
+        ts = Math.max(0.5, Math.min(15.99, ts));
 
         let tsAfter = ts;
 
