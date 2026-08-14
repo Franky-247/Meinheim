@@ -308,12 +308,106 @@ function getUpdates(type) {
     return 1;
 }
 
+
 function importCSV() {
 
+    const fileInput = document.getElementById("csv_import");
     const table = document.getElementById("tsTable");
 
-    let csv = [];
+    if (!fileInput.files.length) {
+        alert("Bitte zuerst eine CSV-Datei auswählen.");
+        return;
+    }
 
+    const file = fileInput.files[0];
+    const reader = new FileReader();
+
+    reader.onload = function (event) {
+
+        const text = event.target.result;
+
+        const lines = text
+            .split(/\r?\n/)
+            .filter(line => line.trim() !== "");
+
+        if (lines.length < 2) {
+            alert("Die CSV-Datei enthält keine Daten.");
+            return;
+        }
+
+        // Header auslesen
+        const headers = lines[0].split(";");
+
+        // Spaltenpositionen der Selects ermitteln
+        const typeIndex = headers.indexOf("Spieltyp");
+        const actionIndex = headers.indexOf("TS Einsatz");
+
+        if (typeIndex === -1 || actionIndex === -1) {
+            alert("Die Spalten 'Spieltyp' oder 'TS Einsatz' wurden nicht gefunden.");
+            return;
+        }
+
+        const csvRows = lines.slice(1).map(line => line.split(";"));
+
+        const tbody = table.querySelector("tbody");
+
+        /*
+         * Die vorhandenen Tabellenzeilen bleiben bestehen.
+         * Wir gehen davon aus, dass deine 32 bzw. 112 Zeilen
+         * bereits erzeugt wurden.
+         */
+        const tableRows = tbody.querySelectorAll("tr");
+
+        csvRows.forEach((csvRow, rowIndex) => {
+
+            const tr = tableRows[rowIndex];
+
+            if (!tr) {
+                return;
+            }
+
+            // -----------------------------
+            // Spieltyp
+            // -----------------------------
+            const typeSelect = tr.querySelector("select.type");
+
+            if (typeSelect) {
+                const value = csvRow[typeIndex]?.trim();
+
+                if (value !== undefined) {
+                    typeSelect.value = value;
+                }
+            }
+
+            // -----------------------------
+            // TS Einsatz
+            // -----------------------------
+            const actionSelect = tr.querySelector("select.action");
+
+            if (actionSelect) {
+                const value = csvRow[actionIndex]?.trim();
+
+                if (value !== undefined) {
+                    actionSelect.value = value;
+                }
+            }
+
+        });
+
+        console.log("CSV erfolgreich importiert.");
+
+        /*
+         * Hier anschließend deine Berechnung
+         * für die Tabelle aufrufen.
+         */
+    };
+
+    reader.onerror = function () {
+        alert("Fehler beim Lesen der CSV-Datei.");
+    };
+
+    reader.readAsText(file, "UTF-8");
+    calc();
 }
 
 function exportCSV() {
@@ -455,6 +549,9 @@ document.querySelectorAll("select").forEach(el => el.addEventListener("change", 
     // .addEventListener("click", importCSV);
 document.getElementById("csvBtn")
     .addEventListener("click", exportCSV);
+document
+    .getElementById("csv_import")
+    .addEventListener("change", importCSV);
 
 startTS.addEventListener("input", calc);
 fqInput.addEventListener("input", calc);
