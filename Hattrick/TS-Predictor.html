@@ -5,7 +5,7 @@
 <meta name="description" content="Hier könnt ihr die Hattrick Teamstimmung vorhersagen lassen."/>
 <meta name="keywords" content="hattrick, managertool, kostenlos, club, Teamstimmung, TS-Rechner. TS Predictor"/>
 
-<title>TS Predictor v0.202608151220-alpha</title>
+<title>TS Predictor v0.202608151320-alpha</title>
 
 <style>
 body { font-family: Arial; }
@@ -34,7 +34,7 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
             <div style="float: left; width:1000px;background: #75b777 ;background-repeat: no-repeat;">
                 <div style="text-align:left;">
 
-<h2>Hattrick Team Spirit (TS) Predictor (v0.202608151220-alpha )</h2>
+<h2>Hattrick Team Spirit (TS) Predictor (v0.202608151320-alpha )</h2>
 
 <label>Start-TS:</label>
 <input type="number" id="startTS" value="4.5" step="0.1" min="0.1" max="12">
@@ -83,7 +83,6 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
 </div>
 
 <br>
-<br>
 <label>Pokal-Aus ab:</label>
 <select id="cupExit">
     <option value="99">Noch im Pokal</option>
@@ -101,6 +100,24 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
     <option value="12">Viertelfinale</option>
     <option value="13">Halbfinale</option>
     <option value="14">Finale</option>
+</select>
+
+<br>
+<br>
+<label>Hattrick Masters-Aus ab:</label>
+<select id="hmExit">
+    <option value="0">Nicht ( mehr ) dabei</option>
+    <option value="1">Runde 1</option>
+    <option value="2">Runde 2</option>
+    <option value="3">Runde 3</option>
+    <option value="4">Runde 4</option>
+    <option value="5">Runde 5</option>
+    <option value="6">Runde 6</option>
+    <option value="7">Runde 7</option>
+    <option value="8">Achtelfinale</option>
+    <option value="9">Viertelfinale</option>
+    <option value="10">Halbfinale</option>
+    <option value="11">Finale</option>
 </select>
 
 
@@ -165,6 +182,7 @@ for (let i = 0; i < 32; i++) {
                 <option value="Friendly">Friendly</option>
                 <option value="Relegation">Relegation</option>
                 <option value="Update">Update</option>
+                <option value="Hattrick Masters">Hattrick Masters</option>
             </select>
         </td>
 
@@ -186,9 +204,9 @@ for (let i = 0; i < 32; i++) {
 
         <td class="before">-</td>
         <td class="after">-</td>
-        <td class="ti">ti</td>
-        <td class="fq">fq</td>
-        <td class="psy">psy</td>
+        <td class="ti">-</td>
+        <td class="fq">-</td>
+        <td class="psy">-</td>
         <td class="mfhome">-</td>
         <td class="mfderby">-</td>
         <td class="mf">-</td>
@@ -219,7 +237,6 @@ const drift_lowsetInput = document.getElementById("drift_low");
 const fqDriftInput = document.getElementById("fq_drift");
 const mfRefInput = document.getElementById("mf_referenz");
 
-// const cupExit = document.getElementById("cup");
 
 // --- Parameter (kalibriert auf mpn-Tabelle) ---
 
@@ -325,7 +342,7 @@ function applyMatch(ts, action) {
 	}
 	if (ts > 15.99) {
 
-        // Cap beim ersten täglichen TS Update
+        // Cap 
         ts = 11.99;
 
     }
@@ -339,6 +356,7 @@ function getUpdates(type) {
     if (type === "Liga") return 4;
     if (type === "Pokal") return 3;
     if (type === "Relegation") return 4;
+    if (type === "Masters") return 1;
     return 1;
 }
 
@@ -347,6 +365,8 @@ function importCSV() {
 
     const fileInput = document.getElementById("csv_import");
     const table = document.getElementById("tsTable");
+    // const fqInput = document.getElementById("fq");
+    // const psyInput = document.getElementById("psy");
 
     if (!fileInput.files.length) {
         alert("Bitte zuerst eine CSV-Datei auswählen.");
@@ -375,9 +395,12 @@ function importCSV() {
         // Spaltenpositionen der Selects ermitteln
         const typeIndex = headers.indexOf("Spieltyp");
         const actionIndex = headers.indexOf("TS Einsatz");
+        const ortIndex = headers.indexOf("Spielort");
+        const fqIndex = headers.indexOf("FQ");
+        const psyIndex = headers.indexOf("Sportpsychologe");
 
-        if (typeIndex === -1 || actionIndex === -1) {
-            alert("Die Spalten 'Spieltyp' oder 'TS Einsatz' wurden nicht gefunden.");
+        if (typeIndex === -1 || actionIndex === -1 || fqIndex === -1 || psyIndex === -1) {
+            alert("Die Spalten 'Spieltyp','Spielort', 'FQ', 'Sportpsychologe' oder 'TS Einsatz' wurden nicht gefunden.");
             return;
         }
 
@@ -387,7 +410,7 @@ function importCSV() {
 
         /*
          * Die vorhandenen Tabellenzeilen bleiben bestehen.
-         * Wir gehen davon aus, dass deine 32 bzw. 112 Zeilen
+         * Wir gehen davon aus, dass die 32 bzw. 112 Zeilen
          * bereits erzeugt wurden.
          */
         const tableRows = tbody.querySelectorAll("tr");
@@ -412,6 +435,19 @@ function importCSV() {
                     typeSelect.value = value;
                 }
             }
+            // -----------------------------
+            // Spielort
+            // -----------------------------
+            const ortSelect = tr.querySelector("select.ort");
+
+            if (ortSelect) {
+                const value = csvRow[ortIndex]?.trim();
+
+                if (value !== undefined) {
+                    ortSelect.value = value;
+                    log(1,"Ort:",ortSelect);
+                }
+            }
 
             // -----------------------------
             // TS Einsatz
@@ -426,14 +462,34 @@ function importCSV() {
                 }
             }
 
+		// -----------------------------
+		// FQ
+		// -----------------------------
+		// Wert aus der Spalte "fq" holen
+		const fqWert = csvRow[fqIndex]?.trim();
+
+		// Feld im Kopfbereich setzen
+		document.getElementById("fq").value = fqWert;
+		    
+		// -----------------------------
+		// Sportpsychologe
+		// -----------------------------
+
+		// Wert aus der Spalte "psy" holen
+		// const psyWert = rows[rows.length - 1].psy;
+		const psyWert = csvRow[psyIndex]?.trim();
+
+		// Feld im Kopfbereich setzen
+		document.getElementById("psy").value = psyWert;
         });
 
-        console.log("CSV erfolgreich importiert.");
+        log(1,"CSV erfolgreich importiert.");
 
         /*
-         * Hier anschließend deine Berechnung
+         * Hier anschließend eine Berechnung
          * für die Tabelle aufrufen.
          */
+         calc();
     };
 
     reader.onerror = function () {
@@ -494,17 +550,18 @@ function exportCSV() {
 
     URL.revokeObjectURL(url);
 }
+
 // Hauptberechnung
 function calc() {
 
     let ts = parseFloat(startTS.value);
     let fq = parseFloat(fqInput.value);
     let psy = parseInt(psyInput.value);
-    // let cupExits = parseInt(cupExit.value);	
 
     const types = document.querySelectorAll(".type");
     const actions = document.querySelectorAll(".action");
-   //  const cupExits = document.querySelectorAll(".cupExit");
+    const ort = document.querySelectorAll(".action");
+    const hmExit = document.querySelectorAll(".hmExit").value;
     const cupExit = document.getElementById("cupExit").value;
 
     const beforeCells = document.querySelectorAll(".before");
@@ -541,6 +598,7 @@ function calc() {
 
         let action = actions[i].value;
         let type = types[i].value;
+        let spielort = ort[i].value;
 
         // Friendly → immer NORMAL
         let effectiveAction = (type === "Friendly") ? "NORMAL" : action;
@@ -556,7 +614,7 @@ function calc() {
         else if (ts >= 8 && ts < 9) beforeCells[i].classList.add("delirious");
         else if (ts >= 9 && ts < 10) beforeCells[i].classList.add("cloud");
         else if (ts >= 10 ) beforeCells[i].classList.add("paradise");
-        else beforeCells[i].classList.add("cold");
+        else beforeCells[i].classList.add("paradise");
 
         // Spiel anwenden
         ts = applyMatch(ts, effectiveAction);
@@ -611,7 +669,8 @@ function calc() {
         else if (ts >= 8 && ts < 9) afterCells[i].classList.add("delirious");
         else if (ts >= 9 && ts < 10) afterCells[i].classList.add("cloud");
         else if (ts >= 10 ) afterCells[i].classList.add("paradise");
-        else afterCells[i].classList.add("cold");
+        else afterCells[i].classList.add("paradise");
+
 	    if (type === "Friendly") {
 		    if (action === "PIC") {
 					alert("Der Schiedsrichter notiert: 'Trainer wollte PIC im Friendly.'");
