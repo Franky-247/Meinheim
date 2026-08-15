@@ -5,16 +5,27 @@
 <meta name="description" content="Hier könnt ihr die Hattrick Teamstimmung vorhersagen lassen."/>
 <meta name="keywords" content="hattrick, managertool, kostenlos, club, Teamstimmung, TS-Rechner. TS Predictor"/>
 
-<title>TS Predictor v0.202608141528-alpha</title>
+<title>TS Predictor v0.202608151220-alpha</title>
 
 <style>
 body { font-family: Arial; }
 table { border-collapse: collapse; margin-top: 10px; }
 td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
 
-.good { background: #c8f7c5; }
-.mid  { background: #fff3a6; }
-.bad  { background: #ffb3b3; }
+.paradise   { background: #b7f7b7; }
+.cloud      { background: #c8f7c5; }
+.delirious  { background: #d9f7c8; }
+.satisfied  { background: #e5f5c8; }
+.content    { background: #eff3c4; }
+.calm       { background: #f5f0b8; }
+.composed   { background: #fff3a6; }
+
+.irritated  { background: #ffd580; }
+.furious    { background: #ffb366; }
+.murderous  { background: #ff8080; }
+
+.cold       { background: #b8d8ff; }
+
 </style>
 </head>
     <body style="background: #75b677 repeat-x; height: 100%;">
@@ -23,7 +34,7 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
             <div style="float: left; width:1000px;background: #75b777 ;background-repeat: no-repeat;">
                 <div style="text-align:left;">
 
-<h2>Hattrick Team Spirit (TS) Predictor (v0.202608141528-alpha )</h2>
+<h2>Hattrick Team Spirit (TS) Predictor (v0.202608151220-alpha )</h2>
 
 <label>Start-TS:</label>
 <input type="number" id="startTS" value="4.5" step="0.1" min="0.1" max="12">
@@ -99,10 +110,18 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
     <thead> <tr> <th>Woche</th>
             <th>Spiel</th>
             <th>Spieltyp</th>
+            <th>Spielort</th>
             <th>TS Einsatz</th>
             <th>TS vor dem Spiel</th>
             <th>TS nach dem Spiel</th>
-            <th>Mittelfeld</th>
+            <th>TI</th>
+            <th>FQ</th>
+            <th>Sportpsychologe</th>
+            <th>Mittelfeld Heimspiel PIN</th>
+            <th>Mittelfeld Auswärts-Derby PIN</th>
+            <th>Mittelfeld Auswärts PIN</th>
+            <th>Mittelfeld Auswärts PIC</th>
+            <th>Mittelfeld Auswärts MOTS</th>
         </tr>
     </thead>
     <tbody id="table-body"></tbody>
@@ -150,6 +169,14 @@ for (let i = 0; i < 32; i++) {
         </td>
 
         <td>
+            <select class="ort">
+                <option value="Neutral">Neutral</option>
+                <option value="Home">Home</option>
+                <option value="Derby">Derby</option>
+                <option value="Away">Away</option>
+            </select>
+        </td>
+        <td>
             <select class="action">
                 <option value="NORMAL">NORMAL</option>
                 <option value="PIC">PIC</option>
@@ -159,7 +186,14 @@ for (let i = 0; i < 32; i++) {
 
         <td class="before">-</td>
         <td class="after">-</td>
+        <td class="ti">ti</td>
+        <td class="fq">fq</td>
+        <td class="psy">psy</td>
+        <td class="mfhome">-</td>
+        <td class="mfderby">-</td>
         <td class="mf">-</td>
+        <td class="pic">-</td>
+        <td class="mots">-</td>
     `;
     tbody.appendChild(row);
 
@@ -172,7 +206,7 @@ for (let i = 0; i < 32; i++) {
 </table>
 
 <button id="csvBtn">CSV Export</button>
-<input type="file" id="csv_import" accept=".csv">
+<input type="file" id="csv_import" accept=".csv">Import</input>
 
 <script>
 
@@ -241,7 +275,7 @@ function applyUpdate(ts, ruhe, factors) {
         factor = factors.low;
     }
 
-	// ts = ts + (ruhe - ts) * (  drift_high - fq * fq_drift );
+    // ts = ts + (ruhe - ts) * (  drift_high - fq * fq_drift );
     return ts + (ruhe - ts) * factor;
 }
 
@@ -475,7 +509,14 @@ function calc() {
 
     const beforeCells = document.querySelectorAll(".before");
     const afterCells = document.querySelectorAll(".after");
+    const tiCells = document.querySelectorAll(".ti");
+    const fqCells = document.querySelectorAll(".fq");
+    const psyCells = document.querySelectorAll(".psy");
     const mfCells = document.querySelectorAll(".mf");
+    const picCells = document.querySelectorAll(".pic");
+    const motsCells = document.querySelectorAll(".mots");
+    const mfhomeCells = document.querySelectorAll(".mfhome");
+    const mfderbyCells = document.querySelectorAll(".mfderby");
 
     let ruhe = getRuhewert(psy);
     let factors = fqFactor(fq);
@@ -504,6 +545,19 @@ function calc() {
         // Friendly → immer NORMAL
         let effectiveAction = (type === "Friendly") ? "NORMAL" : action;
 
+        if ( ts < 1) beforeCells[i].classList.add("cold");
+        else if (ts >= 1 && ts < 2) beforeCells[i].classList.add("murderous");
+        else if (ts >= 2 && ts < 3) beforeCells[i].classList.add("furious");
+        else if (ts >= 3 && ts < 4) beforeCells[i].classList.add("irritated");
+        else if (ts >= 4 && ts < 5) beforeCells[i].classList.add("composed");
+        else if (ts >= 5 && ts < 6) beforeCells[i].classList.add("calm");
+        else if (ts >= 6 && ts < 7) beforeCells[i].classList.add("content");
+        else if (ts >= 7 && ts < 8) beforeCells[i].classList.add("satisfied");
+        else if (ts >= 8 && ts < 9) beforeCells[i].classList.add("delirious");
+        else if (ts >= 9 && ts < 10) beforeCells[i].classList.add("cloud");
+        else if (ts >= 10 ) beforeCells[i].classList.add("paradise");
+        else beforeCells[i].classList.add("cold");
+
         // Spiel anwenden
         ts = applyMatch(ts, effectiveAction);
 
@@ -516,20 +570,48 @@ function calc() {
         beforeCells[i].innerText = tsBefore.toFixed(2);
         afterCells[i].innerText = tsAfter.toFixed(2);
 
+	let ti = 100;
+	let fq = parseFloat(fqInput.value);
+	let psy = parseInt(psyInput.value);
 	let mf = mf_referenz + mf_referenz * ( tsBefore - 4.5 ) * 0.07;
-	// let mf = 10;
-	    log(1,"MF Referenz:",mf_referenz);
-	    log(1,"start TS:",ruhe);
-	    log(1,"TS: vorher",tsBefore);
+	// Playing away 		100%
+	// Playing at home 	119.892%
+	// Playing CA 		93%
+	// Playing PIC 		83.945%
+	// Playing MOTS 		111.49%
+	// Playing derby 		111.493% (*)    
+	let pic = mf * 0.83945;
+	let mots = mf * 1.1193;
+	let mfhome = mf * 1.19892;
+	let mfderby = mf * 1.11493;
+	log(1,"MF Referenz:",mf_referenz);
+	log(1,"start TS:",ruhe);
+	log(1,"TS: vorher",tsBefore);
 
+        tiCells[i].innerText = ti.toFixed(2);
+        fqCells[i].innerText = fq.toFixed(2);
+        psyCells[i].innerText = psy.toFixed(2);
         mfCells[i].innerText = mf.toFixed(2);
+        picCells[i].innerText = pic.toFixed(2);
+        motsCells[i].innerText = mots.toFixed(2);
+        mfhomeCells[i].innerText = mfhome.toFixed(2);
+        mfderbyCells[i].innerText = mfderby.toFixed(2);
 
         // Farbe
         afterCells[i].className = "after";
 
-        if (ts >= 4 && ts <= 6) afterCells[i].classList.add("good");
-        else if (ts >= 3) afterCells[i].classList.add("mid");
-        else afterCells[i].classList.add("bad");
+        if ( ts < 1) afterCells[i].classList.add("cold");
+        else if (ts >= 1 && ts < 2) afterCells[i].classList.add("murderous");
+        else if (ts >= 2 && ts < 3) afterCells[i].classList.add("furious");
+        else if (ts >= 3 && ts < 4) afterCells[i].classList.add("irritated");
+        else if (ts >= 4 && ts < 5) afterCells[i].classList.add("composed");
+        else if (ts >= 5 && ts < 6) afterCells[i].classList.add("calm");
+        else if (ts >= 6 && ts < 7) afterCells[i].classList.add("content");
+        else if (ts >= 7 && ts < 8) afterCells[i].classList.add("satisfied");
+        else if (ts >= 8 && ts < 9) afterCells[i].classList.add("delirious");
+        else if (ts >= 9 && ts < 10) afterCells[i].classList.add("cloud");
+        else if (ts >= 10 ) afterCells[i].classList.add("paradise");
+        else afterCells[i].classList.add("cold");
 	    if (type === "Friendly") {
 		    if (action === "PIC") {
 					alert("Der Schiedsrichter notiert: 'Trainer wollte PIC im Friendly.'");
@@ -781,6 +863,24 @@ gesenkt werden.
 Um Trainingsverluste möglichst gering zu halten, empfiehlt es sich,
 die Intensität direkt nach dem Spiel wieder anzuheben.
 </p>
+
+<h2>TS-Drop</h2>
+Jedes Mal, wenn du einen Spieler kaufst oder verkaufst, besteht die Gefahr, dass die Teamstimmung sinkt. Dieser Abfall kann sichtbar oder unsichtbar sein (da die Stimmung möglicherweise nicht um ein ganzes Level fällt), aber wenn er auftritt, erscheint immer eine Meldung auf der Seite „Der Verein“.
+
+Beim Kauf eines Spielers besteht – abhängig von dessen Charakter – die Möglichkeit, dass deine Teamstimmung (TS) sinkt:
+
+Beliebt/Sympathisch	 0 % Wahrscheinlichkeit für einen TS-Abfall
+Angenehm	 	30 %	"
+Umstritten	 	47 %	"
+Unangenehm	 	69 %	"
+
+Beim Verkauf eines Spielers liegen die Wahrscheinlichkeiten für einen TS-Abfall bei:
+
+Beliebt	 		27 % Wahrscheinlichkeit für einen TS-Abfall
+Sympathisch	 	22 %	"
+Angenehm	 	12 %	"
+Umstritten/Unangenehm	 0 %	"
+
 
 <h3>Weiterführende Rechner &amp; Informationen</h3>
 
