@@ -5,7 +5,7 @@
 <meta name="description" content="Hier könnt ihr die Hattrick Teamstimmung vorhersagen lassen."/>
 <meta name="keywords" content="hattrick, managertool, kostenlos, club, Teamstimmung, TS-Rechner. TS Predictor"/>
 
-<title>TS Predictor v0.202608152115-alpha</title>
+<title>TS Predictor v0.202608181015-alpha</title>
 
 <style>
 body { font-family: Arial; }
@@ -34,7 +34,7 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
             <div style="float: left; width:1000px;background: #75b777 ;background-repeat: no-repeat;">
                 <div style="text-align:left;">
 
-<h2>Hattrick Team Spirit (TS) Predictor (v0.202608152115-alpha )</h2>
+<h2>Hattrick Team Spirit (TS) Predictor (v0.202608181015-alpha )</h2>
 
 <label>Start-TS:</label>
 <input type="number" id="startTS" value="4.5" step="0.1" min="0.1" max="12">
@@ -135,7 +135,11 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
             <th>FQ</th>
             <th>Sportpsychologe</th>
             <th>Mittelfeld Heimspiel PIN</th>
+            <th>Mittelfeld Heimspiel PIC</th>
+            <th>Mittelfeld Heimspiel MOTS</th>
             <th>Mittelfeld Auswärts-Derby PIN</th>
+            <th>Mittelfeld Auswärts-Derby PIC</th>
+            <th>Mittelfeld Auswärts-Derby MOTS</th>
             <th>Mittelfeld Auswärts PIN</th>
             <th>Mittelfeld Auswärts PIC</th>
             <th>Mittelfeld Auswärts MOTS</th>
@@ -208,7 +212,11 @@ for (let i = 0; i < 32; i++) {
         <td class="fq">-</td>
         <td class="psy">-</td>
         <td class="mfhome">-</td>
+        <td class="mfhomepic">-</td>
+        <td class="mfhomemots">-</td>
         <td class="mfderby">-</td>
+        <td class="mfderbypic">-</td>
+        <td class="mfderbymots">-</td>
         <td class="mf">-</td>
         <td class="pic">-</td>
         <td class="mots">-</td>
@@ -572,8 +580,12 @@ function calc() {
     const mfCells = document.querySelectorAll(".mf");
     const picCells = document.querySelectorAll(".pic");
     const motsCells = document.querySelectorAll(".mots");
+    const mfhomepicCells = document.querySelectorAll(".mfhomepic");
+    const mfhomemotsCells = document.querySelectorAll(".mfhomemots");
     const mfhomeCells = document.querySelectorAll(".mfhome");
     const mfderbyCells = document.querySelectorAll(".mfderby");
+    const mfderbypicCells = document.querySelectorAll(".mfderbypic");
+    const mfderbymotsCells = document.querySelectorAll(".mfderbymots");
 
     let ruhe = getRuhewert(psy);
     let factors = fqFactor(fq);
@@ -642,7 +654,11 @@ function calc() {
 	let pic = mf * 0.83945;
 	let mots = mf * 1.1193;
 	let mfhome = mf * 1.19892;
+	let mfhomepic = mf * 1.19892 * 0.83945;
+	let mfhomemots = mf * 1.19892 * 1.1193;
 	let mfderby = mf * 1.11493;
+	let mfderbypic = mf * 1.11493 * 0.83945;
+	let mfderbymots = mf * 1.11493 * 1.1193;
 	log(1,"MF Referenz:",mf_referenz);
 	log(1,"start TS:",ruhe);
 	log(1,"TS: vorher",tsBefore);
@@ -654,7 +670,11 @@ function calc() {
         picCells[i].innerText = pic.toFixed(2);
         motsCells[i].innerText = mots.toFixed(2);
         mfhomeCells[i].innerText = mfhome.toFixed(2);
+        mfhomepicCells[i].innerText = mfhomepic.toFixed(2);
+        mfhomemotsCells[i].innerText = mfhomemots.toFixed(2);
         mfderbyCells[i].innerText = mfderby.toFixed(2);
+        mfderbypicCells[i].innerText = mfderbypic.toFixed(2);
+        mfderbymotsCells[i].innerText = mfderbymots.toFixed(2);
 
         // Farbe
         afterCells[i].className = "after";
