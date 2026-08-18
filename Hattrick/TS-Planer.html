@@ -5,7 +5,7 @@
 <meta name="description" content="Hier könnt ihr die Hattrick Teamstimmung vorhersagen lassen."/>
 <meta name="keywords" content="hattrick, managertool, kostenlos, club, Teamstimmung, TS-Rechner. TS Predictor"/>
 
-<title>TS Update Predictor v0.202608181106-alpha</title>
+<title>TS Planer v0.202608181612-alpha</title>
 
 <style>
 body { font-family: Arial; }
@@ -34,7 +34,7 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
             <div style="float: left; width:1000px;background: #75b777 ;background-repeat: no-repeat;">
                 <div style="text-align:left;">
 
-<h2>Hattrick Team Spirit (TS) Predictor Updates (v0.202608181106-alpha )</h2>
+<h2>Hattrick Team Spirit (TS) Planer (v0.202608181612-alpha )</h2>
 
 <label>Start-TS:</label>
 <input type="number" id="startTS" value="4.5" step="0.1" min="0.1" max="12">
@@ -111,10 +111,11 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
     <option value="2">Runde 2</option>
     <option value="3">Runde 3</option>
     <option value="4">Runde 4</option>
-    <option value="5">Achtelfinale</option>
-    <option value="6">Viertelfinale</option>
-    <option value="7">Halbfinale</option>
-    <option value="8">Finale</option>
+    <option value="5">Runde 5</option>
+    <option value="6">Achtelfinale</option>
+    <option value="7">Viertelfinale</option>
+    <option value="8">Halbfinale</option>
+    <option value="9">Finale</option>
 </select>
 
 <p><b>1 Saison: 32 Spiele (16 Wochen × 2 Spiele)</b></p>
@@ -385,11 +386,28 @@ function applySeasonDefaults() {
 }
 
 // Spieleffekte (bewusst klassisch gehalten)
-function applyMatch(ts, action) {
-	if (action === "PIC") {
-		ts = ts * 4 / 3;
-	    } else if (action === "MOTS") {
-		ts = ts / 2;
+
+// HM:
+// Einstellung des Teams:
+// Spielt man das "Spiel des Jahres" (Match Of The Season", MOTS) oder "Kraft sparen" ("Play It Cool", PIC), wird die Teamstimmung nicht so sehr wie bei normalen Spielen verringert (fällt um 1/3) bzw. erhöht (steigt um 1/4). Der Effekt während des Spiels fällt aber genauso aus wie bei einem normalen Spiel.
+// 
+
+// Spieleffekte (bewusst klassisch gehalten)
+function applyMatch(ts, action, type) {
+	if (type === "Hattrick Masters") {
+		if (action === "PIC") {
+			ts = ts * 5 / 4;
+		    } else if (action === "MOTS") {
+			ts = ts * 3 / 4;
+		}
+	}
+	else
+	{
+		if (action === "PIC") {
+			ts = ts * 4 / 3;
+		    } else if (action === "MOTS") {
+			ts = ts / 2;
+		}
 	}
 	if (ts > 15.99) {
 
@@ -615,6 +633,7 @@ function calc() {
     const ort = document.querySelectorAll(".action");
     const cupExit = document.getElementById("cupExit").value;
     const hmExit = document.getElementById("hmExit").value;
+    const spieltyp = document.querySelectorAll(".spieltyp");
 
     const updCells = document.querySelectorAll(".upd");
 
@@ -661,6 +680,7 @@ function calc() {
         beforeCells[i].className = "before";
         // Friendly → immer NORMAL
         let effectiveAction = (type === "Friendly") ? "NORMAL" : action;
+        let effectiveType = type;
 
         if ( ts < 1) beforeCells[i].classList.add("cold");
         else if (ts >= 1 && ts < 2) beforeCells[i].classList.add("murderous");
@@ -676,7 +696,7 @@ function calc() {
         else beforeCells[i].classList.add("paradise");
 
         // Spiel anwenden
-        ts = applyMatch(ts, effectiveAction);
+        ts = applyMatch(ts, effectiveAction, effectiveType);
 
         // Clamp
         ts = Math.max(0.5, Math.min(15.99, ts));
@@ -705,6 +725,9 @@ function calc() {
 	let mfderby = mf * 1.11493;
 	let mfderbypic = mf * 1.11493 * 0.83945;
 	let mfderbymots = mf * 1.11493 * 1.1193;
+	let mfhmpic = mf * 1.11493;
+	let mfhmpin = mf * 1.11493;
+	let mfhmmots = mf * 1.11493;
 	log(1,"MF Referenz:",mf_referenz);
 	log(1,"start TS:",ruhe);
 	log(1,"TS: vorher",tsBefore);
@@ -800,6 +823,15 @@ calc();
 &nbsp;&nbsp;- PIC & MOTS haben <b>keine TS-Auswirkung</b><br>
 &nbsp;&nbsp;- Friendlies werden bei Hattrick immer als <b>NORMAL</b> gespielt<br><br>
 
+• <b>Hattrick Masters</b><br>
+&nbsp;&nbsp;- PIC & MOTS haben <b>geringere TS-Auswirkung als sonst üblich</b><br>
+
+&nbsp;&nbsp;- Einstellung des Teams:
+&nbsp;&nbsp;- Spielt man das "Spiel des Jahres" (Match Of The Season", MOTS) oder "Kraft sparen" ("Play It Cool", PIC), wird die Teamstimmung nicht so sehr wie bei normalen Spielen verringert (fällt um 1/3) bzw. erhöht (steigt um 1/4). 
+&nbsp;Der Effekt während des Spiels fällt aber genauso aus wie bei einem normalen Spiel.
+&nbsp;&nbsp;
+<br>
+<br>
 <b>Wichtig zu Pokalspielen</b><br>
 • Auswirkungen auf <b>TS, Selbstvertrauen & Fanstimmung</b> gibt es nur im:<br>
 &nbsp;&nbsp;- nationalen Pokal<br>
@@ -810,6 +842,11 @@ calc();
 
 <b>Pokal-Aus ab</b><br>
 • Runde auswählen, ab der dein Team im Hauptpokal ausgeschieden ist oder voraussichtlich ausscheidet.
+
+
+<br>
+<b>Hattrick Masters-Aus ab</b><br>
+• Runde auswählen, ab der dein Team Hattrick Masters ausgeschieden ist oder voraussichtlich ausscheidet, oder "Nicht ( mehr ) dabei" auswählen.
 
 <br>
 <br>
@@ -999,6 +1036,7 @@ die Intensität direkt nach dem Spiel wieder anzuheben.
         <li><a class='nav-link' href='/hattrick/ht-stamina'>Hattrick Konditionstabelle</a></li>
         <li><a class='nav-link' href='/hattrick/TS-Rechner.html'>Hattrick Team Spirit (TS) Rechner</a></li>
         <li><a class='nav-link' href='/hattrick/TS-Predictor.html'>Hattrick Team Spirit (TS) Predictor</a></li>
+        <li><a class='nav-link' href='/hattrick/TS-Planer.html'>Hattrick Team Spirit (TS) Planer</a></li>
         <li><a class='nav-link' href='/hattrick/TS-subskill-calculator.htm'>Hattrick Team Spirit (TS) Subskill Calculator</a></li>
         <li><a class='nav-link' href='/hattrick/SV-subskill-calculator.htm'>Hattrick Selbstvertrauen ( SV ) Subskill Calculator </a></li>
 </ul>
