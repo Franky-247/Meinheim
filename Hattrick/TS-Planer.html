@@ -5,7 +5,7 @@
 <meta name="description" content="Hier könnt ihr die Hattrick Teamstimmung vorhersagen lassen."/>
 <meta name="keywords" content="hattrick, managertool, kostenlos, club, Teamstimmung, TS-Rechner. TS Predictor"/>
 
-<title>TS Planer v0.202608181612-alpha</title>
+<title>TS Planer v0.202608200754-alpha</title>
 
 <style>
 body { font-family: Arial; }
@@ -19,11 +19,9 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
 .content    { background: #eff3c4; }
 .calm       { background: #f5f0b8; }
 .composed   { background: #fff3a6; }
-
 .irritated  { background: #ffd580; }
 .furious    { background: #ffb366; }
 .murderous  { background: #ff8080; }
-
 .cold       { background: #b8d8ff; }
 
 </style>
@@ -34,7 +32,7 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
             <div style="float: left; width:1000px;background: #75b777 ;background-repeat: no-repeat;">
                 <div style="text-align:left;">
 
-<h2>Hattrick Team Spirit (TS) Planer (v0.202608181612-alpha )</h2>
+<h2>Hattrick Teamstimmung (TS) Planer (v0.202608200754-alpha )</h2>
 
 <label>Start-TS:</label>
 <input type="number" id="startTS" value="4.5" step="0.1" min="0.1" max="12">
@@ -185,8 +183,9 @@ for (let i = 0; i < 112; i++) {
                 <option value="Pokal">Pokal</option>
                 <option value="Friendly">Friendly</option>
                 <option value="Relegation">Relegation</option>
-                <option value="Update">Update</option>
                 <option value="Reset">Reset</option>
+                <option value="Update">Update</option>
+                <option value="Drop">Drop</option>
                 <option value="Hattrick Masters">Hattrick Masters</option>
             </select>
         </td>
@@ -392,7 +391,6 @@ function applySeasonDefaults() {
 // Spielt man das "Spiel des Jahres" (Match Of The Season", MOTS) oder "Kraft sparen" ("Play It Cool", PIC), wird die Teamstimmung nicht so sehr wie bei normalen Spielen verringert (fällt um 1/3) bzw. erhöht (steigt um 1/4). Der Effekt während des Spiels fällt aber genauso aus wie bei einem normalen Spiel.
 // 
 
-// Spieleffekte (bewusst klassisch gehalten)
 function applyMatch(ts, action, type) {
 	if (type === "Hattrick Masters") {
 		if (action === "PIC") {
@@ -400,6 +398,10 @@ function applyMatch(ts, action, type) {
 		    } else if (action === "MOTS") {
 			ts = ts * 3 / 4;
 		}
+        } else if (type === "Reset") {
+			ts = 4.5;
+        } else if (type === "Drop") {
+			ts = Math.ceil( ts ) - 1.01;
 	}
 	else
 	{
@@ -409,13 +411,6 @@ function applyMatch(ts, action, type) {
 			ts = ts / 2;
 		}
 	}
-	if (ts > 15.99) {
-
-        // Cap beim ersten täglichen TS Update
-        ts = 11.99;
-
-    }
-
     return ts;
 }
 
@@ -433,8 +428,6 @@ function importCSV() {
 
     const fileInput = document.getElementById("csv_import");
     const table = document.getElementById("tsTable");
-    // const fqInput = document.getElementById("fq");
-    // const psyInput = document.getElementById("psy");
 
     if (!fileInput.files.length) {
         alert("Bitte zuerst eine CSV-Datei auswählen.");
@@ -557,7 +550,7 @@ function importCSV() {
          * Hier anschließend eine Berechnung
          * für die Tabelle aufrufen.
          */
-         calc();
+    //     calc();
     };
 
     reader.onerror = function () {
@@ -619,6 +612,7 @@ function exportCSV() {
 
     URL.revokeObjectURL(url);
 }
+
 // Hauptberechnung
 function calc() {
 
@@ -728,6 +722,7 @@ function calc() {
 	let mfhmpic = mf * 1.11493;
 	let mfhmpin = mf * 1.11493;
 	let mfhmmots = mf * 1.11493;
+
 	log(1,"MF Referenz:",mf_referenz);
 	log(1,"start TS:",ruhe);
 	log(1,"TS: vorher",tsBefore);
@@ -1036,7 +1031,7 @@ die Intensität direkt nach dem Spiel wieder anzuheben.
         <li><a class='nav-link' href='/hattrick/ht-stamina'>Hattrick Konditionstabelle</a></li>
         <li><a class='nav-link' href='/hattrick/TS-Rechner.html'>Hattrick Team Spirit (TS) Rechner</a></li>
         <li><a class='nav-link' href='/hattrick/TS-Predictor.html'>Hattrick Team Spirit (TS) Predictor</a></li>
-        <li><a class='nav-link' href='/hattrick/TS-Planer.html'>Hattrick Team Spirit (TS) Planer</a></li>
+        <li><a class='nav-link' href='/hattrick/TS-Planer.html'>Hattrick Teamstimmung (TS) Planer</a></li>
         <li><a class='nav-link' href='/hattrick/TS-subskill-calculator.htm'>Hattrick Team Spirit (TS) Subskill Calculator</a></li>
         <li><a class='nav-link' href='/hattrick/SV-subskill-calculator.htm'>Hattrick Selbstvertrauen ( SV ) Subskill Calculator </a></li>
 </ul>
