@@ -5,7 +5,7 @@
 <meta name="description" content="Hier könnt ihr die Hattrick Teamstimmung vorhersagen lassen."/>
 <meta name="keywords" content="hattrick, managertool, kostenlos, club, Teamstimmung, TS-Rechner. TS Predictor"/>
 
-<title>TS Planer v0.202608261253-alpha</title>
+<title>TS Planer v0.202608261553-alpha</title>
 
 <style>
 body { font-family: Arial; }
@@ -32,7 +32,7 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
             <div style="float: left; width:1000px;background: #75b777 ;background-repeat: no-repeat;">
                 <div style="text-align:left;">
 
-<h2>Hattrick Teamstimmung (TS) Planer (v0.202608261253-alpha )</h2>
+<h2>Hattrick Teamstimmung (TS) Planer (v0.202608261553-alpha )</h2>
 
 <label>Start-TS:</label>
 <input type="number" id="startTS" value="4.5" step="0.1" min="0.1" max="12">
@@ -71,9 +71,9 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
        min="0"
        max="2">
 
-<label>FQ Drift:</label>
+<label>TS Drift:</label>
 <input type="number"
-       id="fq_drift"
+       id="ts_drift"
        value="1"
        step="0.01"
        min="0"
@@ -100,8 +100,6 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
     <option value="14">Finale</option>
 </select>
 
-<br>
-<br>
 <label>Hattrick Masters-Aus ab:</label>
 <select id="hmExit">
     <option value="0">Nicht ( mehr ) dabei</option>
@@ -115,8 +113,6 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
     <option value="8">Halbfinale</option>
     <option value="9">Finale</option>
 </select>
-
-<p><b>1 Saison: 32 Spiele (16 Wochen × 2 Spiele)</b></p>
 
 <table id="tsTable" border="1">
     <thead> <tr> <th>Woche</th>
@@ -142,6 +138,8 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
     </thead>
     <tbody id="table-body"></tbody>
 </table>
+
+<p><b>1 Saison: 32 Spiele (16 Wochen × 2 Spiele) und 7 Updates pro Woche</b></p>
 
 <script>
 
@@ -187,7 +185,9 @@ for (let i = 0; i < 112; i++) {
                 <option value="Update">Update</option>
                 <option value="Drop">Drop</option>
                 <option value="Turnier">Turnier</option>
+                <option value="Turnierstart">Turnierstart</option>
                 <option value="Hattrick Masters">Hattrick Masters</option>
+                <option value=""></option>
             </select>
         </td>
 
@@ -244,7 +244,7 @@ const fqInput = document.getElementById("fq");
 const psyInput = document.getElementById("psy");
 const drift_highsetInput = document.getElementById("drift_high");
 const drift_lowsetInput = document.getElementById("drift_low");
-const fqDriftInput = document.getElementById("fq_drift");
+const tsDriftInput = document.getElementById("ts_drift");
 const mfRefInput = document.getElementById("mf_referenz");
 
 // const cupExit = document.getElementById("cup");
@@ -257,18 +257,18 @@ function fqFactor(fq) {
 
     const drift_high  = parseFloat(drift_highsetInput.value) || 0;
     const drift_low  = parseFloat(drift_lowsetInput.value) || 0;
-    const fq_drift  = parseFloat(fqDriftInput.value) || 0;
+    const ts_drift  = parseFloat(tsDriftInput.value) || 0;
     const mf_referenz  = parseFloat(mfRefInput.value) || 0;
 
     const result = {
 //      high: 0.07 - fq * 0.005, // hohe FQ bremst Zerfall
 //      low:  0.02 + fq * 0.005  // hohe FQ beschleunigt Erholung
 
-        // high: drift_high - fq * fq_drift  ,
-        // low: drift_low + fq * fq_drift  ,
+        // high: drift_high - fq * ts_drift  ,
+        // low: drift_low + fq * ts_drift  ,
 
-        high: drift_high / (fq - fq_drift),
-        low: drift_low / (fq - fq_drift),
+        high: drift_high / (fq - ts_drift),
+        low: drift_low / (fq - ts_drift),
 
     };
 
@@ -277,7 +277,7 @@ function fqFactor(fq) {
     log(1,"Drift Low :", drift_low);
     log(1,"High Faktor:", result.high);
     log(1,"Low Faktor:", result.low);
-    log(1,"FQ Drift:", fq_drift);
+    log(1,"TS Drift:", ts_drift);
 
     return result;
 }
@@ -290,9 +290,9 @@ function getRuhewert(psy) {
 
 function applyUpdate(ts, ruhe, factors) {
 
-    let fqdrift = parseInt(document.getElementById("fq_drift").value);
-    log(1,"FQ Drift:", fqdrift);
-    if (fqdrift >= 1 ) {
+    let tsdrift = parseInt(document.getElementById("ts_drift").value);
+    log(1,"TS Drift:", tsdrift);
+    if (tsdrift >= 1 ) {
 	    if (ts > 9.99) {
 		// Verein: Cap 9.99 beim ersten täglichen TS-Update
 		ts = 9.99;
@@ -309,7 +309,7 @@ function applyUpdate(ts, ruhe, factors) {
         factor = factors.low;
     }
 
-	// ts = ts + (ruhe - ts) * (  drift_high / (fq - fq_drift) )
+	// ts = ts + (ruhe - ts) * (  drift_high / (fq - ts_drift) )
     return ts + (ruhe - ts) * factor;
 }
 
@@ -404,7 +404,15 @@ function applyMatch(ts, action, type) {
 			ts = ts * 3 / 4;
 		}
         } else if (type === "Reset") {
-			ts = 4.5;
+			let tsdrift = parseInt(document.getElementById("ts_drift").value);
+			log(1,"TS Drift:", tsdrift, "TS:", ts);
+			if (tsdrift >= 1 ) {
+				ts = 4.5;
+			}
+			else
+			{
+				ts = 5;
+			}
         } else if (type === "Drop") {
 			ts = Math.ceil( ts ) - 1.01;
 	}
@@ -656,7 +664,7 @@ function calc() {
     let drift_high = parseFloat(drift_highsetInput.value);
     let drift_low = parseFloat(drift_lowsetInput.value);
     let mf_referenz = parseFloat(mfRefInput.value);
-    let fq_drift = parseFloat(fqDriftInput.value);
+    let ts_drift = parseFloat(tsDriftInput.value);
 
 	log(1,beforeCells.length, afterCells.length);
 	log(1,"calc läuft");
@@ -784,7 +792,7 @@ document.getElementById("csvBtn")
 startTS.addEventListener("input", calc);
 fqInput.addEventListener("input", calc);
 psyInput.addEventListener("input", calc);
-fqDriftInput.addEventListener("input", calc);
+tsDriftInput.addEventListener("input", calc);
 mfRefInput.addEventListener("input", calc);
 drift_highsetInput.addEventListener("input", calc);
 drift_lowsetInput.addEventListener("input", calc);
@@ -842,11 +850,26 @@ calc();
 
 <b>Pokal-Aus ab</b><br>
 • Runde auswählen, ab der dein Team im Hauptpokal ausgeschieden ist oder voraussichtlich ausscheidet.
-
-
+<br>
 <br>
 <b>Hattrick Masters-Aus ab</b><br>
 • Runde auswählen, ab der dein Team Hattrick Masters ausgeschieden ist oder voraussichtlich ausscheidet, oder "Nicht ( mehr ) dabei" auswählen.
+<br>
+<br>
+<b>Nationalmannschaften</b><br>
+  - Bei Nationalmannschaften (NT) und U21-Nationalmannschaften (U21-NT) zerfällt die TS langsamer als üblich.<br>
+  - Zur Ermittlung der TS sollte im <i>Expert-Modus</i> der Wert „TS-Drift“ von <b>1</b> auf <b>0,67</b> geändert werden.<br>
+  - Der <i>Expert-Modus</i> kann ausschließlich über den URL-Parameter <code>?&expert=1</code> aktiviert werden.<br>
+  - Die Start-TS beträgt <b>5,0</b>. Die FQ muss mindestens <b>6</b> betragen.<br>
+  - Sportpsychologen gibt es bei Nationalmannschaften zwar nicht. Wird jedoch <b>Level 5</b> eingestellt, erhöht sich der Ruhewert ebenfalls auf <b>5,0</b>.<br>
+  - Für typische NT-Turniere ist der Spieltyp <b>„Turnier“</b> vorgesehen.<br>
+  - Die Spieltypen <b>„Liga“</b>, <b>„Pokal“</b> und <b>„Relegation“</b> werden ebenfalls unterstützt.<br>
+  - Der Turnierplan muss in der Regel manuell erstellt werden. Hilfreich ist es, einen bereits erstellten Plan zu exportieren und diesen anschließend zur weiteren Bearbeitung wieder zu importieren.<br>
+  - Das Event <b>1</b> sollte von <b>Reset</b> auf <b>Turnierstart</b>, <b>Turnier</b>, <b>   </b> oder <b>Update</b> geändert werden.<br>
+  - Bei einem <b>Reset</b> wird der Ruhewert auf <b>5,0</b> gesetzt, wenn TS-Drift kleiner <b>1</b> ist, sonst auf <b>4,5</b>.<br>
+  - Mit dem "Spieltyp" <b>Update</b> können zur Not auch Fehleinträge überschrieben werden. Das wirkt, wie ein leerer Eintrag.<br>
+
+
 
 <br>
 <br>
@@ -889,6 +912,7 @@ Je höher die Teamstimmung, desto stärker fällt das Mittelfeldrating aus.
     <li>
         <strong>Transfers</strong><br>
         Spielertransfers können die Teamstimmung negativ beeinflussen.
+	Ein Drop der Teamstimmung nach einem Transfer kann mit einem Eintrag "Drop" simuliert werden.
     </li>
 
     <li>
