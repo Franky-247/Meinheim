@@ -186,6 +186,7 @@ for (let i = 0; i < 112; i++) {
                 <option value="Reset">Reset</option>
                 <option value="Update">Update</option>
                 <option value="Drop">Drop</option>
+                <option value="Turnier">Turnier</option>
                 <option value="Hattrick Masters">Hattrick Masters</option>
             </select>
         </td>
@@ -304,7 +305,7 @@ function applyUpdate(ts, ruhe, factors) {
         factor = factors.low;
     }
 
-	// ts = ts + (ruhe - ts) * (  drift_high - fq * fq_drift );
+	// ts = ts + (ruhe - ts) * (  drift_high / (fq - fq_drift) )
     return ts + (ruhe - ts) * factor;
 }
 
