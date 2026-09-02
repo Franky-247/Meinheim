@@ -481,7 +481,7 @@ function getUpdates(type) {
 }
 
 function importCSV() {
-
+// ToDo: TI importieren
     const fileInput = document.getElementById("csv_import");
     const table = document.getElementById("tsTable");
 
@@ -620,6 +620,7 @@ function importCSV() {
 
 function exportCSV() {
 
+	// ToDo: TI exportieren,
     const table = document.getElementById("tsTable");
 
     let csv = [];
@@ -763,7 +764,6 @@ function calc() {
 
 		// letzes Update vor dem TU
 		types[i].value = "TI-Schraube";
-		// if (tiAfter !== tiBefore) {
 		if (tiAfter !== oldTI) {
 			ts = applyTISchraube(ts, oldTI, tiAfter);
 		}
@@ -900,7 +900,7 @@ calc();
 <h3>Weiterführende Rechner &amp; Informationen</h3>
 
 <ul>
-        <li><a class='nav-link' href='/hattrick/TS-Planer.doku'>Dokumentation für den Hattrick Teamstimmung (TS) Planer</a></li>
+        <li><a class='nav-link' href='/hattrick/Doku-TS-Planer.html'>Dokumentation für den Hattrick Teamstimmung (TS) Planer</a></li>
         <li><a class='nav-link' href='/hattrick/TS-Planer.html'>Hattrick Teamstimmung (TS) Planer</a></li>
         <li><a class='nav-link' href='http://www.ht-links.de/TISchrauber.php'>TI-Schrauber zur Berechnung der optimalen Trainingsintensität</a></li>
         <li><a class='nav-link' href='https://ht.8ic.ro/trainingintensity'>Training Intensity bei HT Utilities</a></li>
