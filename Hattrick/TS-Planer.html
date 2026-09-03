@@ -5,7 +5,7 @@
 <meta name="description" content="Hier könnt ihr die Hattrick Teamstimmung vorhersagen lassen."/>
 <meta name="keywords" content="hattrick, managertool, kostenlos, club, Teamstimmung, TS-Rechner. TS Predictor"/>
 
-<title>TS Planer v0.202609031012-alpha</title>
+<title>TS Planer v0.202609032211-alpha</title>
 
 <style>
 body { font-family: Arial; }
@@ -24,6 +24,12 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
 .murderous  { background: #ff8080; }
 .cold       { background: #b8d8ff; }
 
+.cool       { background: #b8d8fa; }
+.normal     { background: #c8f7c5; }
+.hot        { background: #ffb366; }
+.neutral    { background: #75b77f; }
+
+
 </style>
 </head>
     <body style="background: #75b677 repeat-x; height: 100%;">
@@ -32,7 +38,7 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
             <div style="float: left; width:1000px;background: #75b777 ;background-repeat: no-repeat;">
                 <div style="text-align:left;">
 
-<h2>Hattrick Teamstimmung (TS) Planer (v0.202609031012-alpha )</h2>
+<h2>Hattrick Teamstimmung (TS) Planer (v0.202609032211-alpha )</h2>
 
 <label>Start-TS:</label>
 <input type="number" id="startTS" value="4.5" step="0.1" min="0.1" max="12">
@@ -178,19 +184,18 @@ for (let i = 0; i < 112; i++) {
 
         <td>
             <select class="type">
-                <option value="Liga">Liga</option>
-                <option value="Pokal">Pokal</option>
                 <option value="Friendly">Friendly</option>
+                <option value="Pokal">Pokal</option>
+                <option value="Liga">Liga</option>
                 <option value="Relegation">Relegation</option>
+                <option value="Hattrick Masters">Hattrick Masters</option>
                 <option value="Reset">Reset</option>
-                <option value="Update">Update</option>
-                <option value="Drop">Drop</option>
-                <option value="TI einstellen">TI einstellen</option>
                 <option value="TI-Schraube">TI-Schraube</option>
                 <option value="Nero pill">Nero pill</option>
+                <option value="Drop">Drop</option>
+                <option value="Update">Update</option>
                 <option value="Turnier">Turnier</option>
                 <option value="Turnierstart">Turnierstart</option>
-                <option value="Hattrick Masters">Hattrick Masters</option>
                 <option value=""></option>
             </select>
         </td>
@@ -201,13 +206,16 @@ for (let i = 0; i < 112; i++) {
                 <option value="Home">Home</option>
                 <option value="Derby">Derby</option>
                 <option value="Away">Away</option>
+                <option value=""></option>
             </select>
         </td>
         <td>
             <select class="action">
                 <option value="NORMAL">NORMAL</option>
                 <option value="PIC">PIC</option>
+                <option value="PIN">PIN</option>
                 <option value="MOTS">MOTS</option>
+                <option value=""></option>
             </select>
 
         </td>
@@ -470,7 +478,7 @@ function applyTISchraube(ts, oldTI, newTI) {
 	return ts * (newTI / oldTI) ** NERO_EXPONENT;
 }
 
-// Realistischere Update-Anzahl
+// Realistischere Update-Anzahl, bei der Version mit täglichen Updates wird immer mit 1 gerechnet.
 function getUpdates(type) {
     // if (type === "Friendly") return 3;
     // if (type === "Liga") return 4;
@@ -686,7 +694,7 @@ function calc() {
 
     const types = document.querySelectorAll(".type");
     const actions = document.querySelectorAll(".action");
-    const ort = document.querySelectorAll(".action");
+    const ort = document.querySelectorAll(".ort");
     const cupExit = document.getElementById("cupExit").value;
     const hmExit = document.getElementById("hmExit").value;
     const spieltyp = document.querySelectorAll(".spieltyp");
@@ -848,9 +856,37 @@ function calc() {
 		    if (action === "MOTS") {
 					alert("Der Schiedsrichter notiert: 'Trainer wollte MOTS im Friendly.'");
 				} 
+		} 
+		    if (action === "PIC") {
+			    if (spielort === "Neutral") { picCells[i].classList.add("cool"); } 
+			    else if ( spielort === "Home" ) { mfhomepicCells[i].classList.add("cool"); }
+			    else if ( spielort === "Away" ) { picCells[i].classList.add("cool"); }
+			    else if ( spielort === "Derby" ) { mfderbypicCells[i].classList.add("cool"); }
+			    else { mfCells[i].classList.add("normal"); }
+			} 
+		    else if (action === "PIN") {
+			    if (spielort === "Neutral") { mfCells[i].classList.add("normal"); } 
+			    else if ( spielort === "Home" ) { mfhomeCells[i].classList.add("normal"); }
+			    else if ( spielort === "Away" ) { mfCells[i].classList.add("normal"); }
+			    else if ( spielort === "Derby" ) { mfderbyCells[i].classList.add("normal"); }
+			    else { mfCells[i].classList.add("normal"); }
+			} 
+		    else if (action === "MOTS") {
+		            // mfCells[i].classList.add("neutral");
+			    if (spielort === "Neutral") { motsCells[i].classList.add("hot"); } 
+			    else if ( spielort === "Home" ) { mfhomemotsCells[i].classList.add("hot"); }
+			    else if ( spielort === "Away" ) { motsCells[i].classList.add("hot"); }
+			    else if ( spielort === "Derby" ) { mfderbymotsCells[i].classList.add("hot"); }
+			    else { mfCells[i].classList.add("normal"); }
+			} 
+		    else { // NORMAL
+			    if (spielort === "Neutral") { mfCells[i].classList.add("normal"); } 
+			    else if ( spielort === "Home" ) { mfhomeCells[i].classList.add("normal"); }
+			    else if ( spielort === "Away" ) { mfCells[i].classList.add("normal"); }
+			    else if ( spielort === "Derby" ) { mfderbyCells[i].classList.add("normal"); }
+			    else { mfCells[i].classList.add("normal"); }
 			} 
     }
-
 }
 
 // Events
