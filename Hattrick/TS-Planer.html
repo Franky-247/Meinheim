@@ -5,7 +5,7 @@
 <meta name="description" content="Hier könnt ihr die Hattrick Teamstimmung vorhersagen lassen."/>
 <meta name="keywords" content="hattrick, managertool, kostenlos, club, Teamstimmung, TS-Rechner. TS Predictor"/>
 
-<title>TS Planer v0.202609022312-alpha</title>
+<title>TS Planer v0.202609031012-alpha</title>
 
 <style>
 body { font-family: Arial; }
@@ -32,7 +32,7 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
             <div style="float: left; width:1000px;background: #75b777 ;background-repeat: no-repeat;">
                 <div style="text-align:left;">
 
-<h2>Hattrick Teamstimmung (TS) Planer (v0.202609022312-alpha )</h2>
+<h2>Hattrick Teamstimmung (TS) Planer (v0.202609031012-alpha )</h2>
 
 <label>Start-TS:</label>
 <input type="number" id="startTS" value="4.5" step="0.1" min="0.1" max="12">
@@ -762,12 +762,14 @@ function calc() {
 
         if ( ( i + 2 ) % 7 === 0) {
 
-		// letzes Update vor dem TU
-		types[i].value = "TI-Schraube";
+		// letzes Update vor dem TU, da könnte evtl. ein HM Spiel oder ein anderes Event den Eintrag "TI-Schraube" überschreiben
+		if ( types[i].value === "" ) {
+			types[i].value = "TI-Schraube";
+		}
 		if (tiAfter !== oldTI) {
 			ts = applyTISchraube(ts, oldTI, tiAfter);
+			oldTI = tiAfter;
 		}
-		oldTI = tiAfter;
 	}
 
     // normale Berechnung ...
