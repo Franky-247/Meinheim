@@ -5,7 +5,7 @@
 <meta name="description" content="Hier könnt ihr die Hattrick Teamstimmung vorhersagen lassen."/>
 <meta name="keywords" content="hattrick, managertool, kostenlos, club, Teamstimmung, TS-Rechner. TS Predictor"/>
 
-<title>TS Planer v0.202609041400-alpha</title>
+<title>TS Planer v0.202609041744-alpha</title>
 
 <style>
 body { font-family: Arial; }
@@ -38,7 +38,7 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
             <div style="float: left; width:1000px;background: #75b777 ;background-repeat: no-repeat;">
                 <div style="text-align:left;">
 
-<h2>Hattrick Teamstimmung (TS) Planer (v0.202609041400-alpha )</h2>
+<h2>Hattrick Teamstimmung (TS) Planer (v0.202609041744-alpha )</h2>
 
 <label>Start-TS:</label>
 <input type="number" id="startTS" value="4.5" step="0.1" min="0.1" max="12">
@@ -189,12 +189,13 @@ for (let i = 0; i < 112; i++) {
                 <option value="Liga">Liga</option>
                 <option value="Relegation">Relegation</option>
                 <option value="Hattrick Masters">Hattrick Masters</option>
+                <option value="Turnier">Turnier</option>
                 <option value="Reset">Reset</option>
+                <option value="TI einstellen">TI einstellen</option>
                 <option value="TI-Schraube">TI-Schraube</option>
                 <option value="Nero pill">Nero pill</option>
                 <option value="Drop">Drop</option>
                 <option value="Update">Update</option>
-                <option value="Turnier">Turnier</option>
                 <option value="Turnierstart">Turnierstart</option>
                 <option value=""></option>
             </select>
@@ -211,11 +212,11 @@ for (let i = 0; i < 112; i++) {
         </td>
         <td>
             <select class="action">
+                <option value=""></option>
                 <option value="NORMAL">NORMAL</option>
                 <option value="PIC">PIC</option>
                 <option value="PIN">PIN</option>
                 <option value="MOTS">MOTS</option>
-                <option value=""></option>
             </select>
 
         </td>
@@ -362,6 +363,7 @@ function applyUpdate(ts, ruhe, factors) {
 function applySeasonDefaults() {
 
     const types = document.querySelectorAll(".type");
+    const actions = document.querySelectorAll(".action");
 
     let cupExit = parseInt(document.getElementById("cupExit").value);
     let hmExit = parseInt(document.getElementById("hmExit").value);
@@ -378,6 +380,7 @@ function applySeasonDefaults() {
         } else if ( ( i + 4 ) % 7 === 0) {
 
             cupRound++;
+	    actions[i].value = "PIN";
 
             if (cupRound > cupExit) {
                 types[i].value = "Friendly";
@@ -391,6 +394,7 @@ function applySeasonDefaults() {
             if (i > 27) {
 		    if ( ( hmRound ) < ( hmExit ) ) {
 			types[i].value = "Hattrick Masters";
+            		actions[i].value = "PIN";
             	 	hmRound++;
 		    } else {
 			types[i].value = "";
@@ -404,6 +408,7 @@ function applySeasonDefaults() {
             if (i > 27) {
 		    if ( ( hmRound ) < ( hmExit ) ) {
 			types[i].value = "Hattrick Masters";
+	    		actions[i].value = "MOTS";
             	 	hmRound++;
 		    } else {
 			types[i].value = "";
@@ -418,20 +423,22 @@ function applySeasonDefaults() {
                 types[i].value = "Friendly";
             } else {
                 types[i].value = "Liga";
+	        actions[i].value = "PIN";
             }
+        } else if ( ( i + 3 ) % 7 === 0) {
+                types[i].value = "TI einstellen";
         } else {
 
             // Update
                 types[i].value = "";
         }
     }
-            log(1,"HMExit:",hmExit);
-            log(1,"HM-Runde:",hmRound);
+    log(1,"HMExit:",hmExit);
+    log(1,"HM-Runde:",hmRound);
 
     // Spiel 30 optional Relegation
-    // types[29].value = "Relegation";
-    // types[30].value = "Friendly";
     types[105].value = "Relegation";
+    actions[105].value = "MOTS";
 }
 
 // Spieleffekte (bewusst klassisch gehalten)
@@ -762,14 +769,13 @@ function calc() {
         // Spiel anwenden
         ts = applyMatch(ts, effectiveAction, effectiveType);
 
-
-	 // console.log(i, tiCells[i], tiCells[i].querySelector(".ti-input"));
-
 	tiAfter = Number(tiCells[i].value);
 
         if ( ( i + 2 ) % 7 === 0) {
 
-		// letzes Update vor dem TU, da könnte evtl. ein HM Spiel oder ein anderes Event den Eintrag "TI-Schraube" überschreiben
+		// Die effektive TI muß ein "tägliches Update" vor dem TU eingestellt werden !
+ 		tiAfter = Number(tiCells[i-1].value);
+
 		if ( types[i].value === "" ) {
 			types[i].value = "TI-Schraube";
 		}
@@ -848,43 +854,44 @@ function calc() {
         else if (ts >= 10 ) afterCells[i].classList.add("paradise");
         else afterCells[i].classList.add("paradise");
 
-	    if (type === "Friendly") {
-		    if (action === "PIC") {
-					alert("Der Schiedsrichter notiert: 'Trainer wollte PIC im Friendly.'");
-				} 
-		    if (action === "MOTS") {
-					alert("Der Schiedsrichter notiert: 'Trainer wollte MOTS im Friendly.'");
-				} 
-		} 
-		    if (action === "PIC") {
-			    if (spielort === "Neutral") { picCells[i].classList.add("cool"); } 
-			    else if ( spielort === "Home" ) { mfhomepicCells[i].classList.add("cool"); }
-			    else if ( spielort === "Away" ) { picCells[i].classList.add("cool"); }
-			    else if ( spielort === "Derby" ) { mfderbypicCells[i].classList.add("cool"); }
-			    else { mfCells[i].classList.add("normal"); }
+        if (type === "Friendly") {
+	    if (action === "PIC") {
+				alert("Der Schiedsrichter notiert: 'Trainer wollte PIC im Friendly.'");
 			} 
-		    else if (action === "PIN") {
-			    if (spielort === "Neutral") { mfCells[i].classList.add("normal"); } 
-			    else if ( spielort === "Home" ) { mfhomeCells[i].classList.add("normal"); }
-			    else if ( spielort === "Away" ) { mfCells[i].classList.add("normal"); }
-			    else if ( spielort === "Derby" ) { mfderbyCells[i].classList.add("normal"); }
-			    else { mfCells[i].classList.add("normal"); }
+	    if (action === "MOTS") {
+				alert("Der Schiedsrichter notiert: 'Trainer wollte MOTS im Friendly.'");
 			} 
-		    else if (action === "MOTS") {
-		            // mfCells[i].classList.add("neutral");
-			    if (spielort === "Neutral") { motsCells[i].classList.add("hot"); } 
-			    else if ( spielort === "Home" ) { mfhomemotsCells[i].classList.add("hot"); }
-			    else if ( spielort === "Away" ) { motsCells[i].classList.add("hot"); }
-			    else if ( spielort === "Derby" ) { mfderbymotsCells[i].classList.add("hot"); }
-			    else { mfCells[i].classList.add("normal"); }
-			} 
-		    else { // NORMAL
-			    if (spielort === "Neutral") { mfCells[i].classList.add("normal"); } 
-			    else if ( spielort === "Home" ) { mfhomeCells[i].classList.add("normal"); }
-			    else if ( spielort === "Away" ) { mfCells[i].classList.add("normal"); }
-			    else if ( spielort === "Derby" ) { mfderbyCells[i].classList.add("normal"); }
-			    else { mfCells[i].classList.add("normal"); }
-			} 
+            actions[i].value = "PIN";
+	} 
+	if (action === "PIC") {
+	    if (spielort === "Neutral") { picCells[i].classList.add("cool"); } 
+	    else if ( spielort === "Home" ) { mfhomepicCells[i].classList.add("cool"); }
+	    else if ( spielort === "Away" ) { picCells[i].classList.add("cool"); }
+	    else if ( spielort === "Derby" ) { mfderbypicCells[i].classList.add("cool"); }
+	    else { mfCells[i].classList.add("normal"); }
+	} 
+	else if (action === "PIN") {
+	    if (spielort === "Neutral") { mfCells[i].classList.add("normal"); } 
+	    else if ( spielort === "Home" ) { mfhomeCells[i].classList.add("normal"); }
+	    else if ( spielort === "Away" ) { mfCells[i].classList.add("normal"); }
+	    else if ( spielort === "Derby" ) { mfderbyCells[i].classList.add("normal"); }
+	    else { mfCells[i].classList.add("normal"); }
+	} 
+	else if (action === "MOTS") {
+	    // mfCells[i].classList.add("neutral");
+	    if (spielort === "Neutral") { motsCells[i].classList.add("hot"); } 
+	    else if ( spielort === "Home" ) { mfhomemotsCells[i].classList.add("hot"); }
+	    else if ( spielort === "Away" ) { motsCells[i].classList.add("hot"); }
+	    else if ( spielort === "Derby" ) { mfderbymotsCells[i].classList.add("hot"); }
+	    else { mfCells[i].classList.add("normal"); }
+	} 
+	else { // NORMAL
+	    if (spielort === "Neutral") { mfCells[i].classList.add("normal"); } 
+	    else if ( spielort === "Home" ) { mfhomeCells[i].classList.add("normal"); }
+	    else if ( spielort === "Away" ) { mfCells[i].classList.add("normal"); }
+	    else if ( spielort === "Derby" ) { mfderbyCells[i].classList.add("normal"); }
+	    else { mfCells[i].classList.add("normal"); }
+	} 
     }
 }
 
