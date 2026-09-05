@@ -5,7 +5,7 @@
 <meta name="description" content="Hier könnt ihr die Hattrick Teamstimmung vorhersagen lassen."/>
 <meta name="keywords" content="hattrick, managertool, kostenlos, club, Teamstimmung, TS-Rechner. TS Predictor"/>
 
-<title>TS Planer v0.202609051025-alpha</title>
+<title>TS Planer v0.20260951423-alpha</title>
 
 <style>
 body { font-family: Arial; }
@@ -38,7 +38,7 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
             <div style="float: left; width:1000px;background: #75b777 ;background-repeat: no-repeat;">
                 <div style="text-align:left;">
 
-<h2>Hattrick Teamstimmung (TS) Planer (v0.202609051025-alpha )</h2>
+<h2>Hattrick Teamstimmung (TS) Planer (v0.20260951423-alpha )</h2>
 
 <label>Start-TS:</label>
 <input type="number" id="startTS" value="4.5" step="0.1" min="0.1" max="12">
@@ -91,12 +91,6 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
 <br>
 <br>
 <div id="expert-options" hidden>
-
-<label>FQ (1–7):</label>
-<input type="number" id="fq" value="6.5" step="0.01" min="1" max="7.99">
-
-<label>Sportpsychologe (0–5):</label>
-<input type="number" id="psy" value="0" min="0" max="5">
 
 <label>Drift High :</label>
 <input type="number"
@@ -157,7 +151,7 @@ const params = new URLSearchParams(window.location.search);
 
 const DEBUG = Number(params.get("debug") || 0);
 const EXPERT = Number(params.get("expert") || 0);
-const FQ = Number(params.get("fq") || 3,5 );
+const FQ = Number(params.get("fq") || 6,5 );
 const DRIFT = Number(params.get("drift_high") || 0,3 );
 
 function log(level, ...args) {
@@ -282,11 +276,9 @@ for (let i = 0; i < 114; i++) {
 // Inputs
 const startTS = document.getElementById("startTS");
 const ruhewert = document.getElementById("ruhewert");
-const fqInput = document.getElementById("fq");
 const fq_Input = document.getElementById("fq-input");
 const psy_Input = document.getElementById("psy-input");
-const tiInput = document.getElementById(".ti-input");
-const psyInput = document.getElementById("psy");
+const ti_Input = document.getElementById(".ti-input");
 const drift_highsetInput = document.getElementById("drift_high");
 const drift_lowsetInput = document.getElementById("drift_low");
 const tsDriftInput = document.getElementById("ts_drift");
@@ -390,8 +382,9 @@ function getRuhewert(ruhewert, psy) {
 function applyUpdate(ts, ruhe, factors) {
 
     let tsdrift = parseInt(document.getElementById("ts_drift").value);
+    let tszielwert = parseInt(document.getElementById("ruhewert").value);
     log(1,"TS Drift:", tsdrift);
-    if (tsdrift >= 1 ) {
+    if (tszielwert < 5 ) {
 	    if (ts > 9.99) {
 		// Verein: Cap 9.99 beim ersten täglichen TS-Update
 		ts = 9.99;
@@ -533,10 +526,11 @@ function applyMatch(ts, action, type) {
 			let tsdrift = parseInt(document.getElementById("ts_drift").value);
 			log(1,"TS Drift:", tsdrift, "TS:", ts);
 			if (tsdrift >= 1 ) {
-				ts = 4.5;
+    				let tszielwert = parseFloat(ruhewert.value);
+				ts = tszielwert;
 			}
 			else
-			{
+			{ // Spezialfall NT/U21-NT
 				ts = 5;
 			}
         } else if (type === "Drop") {
@@ -569,7 +563,6 @@ function getUpdates(type) {
 }
 
 function importCSV() {
-// ToDo: TI importieren
     const fileInput = document.getElementById("csv_import");
     const table = document.getElementById("tsTable");
 
@@ -597,7 +590,7 @@ function importCSV() {
         // Header auslesen
         const headers = lines[0].split(";");
 
-        // Spaltenpositionen der Selects ermitteln
+        // Spaltenpositionen ermitteln
         const typeIndex = headers.indexOf("Spieltyp");
         const actionIndex = headers.indexOf("TS Einsatz");
         const ortIndex = headers.indexOf("Spielort");
@@ -605,8 +598,10 @@ function importCSV() {
         const tiIndex = headers.indexOf("TI");
         const psyIndex = headers.indexOf("Sportpsychologe");
 
-        if (typeIndex === -1 || actionIndex === -1 || fqIndex === -1 || psyIndex === -1) {
-            alert("Die Spalten 'Spieltyp','Spielort', 'FQ', 'Sportpsychologe' oder 'TS Einsatz' wurden nicht gefunden.");
+        if (typeIndex === -1 || actionIndex === -1 || ortIndex === -1 ||
+            fqIndex === -1 || tiIndex === -1 || psyIndex === -1) {
+
+            alert("Eine oder mehrere benötigte Spalten wurden nicht gefunden.");
             return;
         }
 
@@ -616,8 +611,6 @@ function importCSV() {
 
         /*
          * Die vorhandenen Tabellenzeilen bleiben bestehen.
-         * Wir gehen davon aus, dass die 32 bzw. 112 Zeilen
-         * bereits erzeugt wurden.
          */
         const tableRows = tbody.querySelectorAll("tr");
 
@@ -641,6 +634,7 @@ function importCSV() {
                     typeSelect.value = value;
                 }
             }
+
             // -----------------------------
             // Spielort
             // -----------------------------
@@ -651,7 +645,7 @@ function importCSV() {
 
                 if (value !== undefined) {
                     ortSelect.value = value;
-                    log(1,"Ort:",ortSelect);
+                    log(1, "Ort:", ortSelect);
                 }
             }
 
@@ -668,34 +662,49 @@ function importCSV() {
                 }
             }
 
-		// -----------------------------
-		// FQ
-		// -----------------------------
-		// Wert aus der Spalte "fq" holen
-		const fqWert = csvRow[fqIndex]?.trim();
+            // -----------------------------
+            // TI
+            // -----------------------------
+            const tiInput = tr.querySelector(".ti-input");
 
-		// Feld im Kopfbereich setzen
-		document.getElementById("fq").value = fqWert;
-		    
-		// -----------------------------
-		// Sportpsychologe
-		// -----------------------------
+            if (tiInput) {
+                const tiWert = csvRow[tiIndex]?.trim();
 
-		// Wert aus der Spalte "psy" holen
-		// const psyWert = rows[rows.length - 1].psy;
-		const psyWert = csvRow[psyIndex]?.trim();
+                if (tiWert !== undefined && tiWert !== "") {
+                    tiInput.value = tiWert;
+                }
+            }
 
-		// Feld im Kopfbereich setzen
-		document.getElementById("psy").value = psyWert;
+            // -----------------------------
+            // FQ
+            // -----------------------------
+            const fqInput = tr.querySelector(".fq-input");
+
+            if (fqInput) {
+                const fqWert = csvRow[fqIndex]?.trim();
+
+                if (fqWert !== undefined && fqWert !== "") {
+                    fqInput.value = fqWert;
+                }
+            }
+
+            // -----------------------------
+            // Sportpsychologe
+            // -----------------------------
+            const psyInput = tr.querySelector(".psy-input");
+
+            if (psyInput) {
+                const psyWert = csvRow[psyIndex]?.trim();
+
+                if (psyWert !== undefined && psyWert !== "") {
+                    psyInput.value = psyWert;
+                }
+            }
         });
 
-        log(1,"CSV erfolgreich importiert.");
+        log(1, "CSV erfolgreich importiert.");
 
-        /*
-         * Hier anschließend eine Berechnung
-         * für die Tabelle aufrufen.
-         */
-    //     calc();
+        // calc();
     };
 
     reader.onerror = function () {
@@ -704,7 +713,6 @@ function importCSV() {
 
     reader.readAsText(file, "UTF-8");
 }
-
 
 function exportCSV() {
 
@@ -720,26 +728,27 @@ function exportCSV() {
 
     csv.push(headers.join(";"));
 
-    // Zeilen
-    const rows = table.querySelectorAll("tbody tr");
+	// Zeilen
+	const rows = table.querySelectorAll("tbody tr");
 
-    rows.forEach(row => {
+	rows.forEach(row => {
 
-        const cols = row.querySelectorAll("td");
+	    const cols = row.querySelectorAll("td");
 
-        const rowData = Array.from(cols).map(col => {
+	    const rowData = Array.from(cols).map(col => {
 
-            const select = col.querySelector("select");
+		const field = col.querySelector("input, select, textarea");
 
-            if (select) {
-                return select.value;
-            }
+		if (field) {
+		    return field.value;
+		}
 
-            return col.textContent.trim();
-        });
+		return col.textContent.trim();
+	    });
 
-        csv.push(rowData.join(";"));
-    });
+	    csv.push(rowData.join(";"));
+	});
+
 
     // CSV-Datei erzeugen
     const blob = new Blob(
@@ -768,9 +777,9 @@ function calc() {
     let oldTI = tiAfter;
 
     let ts = parseFloat(startTS.value);
-    let zielwert = parseFloat(ruhewert.value);
-    let deffq = parseFloat(fqInput.value);
-    let defpsy = parseInt(psyInput.value);
+    let tszielwert = parseFloat(ruhewert.value);
+    let deffq = 6;
+    let defpsy = 0;
 
     const types = document.querySelectorAll(".type");
     const actions = document.querySelectorAll(".action");
@@ -796,7 +805,7 @@ function calc() {
     const mfderbypicCells = document.querySelectorAll(".mfderbypic");
     const mfderbymotsCells = document.querySelectorAll(".mfderbymots");
 
-    let ruhe = getRuhewert(zielwert, defpsy);
+    let ruhe = getRuhewert(tszielwert, defpsy);
     let factors = fqFactor(deffq);
     let drift_high = parseFloat(drift_highsetInput.value);
     let drift_low = parseFloat(drift_lowsetInput.value);
@@ -810,7 +819,7 @@ function calc() {
 	defpsy = Number(psyCells[i].value);
 	deffq = Number(fqCells[i].value);
 
-    	ruhe = getRuhewert(zielwert, defpsy);
+    	ruhe = getRuhewert(tszielwert, defpsy);
     	factors = fqFactor(deffq);
         // Drift vor Spiel
         let updates = getUpdates(types[i].value);
@@ -874,9 +883,9 @@ function calc() {
         afterCells[i].innerText = tsAfter.toFixed(2);
 
 
-	let fq = parseFloat(fqInput.value);
-	let psy = parseInt(psyInput.value);
-	let mf = mf_referenz + mf_referenz * ( tsBefore - 4.5 ) * 0.07;
+	// let fq = parseFloat(fqInput.value);
+	// let psy = parseInt(psyInput.value);
+	let mf = mf_referenz + mf_referenz * ( tsBefore - tszielwert ) * 0.07;
 	// Playing away 		100%
 	// Playing at home 	119.892%
 	// Playing CA 		93%
@@ -900,8 +909,8 @@ function calc() {
 	log(1,"TS: vorher",tsBefore);
 
         // tiCells[i].innerText = ti.toFixed(2);
-        fqCells[i].innerText = fq.toFixed(2);
-        psyCells[i].innerText = psy.toFixed(2);
+        // fqCells[i].innerText = fq.toFixed(2);
+        // psyCells[i].innerText = psy.toFixed(2);
         mfCells[i].innerText = mf.toFixed(2);
         picCells[i].innerText = pic.toFixed(2);
         motsCells[i].innerText = mots.toFixed(2);
@@ -987,7 +996,6 @@ document.querySelectorAll(".ti-input").forEach(el =>
     })
 );
 
-
 document.querySelectorAll(".fq-input").forEach(el =>
     el.addEventListener("change", () => {
         log(1,"FQ geändert:", el.value);
@@ -1012,8 +1020,6 @@ document.getElementById("csvBtn")
 
 startTS.addEventListener("input", calc);
 ruhewert.addEventListener("input", calc);
-fqInput.addEventListener("input", calc);
-psyInput.addEventListener("input", calc);
 tsDriftInput.addEventListener("input", calc);
 mfRefInput.addEventListener("input", calc);
 drift_highsetInput.addEventListener("input", calc);
