@@ -5,7 +5,7 @@
 <meta name="description" content="Hier könnt ihr die Hattrick Teamstimmung vorhersagen lassen."/>
 <meta name="keywords" content="hattrick, managertool, kostenlos, club, Teamstimmung, TS-Rechner. TS Predictor"/>
 
-<title>TS Planer v0.202609042244-alpha</title>
+<title>TS Planer v0.202609051025-alpha</title>
 
 <style>
 body { font-family: Arial; }
@@ -25,7 +25,7 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
 .cold       { background: #b8d8ff; }
 
 .cool       { background: #b8d8fa; }
-.normal     { background: #c8f7c5; }
+.normal     { background: #78f7c5; }
 .hot        { background: #ffb366; }
 .neutral    { background: #75b77f; }
 
@@ -38,16 +38,13 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
             <div style="float: left; width:1000px;background: #75b777 ;background-repeat: no-repeat;">
                 <div style="text-align:left;">
 
-<h2>Hattrick Teamstimmung (TS) Planer (v0.202609042244-alpha )</h2>
+<h2>Hattrick Teamstimmung (TS) Planer (v0.202609051025-alpha )</h2>
 
 <label>Start-TS:</label>
 <input type="number" id="startTS" value="4.5" step="0.1" min="0.1" max="12">
 
-<label>FQ (1–7):</label>
-<input type="number" id="fq" value="3.5" step="0.01" min="1" max="7.99">
-
-<label>Sportpsychologe (0–5):</label>
-<input type="number" id="psy" value="0" min="0" max="5">
+<label>Ruhewert :</label>
+<input type="number" id="ruhewert" value="4.5" step="0.1" min="0" max="10">
 
 <label>Referenz Mittelfeld Rating:</label>
 <input type="number"
@@ -94,6 +91,12 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
 <br>
 <br>
 <div id="expert-options" hidden>
+
+<label>FQ (1–7):</label>
+<input type="number" id="fq" value="6.5" step="0.01" min="1" max="7.99">
+
+<label>Sportpsychologe (0–5):</label>
+<input type="number" id="psy" value="0" min="0" max="5">
 
 <label>Drift High :</label>
 <input type="number"
@@ -174,21 +177,24 @@ log(1, "EXPERT:", EXPERT);
 
 const tbody = document.getElementById("table-body");
 
-for (let i = 0; i < 112; i++) {
+for (let i = 0; i < 114; i++) {
     const row = document.createElement("tr");
 
     row.innerHTML = `
 
-	<td class="week">${Math.ceil((i ) / 7)}</td>
+	<td class="week">${Math.ceil((i  ) / 7)}</td>
         <td class="upd">${Math.ceil((i + 1) / 1)}</td>
 
         <td>
             <select class="type">
+                <option value=""></option>
                 <option value="Friendly">Friendly</option>
                 <option value="Pokal">Pokal</option>
                 <option value="Liga">Liga</option>
                 <option value="Relegation">Relegation</option>
                 <option value="Hattrick Masters">Hattrick Masters</option>
+                <option value="FedCup">FedCup</option>
+                <option value="MiniCup">MiniCup</option>
                 <option value="Turnier">Turnier</option>
                 <option value="Reset">Reset</option>
                 <option value="TI einstellen">TI einstellen</option>
@@ -197,7 +203,6 @@ for (let i = 0; i < 112; i++) {
                 <option value="Drop">Drop</option>
                 <option value="Update">Update</option>
                 <option value="Turnierstart">Turnierstart</option>
-                <option value=""></option>
             </select>
         </td>
 
@@ -233,8 +238,22 @@ for (let i = 0; i < 112; i++) {
                max="100">
     </td>
 
-        <td class="fq">-</td>
-        <td class="psy">-</td>
+	 <td class="fq">
+        <input type="number"
+               class="fq-input"
+               value="6.5"
+               step="0.01"
+               min="1"
+               max="7.99">
+    </td>
+	 <td class="psy">
+        <input type="number"
+               class="psy-input"
+               value="0"
+               step="1"
+               min="0"
+               max="5">
+    </td>
         <td class="mfhome">-</td>
         <td class="mfhomepic">-</td>
         <td class="mfhomemots">-</td>
@@ -262,7 +281,10 @@ for (let i = 0; i < 112; i++) {
 
 // Inputs
 const startTS = document.getElementById("startTS");
+const ruhewert = document.getElementById("ruhewert");
 const fqInput = document.getElementById("fq");
+const fq_Input = document.getElementById("fq-input");
+const psy_Input = document.getElementById("psy-input");
 const tiInput = document.getElementById(".ti-input");
 const psyInput = document.getElementById("psy");
 const drift_highsetInput = document.getElementById("drift_high");
@@ -307,6 +329,40 @@ function fqFactor(fq) {
     return result;
 }
 
+function applyFQDefaults(changedInput) {
+    const newFQ = Number(changedInput.value);
+
+    const row = changedInput.closest("tr");
+    const rows = Array.from(tbody.querySelectorAll("tr"));
+    const startIndex = rows.indexOf(row);
+
+    for (let i = startIndex + 1; i < rows.length; i++) {
+        const input = rows[i].querySelector(".fq-input");
+
+		if (input) {
+		    input.value = newFQ;
+		}
+    }
+}
+
+
+function applyPSYDefaults(changedInput) {
+    const newPSY = Number(changedInput.value);
+
+    const row = changedInput.closest("tr");
+    const rows = Array.from(tbody.querySelectorAll("tr"));
+    const startIndex = rows.indexOf(row);
+
+    for (let i = startIndex + 1; i < rows.length; i++) {
+        const input = rows[i].querySelector(".psy-input");
+
+		if (input) {
+		    input.value = newPSY;
+		}
+    }
+}
+
+
 function applyTIDefaults(changedInput) {
     const newTI = Number(changedInput.value);
 
@@ -324,8 +380,9 @@ function applyTIDefaults(changedInput) {
 }
 
 
-function getRuhewert(psy) {
-    return Math.min(5.0, 4.5 + psy * 0.1);
+function getRuhewert(ruhewert, psy) {
+    // return Math.min(5.0, 4.5 + psy * 0.1);
+    return Math.min(5.0, ruhewert + psy * 0.1);
 }
 
 // Drift pro Update
@@ -364,6 +421,7 @@ function applySeasonDefaults() {
 
     const types = document.querySelectorAll(".type");
     const actions = document.querySelectorAll(".action");
+    const weeks = document.querySelectorAll(".week");
 
     let cupExit = parseInt(document.getElementById("cupExit").value);
     let hmExit = parseInt(document.getElementById("hmExit").value);
@@ -371,7 +429,7 @@ function applySeasonDefaults() {
     let cupRound = 0;
     let hmRound = 0;
 
-    for (let i = 0; i < 112; i++) {
+    for (let i = 0; i < 114; i++) {
 
 	// Midweek-Spiele
         if (i  === 0) {
@@ -380,7 +438,9 @@ function applySeasonDefaults() {
         } else if ( ( i + 4 ) % 7 === 0) {
 
             cupRound++;
-	    actions[i].value = "PIN";
+	    if (actions[i].value === "") {
+	    	actions[i].value = "PIN";
+	    } 
 
             if (cupRound > cupExit) {
                 types[i].value = "Friendly";
@@ -394,8 +454,10 @@ function applySeasonDefaults() {
             if (i > 27) {
 		    if ( ( hmRound ) < ( hmExit ) ) {
 			types[i].value = "Hattrick Masters";
-            		actions[i].value = "PIN";
-            	 	hmRound++;
+			if (actions[i].value === "") {
+				actions[i].value = "PIN";
+			} 
+			hmRound++;
 		    } else {
 			types[i].value = "";
 		    }
@@ -408,7 +470,9 @@ function applySeasonDefaults() {
             if (i > 27) {
 		    if ( ( hmRound ) < ( hmExit ) ) {
 			types[i].value = "Hattrick Masters";
-	    		actions[i].value = "MOTS";
+			if (actions[i].value === "") {
+	    			actions[i].value = "MOTS";
+			} 
             	 	hmRound++;
 		    } else {
 			types[i].value = "";
@@ -423,14 +487,18 @@ function applySeasonDefaults() {
                 types[i].value = "Friendly";
             } else {
                 types[i].value = "Liga";
-	        actions[i].value = "PIN";
+		if (actions[i].value === "") {
+	        	actions[i].value = "PIN";
+		}	
             }
         } else if ( ( i + 3 ) % 7 === 0) {
-                types[i].value = "TI einstellen";
+		if (types[i].value === "") {
+                	types[i].value = "TI einstellen";
+		}	
         } else {
 
             // Update
-                types[i].value = "";
+            types[i].value = "";
         }
     }
     log(1,"HMExit:",hmExit);
@@ -439,6 +507,12 @@ function applySeasonDefaults() {
     // Spiel 30 optional Relegation
     types[105].value = "Relegation";
     actions[105].value = "MOTS";
+    // Spiel 31 optional FedCup
+    types[108].value = "FedCup";
+    actions[108].value = "NORMAL";
+    weeks[113].value = "0";
+    types[113].value = "Reset";
+    actions[113].value = "";
 }
 
 // Spieleffekte (bewusst klassisch gehalten)
@@ -694,9 +768,9 @@ function calc() {
     let oldTI = tiAfter;
 
     let ts = parseFloat(startTS.value);
-    let fq = parseFloat(fqInput.value);
-    let psy = parseInt(psyInput.value);
-
+    let zielwert = parseFloat(ruhewert.value);
+    let deffq = parseFloat(fqInput.value);
+    let defpsy = parseInt(psyInput.value);
 
     const types = document.querySelectorAll(".type");
     const actions = document.querySelectorAll(".action");
@@ -710,8 +784,8 @@ function calc() {
     const beforeCells = document.querySelectorAll(".before");
     const afterCells = document.querySelectorAll(".after");
     const tiCells = document.querySelectorAll(".ti-input");
-    const fqCells = document.querySelectorAll(".fq");
-    const psyCells = document.querySelectorAll(".psy");
+    const fqCells = document.querySelectorAll(".fq-input");
+    const psyCells = document.querySelectorAll(".psy-input");
     const mfCells = document.querySelectorAll(".mf");
     const picCells = document.querySelectorAll(".pic");
     const motsCells = document.querySelectorAll(".mots");
@@ -722,8 +796,8 @@ function calc() {
     const mfderbypicCells = document.querySelectorAll(".mfderbypic");
     const mfderbymotsCells = document.querySelectorAll(".mfderbymots");
 
-    let ruhe = getRuhewert(psy);
-    let factors = fqFactor(fq);
+    let ruhe = getRuhewert(zielwert, defpsy);
+    let factors = fqFactor(deffq);
     let drift_high = parseFloat(drift_highsetInput.value);
     let drift_low = parseFloat(drift_lowsetInput.value);
     let mf_referenz = parseFloat(mfRefInput.value);
@@ -732,9 +806,12 @@ function calc() {
 	log(1,beforeCells.length, afterCells.length);
 	log(1,"calc läuft");
 
-			   
-    for (let i = 0; i < 112; i++) {
+    for (let i = 0; i < 114; i++) {
+	defpsy = Number(psyCells[i].value);
+	deffq = Number(fqCells[i].value);
 
+    	ruhe = getRuhewert(zielwert, defpsy);
+    	factors = fqFactor(deffq);
         // Drift vor Spiel
         let updates = getUpdates(types[i].value);
 
@@ -860,6 +937,7 @@ function calc() {
 			} 
             actions[i].value = "PIN";
 	} 
+	// mfCells[i].classList.add("paradise");
 	if (action === "PIC") {
 	    if (spielort === "Neutral") { picCells[i].classList.add("cool"); } 
 	    else if ( spielort === "Home" ) { mfhomepicCells[i].classList.add("cool"); }
@@ -868,26 +946,32 @@ function calc() {
 	    else { mfCells[i].classList.add("normal"); }
 	} 
 	else if (action === "PIN") {
-	    if (spielort === "Neutral") { mfCells[i].classList.add("normal"); } 
-	    else if ( spielort === "Home" ) { mfhomeCells[i].classList.add("normal"); }
-	    else if ( spielort === "Away" ) { mfCells[i].classList.add("normal"); }
-	    else if ( spielort === "Derby" ) { mfderbyCells[i].classList.add("normal"); }
-	    else { mfCells[i].classList.add("normal"); }
+	    if (spielort === "Neutral") { mfCells[i].classList.add("calm"); } 
+	    else if ( spielort === "Home" ) { mfhomeCells[i].classList.add("calm"); }
+	    else if ( spielort === "Away" ) { mfCells[i].classList.add("calm"); }
+	    else if ( spielort === "Derby" ) { mfderbyCells[i].classList.add("calm"); }
+	    else { mfCells[i].classList.add("calm"); }
 	} 
 	else if (action === "MOTS") {
-	    // mfCells[i].classList.add("neutral");
 	    if (spielort === "Neutral") { motsCells[i].classList.add("hot"); } 
 	    else if ( spielort === "Home" ) { mfhomemotsCells[i].classList.add("hot"); }
 	    else if ( spielort === "Away" ) { motsCells[i].classList.add("hot"); }
 	    else if ( spielort === "Derby" ) { mfderbymotsCells[i].classList.add("hot"); }
 	    else { mfCells[i].classList.add("normal"); }
 	} 
-	else { // NORMAL
-	    if (spielort === "Neutral") { mfCells[i].classList.add("normal"); } 
-	    else if ( spielort === "Home" ) { mfhomeCells[i].classList.add("normal"); }
-	    else if ( spielort === "Away" ) { mfCells[i].classList.add("normal"); }
-	    else if ( spielort === "Derby" ) { mfderbyCells[i].classList.add("normal"); }
-	    else { mfCells[i].classList.add("normal"); }
+	else if (action === "NORMAL") {
+	    if (spielort === "Neutral") { mfCells[i].classList.add("mormal"); } 
+	    else if ( spielort === "Home" ) { mfhomeCells[i].classList.add("mormal"); }
+	    else if ( spielort === "Away" ) { mfCells[i].classList.add("mormal"); }
+	    else if ( spielort === "Derby" ) { mfderbyCells[i].classList.add("mormal"); }
+	    else { mfCells[i].classList.add("mormal"); }
+	} 
+	else { 
+	    if (spielort === "Neutral") { mfCells[i].classList.add("cloud"); } 
+	    else if ( spielort === "Home" ) { mfhomeCells[i].classList.add("cloud"); }
+	    else if ( spielort === "Away" ) { mfCells[i].classList.add("cloud"); }
+	    else if ( spielort === "Derby" ) { mfderbyCells[i].classList.add("cloud"); }
+	    else { mfCells[i].classList.add("cloud"); }
 	} 
     }
 }
@@ -904,6 +988,22 @@ document.querySelectorAll(".ti-input").forEach(el =>
 );
 
 
+document.querySelectorAll(".fq-input").forEach(el =>
+    el.addEventListener("change", () => {
+        log(1,"FQ geändert:", el.value);
+        applyFQDefaults(el);
+        calc();
+    })
+);
+
+document.querySelectorAll(".psy-input").forEach(el =>
+    el.addEventListener("change", () => {
+        log(1,"Sportpsychologe geändert:", el.value);
+        applyPSYDefaults(el);
+        calc();
+    })
+);
+
 document
     .getElementById("csv_import")
     .addEventListener("change", importCSV);
@@ -911,6 +1011,7 @@ document.getElementById("csvBtn")
     .addEventListener("click", exportCSV);
 
 startTS.addEventListener("input", calc);
+ruhewert.addEventListener("input", calc);
 fqInput.addEventListener("input", calc);
 psyInput.addEventListener("input", calc);
 tsDriftInput.addEventListener("input", calc);
