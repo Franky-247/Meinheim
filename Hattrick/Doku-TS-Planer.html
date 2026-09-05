@@ -59,20 +59,14 @@
 <br>
 <b>Nationalmannschaften</b><br>
   - Bei Nationalmannschaften (NT) und U21-Nationalmannschaften (U21-NT) zerfällt die TS langsamer als üblich.<br>
-  - Zur Ermittlung der TS sollte im <i>Expert-Modus</i> der Wert „TS-Drift“ von <b>1</b> auf <b>0,67</b> geändert werden.<br>
-  - Der <i>Expert-Modus</i> kann ausschließlich über den URL-Parameter <code>?&expert=1</code> aktiviert werden.<br>
-  - Die Start-TS beträgt <b>5,0</b>. Die FQ muss mindestens <b>6</b> betragen.<br>
-  - Sportpsychologen gibt es bei Nationalmannschaften zwar nicht. Wird jedoch <b>Level 5</b> eingestellt, erhöht sich der Ruhewert ebenfalls auf <b>5,0</b>.<br>
+  - Die Berechnungslogik für NTs wird über den Ruhwert aktiviert, wenn dieser >= 5.00 eingestellt wird.
+  - Die Start-TS beträgt bei NTs <b>5,0</b>. Die FQ sollte mindestens <b>6</b> betragen.<br>
   - Für typische NT-Turniere ist der Spieltyp <b>„Turnier“</b> vorgesehen.<br>
   - Die Spieltypen <b>„Liga“</b>, <b>„Pokal“</b> und <b>„Relegation“</b> werden ebenfalls unterstützt.<br>
   - Der Turnierplan muss in der Regel manuell erstellt werden. Hilfreich ist es, einen bereits erstellten Plan zu exportieren und diesen anschließend zur weiteren Bearbeitung wieder zu importieren.<br>
   - Das Event <b>1</b> sollte evtl. von <b>Reset</b> auf <b>Turnierstart</b>, <b>Turnier</b>, <b>   </b> oder <b>Update</b> geändert werden.<br>
-  - Bei einem <b>Reset</b> wird der Ruhewert auf <b>5,0</b> gesetzt, wenn TS-Drift kleiner <b>1</b> ist, sonst auf <b>4,5</b>.<br>
   - Mit dem "Spieltyp" <b>Update</b> können zur Not auch Fehleinträge überschrieben werden. Das wirkt, wie ein leerer Eintrag.<br>
-  - Das Mittelfeld bei Heimspielen ist wie bei "Auswärts-Derby".<br>
-
-
-
+  - Das Mittelfeld bei Heimspielen wirkt wie bei "Auswärts-Derby".<br>
 <br>
 <br>
 <hr>
