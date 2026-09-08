@@ -5,7 +5,7 @@
 <meta name="description" content="Hier könnt ihr die Hattrick Teamstimmung vorhersagen lassen."/>
 <meta name="keywords" content="hattrick, managertool, kostenlos, club, Teamstimmung, TS-Rechner. TS Predictor"/>
 
-<title>TS Planer v0.202609051510-alpha</title>
+<title>TS Planer v0.202609081335-alpha</title>
 
 <style>
 body { font-family: Arial; }
@@ -38,7 +38,7 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
             <div style="float: left; width:1000px;background: #75b777 ;background-repeat: no-repeat;">
                 <div style="text-align:left;">
 
-<h2>Hattrick Teamstimmung (TS) Planer (v0.202609051510-alpha )</h2>
+<h2>Hattrick Teamstimmung (TS) Planer (v0.202609081335-alpha )</h2>
 
 <label>Start-TS:</label>
 <input type="number" id="startTS" value="4.5" step="0.1" min="0.1" max="12">
@@ -144,7 +144,7 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
 </table>
 
 <p><b>1 Saison: 32 Spiele (16 Wochen × 2 Spiele) und 7 Updates pro Woche</b></p>
-
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 
 const params = new URLSearchParams(window.location.search);
@@ -268,8 +268,15 @@ for (let i = 0; i < 114; i++) {
 
 </table>
 
+<button id="GraphikBtn">Show Graphik</button>
 <button id="csvBtn">CSV Export</button>
 <input type="file" id="csv_import" accept=".csv">
+
+<div id="chartContainer" style="display: none;">
+    <h3>TS-Verlauf</h3>
+    <canvas id="tsChart"></canvas>
+</div>
+
 
 <script>
 
@@ -714,6 +721,240 @@ function importCSV() {
     reader.readAsText(file, "UTF-8");
 }
 
+function getCellValue(cell) {
+
+    const field = cell.querySelector("input, select, textarea");
+
+    let value;
+
+    if (field) {
+        value = field.value;
+    } else {
+        value = cell.textContent.trim();
+    }
+
+    if (value === "") {
+        return null;
+    }
+
+    return parseFloat(
+        value.replace(",", ".")
+    );
+}
+
+let tsChart = null;
+let graphikVisible = false;
+
+
+function showGraphik() {
+
+    const table = document.getElementById("tsTable");
+
+    const headers = Array.from(
+        table.querySelectorAll("thead th")
+    ).map(th => th.textContent.trim());
+
+    const eventCol = headers.indexOf("Event");
+    const tsCol = headers.indexOf("TS vor dem Spiel");
+
+    if (eventCol === -1 || tsCol === -1) {
+        alert("Spalten für Event oder TS vor dem Spiel nicht gefunden.");
+        return;
+    }
+
+    const events = [];
+    const ts = [];
+
+    table.querySelectorAll("tbody tr").forEach(row => {
+
+        const cols = row.querySelectorAll("td");
+
+        const event = cols[eventCol].textContent.trim();
+        const value = getCellValue(cols[tsCol]);
+
+        if (event !== "" && value !== null) {
+            events.push(event);
+            ts.push(value);
+        }
+    });
+
+    // Container sichtbar machen
+    document.getElementById("chartContainer").style.display = "block";
+
+    // Altes Diagramm entfernen
+    // if (tsChart !== null) {
+        // tsChart.destroy();
+    // }
+
+	const ctx = document.getElementById("tsChart");
+
+	if (tsChart === null) {
+
+	    tsChart = new Chart(ctx, {
+
+		type: "line",
+
+		data: {
+		    labels: events,
+
+		    datasets: [{
+			label: "TS",
+			data: ts,
+
+			borderColor: "#3366cc",
+			backgroundColor: "#3366cc",
+
+			borderWidth: 1.5,
+			pointRadius: 2,
+			pointHoverRadius: 5,
+
+			tension: 0.1
+		    }]
+		},
+
+		options: {
+		    responsive: true,
+
+		    scales: {
+			x: {
+			    title: {
+				display: true,
+				text: "Event",
+				color: "#000000",
+				font: {
+				    weight: "bold"
+				}
+			    },
+			    ticks: {
+				color: "#000000"
+			    },
+			    grid: {
+				color: "rgba(0, 0, 0, 0.20)"
+			    }
+			},
+
+			y: {
+			    title: {
+				display: true,
+				text: "TS",
+				color: "#000000",
+				font: {
+				    weight: "bold"
+				}
+			    },
+			    ticks: {
+				color: "#000000"
+			    },
+			    grid: {
+				color: "rgba(0, 0, 0, 0.20)"
+			    }
+			}
+		    }
+		}
+	    });
+
+	} else {
+
+	    tsChart.data.labels = events;
+	    tsChart.data.datasets[0].data = ts;
+
+		if (tsChart === null) {
+		    // Chart erstmalig erzeugen
+		} else {
+		    // nur Daten ändern
+		    tsChart.data.labels = events;
+		    tsChart.data.datasets[0].data = ts;
+		    tsChart.update();
+		}
+
+	}
+
+
+    tsChart = new Chart(ctx, {
+
+        type: "line",
+
+        data: {
+            labels: events,
+
+            datasets: [{
+                label: "TS",
+                data: ts,
+
+                borderColor: "rgb(54, 162, 235)",
+                backgroundColor: "rgba(54, 162, 235, 0.15)",
+
+                borderWidth: 2,
+                pointRadius: 3,
+                pointHoverRadius: 6,
+
+                tension: 0.1
+            }]
+        },
+
+	    options: {
+
+    responsive: true,
+
+    scales: {
+
+        x: {
+            title: {
+                display: true,
+                text: "Event",
+                color: "#000000",
+                font: {
+                    weight: "bold"
+                }
+            },
+
+            ticks: {
+                color: "#000000"
+            },
+
+            grid: {
+                color: "rgba(0, 0, 0, 0.20)"
+            }
+        },
+
+        y: {
+            title: {
+                display: true,
+                text: "TS",
+                color: "#000000",
+                font: {
+                    weight: "bold"
+                }
+            },
+
+            ticks: {
+                color: "#000000"
+            },
+
+            grid: {
+                color: "rgba(0, 0, 0, 0.20)"
+            }
+        }
+    },
+
+    plugins: {
+
+        legend: {
+            labels: {
+                color: "#000000"
+            }
+        },
+
+        tooltip: {
+            enabled: true
+        }
+    }
+}
+
+
+    });
+}
+
 function exportCSV() {
 
 	// ToDo: TI exportieren,
@@ -768,6 +1009,28 @@ function exportCSV() {
     URL.revokeObjectURL(url);
 }
 
+
+function toggleGraphik() {
+
+    const container = document.getElementById("chartContainer");
+    const button = document.getElementById("GraphikBtn");
+
+    graphikVisible = !graphikVisible;
+
+    if (graphikVisible) {
+
+        container.style.display = "block";
+        button.textContent = "Hide Graphik";
+
+        showGraphik();
+
+    } else {
+
+        container.style.display = "none";
+        button.textContent = "Show Graphik";
+    }
+}
+	    
 // Hauptberechnung
 function calc() {
 
@@ -983,6 +1246,10 @@ function calc() {
 	    else { mfCells[i].classList.add("cloud"); }
 	} 
     }
+    if (graphikVisible) {
+	    showGraphik();
+    }
+
 }
 
 // Events
@@ -1015,6 +1282,10 @@ document.querySelectorAll(".psy-input").forEach(el =>
 document
     .getElementById("csv_import")
     .addEventListener("change", importCSV);
+
+document.getElementById("GraphikBtn")
+    .addEventListener("click", toggleGraphik);
+
 document.getElementById("csvBtn")
     .addEventListener("click", exportCSV);
 
