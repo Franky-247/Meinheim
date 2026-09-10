@@ -255,15 +255,19 @@ die Intensität direkt nach dem Spiel wieder anzuheben.
 </p>
 
 <h3>Beispiel für einen graphischen Vergleich mehrerer TS-Pläne</h3> 
-<p> Mit <strong>gnuplot</strong> können mehrere exportierte TS-Pläne miteinander verglichen und grafisch dargestellt werden. Dazu werden die CSV-Dateien mit einem Gnuplot-Skript eingelesen. </p> 
-<p>Das Skript kann beispielsweise mit folgendem Befehl gestartet werden:</p> <pre><code>gnuplot ts-export.gp</code></pre> 
+<p> Die exportierten CSV-Dateien können auch mit externen Programmen grafisch ausgewertet werden. 
+Ein Beispiel ist <strong>gnuplot</strong>, mit dem sich beispielsweise mehrere TS-Pläne miteinander vergleichen lassen. </p> 
+<p> Das folgende Beispiel verwendet drei exportierte TS-Pläne und stellt deren Mittelfeldentwicklung über die Events gemeinsam dar. </p> 
+<p>Zusätzlich werden noch die Verläufe des Mittelfeldes für PIN, PIC und MOTS bei dem Plan ts-export-3.csv angezeigt.</p> 
+<p>Aufruf des Gnuplot-Skripts:</p> 
+<pre><code>gnuplot ts-export.gp</code></pre> 
 <p>Inhalt der Datei <code>ts-export.gp</code>:</p> 
 <pre><code>
 set terminal wxt
 
 set datafile separator ";"
 
-set title "TS und MF über die Events"
+set title "MF über die Events"
 set xlabel "Event"
 set ylabel "Wert"
 set grid
@@ -271,13 +275,20 @@ set autoscale
 
 plot 'ts-export-1.csv' using 2:11 with linespoints title 'MF PIN PIC PIC', \
      'ts-export-2.csv' using 2:11 with linespoints title 'MF PIN PIN PIC', \
+     'ts-export-3.csv' using 2:11 with linespoints title 'MF PIC PIC PIC', \
      'ts-export-3.csv' using 2:17 with linespoints title 'MF auswärts PIN', \
      'ts-export-3.csv' using 2:18 with linespoints title 'MF auswärts PIC', \
-     'ts-export-3.csv' using 2:19 with linespoints title 'MF auswärts MOTS', \
-     'ts-export-3.csv' using 2:11 with linespoints title 'MF PIC PIC PIC'
+     'ts-export-3.csv' using 2:19 with linespoints title 'MF auswärts MOTS'
 
 pause -1
-</code></pre> <p> In diesem Beispiel werden drei unterschiedliche TS-Pläne miteinander verglichen. Die Bezeichnungen <code>PIN PIN PIC</code>, <code>PIN PIC PIC</code> und <code>PIC PIC PIC</code> kennzeichnen die jeweils verwendete TS-Strategie. </p> <p> Die CSV-Dateien müssen sich im gleichen Verzeichnis wie die Gnuplot-Datei befinden, sofern im Skript keine anderen Pfade angegeben werden. </p>
+</code></pre> 
+<p> Die Bezeichnungen <code>PIN PIN PIC</code>, 
+<code>PIN PIC PIC</code> und <code>PIC PIC PIC</code> kennzeichnen die verwendeten TS-Strategien. </p> 
+<p> Dies ist lediglich ein Beispiel für eine weitergehende Auswertung. Gnuplot bietet zahlreiche weitere Möglichkeiten zur Darstellung und Analyse von Daten. Anwender, die solche Auswertungen erstellen möchten, finden entsprechende Informationen in der Gnuplot-Dokumentation. 
+<p> Die CSV-Dateien müssen sich im gleichen Verzeichnis wie die Gnuplot-Datei befinden, sofern im Skript keine anderen Pfade angegeben werden. </p>
+
+</p>
+
 
 <h3>Weiterführende Rechner &amp; Informationen</h3>
 
