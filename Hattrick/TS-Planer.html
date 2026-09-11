@@ -5,7 +5,7 @@
 <meta name="description" content="Hier könnt ihr die Hattrick Teamstimmung vorhersagen lassen."/>
 <meta name="keywords" content="hattrick, managertool, kostenlos, club, Teamstimmung, TS-Rechner. TS Predictor"/>
 
-<title>TS Planer v0.202609102347-alpha</title>
+<title>TS Planer v0.202609111428-alpha</title>
 
 <style>
 body { font-family: Arial; }
@@ -38,7 +38,7 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
             <div style="float: left; width:1000px;background: #75b777 ;background-repeat: no-repeat;">
                 <div style="text-align:left;">
 
-<h2>Hattrick Teamstimmung (TS) Planer (v0.202609102347-alpha )</h2>
+<h2>Hattrick Teamstimmung (TS) Planer (v0.202609111428-alpha )</h2>
 
 <label>Start-TS:</label>
 <input type="number" id="startTS" value="4.5" step="0.1" min="0.1" max="12">
@@ -250,15 +250,15 @@ for (let i = 0; i < 114; i++) {
                min="0"
                max="5">
     </td>
-        <td class="mfhome">-</td>
+        <td class="mfhomepin">-</td>
         <td class="mfhomepic">-</td>
         <td class="mfhomemots">-</td>
-        <td class="mfderby">-</td>
+        <td class="mfderbypin">-</td>
         <td class="mfderbypic">-</td>
         <td class="mfderbymots">-</td>
-        <td class="mf">-</td>
-        <td class="mfpic">-</td>
-        <td class="mfmots">-</td>
+        <td class="mfawaypin">-</td>
+        <td class="mfawaypic">-</td>
+        <td class="mfawaymots">-</td>
         <td class="match">-</td>
         <td class="teamB">-</td>
     `;
@@ -277,7 +277,7 @@ for (let i = 0; i < 114; i++) {
 <input type="file" id="csv_import" accept=".csv">
 
 <div id="chartContainer" style="display: none;">
-    <h3>TS-Verlauf</h3>
+    <h3>Verlauf</h3>
     <canvas id="tsChart"></canvas>
 </div>
 
@@ -760,6 +760,7 @@ function showGraphik() {
 
     const graphColumns = [
         "TS vor dem Spiel",
+        "TS nach dem Spiel",
         "Mittelfeld beim Spiel",
         "FQ",
         "Sportpsychologe"
@@ -1128,13 +1129,13 @@ function calc() {
     const tiCells = document.querySelectorAll(".ti-input");
     const fqCells = document.querySelectorAll(".fq-input");
     const psyCells = document.querySelectorAll(".psy-input");
-    const mfCells = document.querySelectorAll(".mf");
-    const mfpicCells = document.querySelectorAll(".mfpic");
-    const mfmotsCells = document.querySelectorAll(".mfmots");
+    const mfawaypinCells = document.querySelectorAll(".mfawaypin");
+    const mfawaypicCells = document.querySelectorAll(".mfawaypic");
+    const mfawaymotsCells = document.querySelectorAll(".mfawaymots");
     const mfhomepicCells = document.querySelectorAll(".mfhomepic");
     const mfhomemotsCells = document.querySelectorAll(".mfhomemots");
-    const mfhomeCells = document.querySelectorAll(".mfhome");
-    const mfderbyCells = document.querySelectorAll(".mfderby");
+    const mfhomepinCells = document.querySelectorAll(".mfhomepin");
+    const mfderbypinCells = document.querySelectorAll(".mfderbypin");
     const mfderbypicCells = document.querySelectorAll(".mfderbypic");
     const mfderbymotsCells = document.querySelectorAll(".mfderbymots");
     const mfmatchCells = document.querySelectorAll(".match");
@@ -1217,44 +1218,35 @@ function calc() {
         beforeCells[i].innerText = tsBefore.toFixed(2);
         afterCells[i].innerText = tsAfter.toFixed(2);
 
-
-	// let fq = parseFloat(fqInput.value);
-	// let psy = parseInt(psyInput.value);
-	let mf = mf_referenz + mf_referenz * ( tsBefore - tszielwert ) * 0.07;
+	let mfawaypin = mf_referenz + mf_referenz * ( tsBefore - tszielwert ) * 0.07;
 	// Playing away 		100%
 	// Playing at home 	119.892%
 	// Playing CA 		93%
 	// Playing PIC 		83.945%
 	// Playing MOTS 		111.49%
 	// Playing derby 		111.493% (*)    
-	let mfpic = mf * 0.83945;
-	let mfmots = mf * 1.1193;
-	let mfhome = mf * 1.19892;
-	let mfhomepic = mf * 1.19892 * 0.83945;
-	let mfhomemots = mf * 1.19892 * 1.1193;
-	let mfderby = mf * 1.11493;
-	let mfderbypic = mf * 1.11493 * 0.83945;
-	let mfderbymots = mf * 1.11493 * 1.1193;
-	let mfhmpic = mf * 1.11493;
-	let mfhmpin = mf * 1.11493;
-	let mfhmmots = mf * 1.11493;
-	let mfmatch = mf;
+	let mfawaypic = mfawaypin * 0.83945;
+	let mfawaymots = mfawaypin * 1.1193;
+	let mfhomepin = mfawaypin * 1.19892;
+	let mfhomepic = mfawaypin * 1.19892 * 0.83945;
+	let mfhomemots = mfawaypin * 1.19892 * 1.1193;
+	let mfderbypin = mfawaypin * 1.11493;
+	let mfderbypic = mfawaypin * 1.11493 * 0.83945;
+	let mfderbymots = mfawaypin * 1.11493 * 1.1193;
+	let mfmatch = mfawaypin;
 	let teamB = "B";
 
 	log(1,"MF Referenz:",mf_referenz);
 	log(1,"start TS:",ruhe);
 	log(1,"TS: vorher",tsBefore);
 
-        // tiCells[i].innerText = ti.toFixed(2);
-        // fqCells[i].innerText = fq.toFixed(2);
-        // psyCells[i].innerText = psy.toFixed(2);
-        mfCells[i].innerText = mf.toFixed(2);
-        mfpicCells[i].innerText = mfpic.toFixed(2);
-        mfmotsCells[i].innerText = mfmots.toFixed(2);
-        mfhomeCells[i].innerText = mfhome.toFixed(2);
+        mfawaypinCells[i].innerText = mfawaypin.toFixed(2);
+        mfawaypicCells[i].innerText = mfawaypic.toFixed(2);
+        mfawaymotsCells[i].innerText = mfawaymots.toFixed(2);
+        mfhomepinCells[i].innerText = mfhomepin.toFixed(2);
         mfhomepicCells[i].innerText = mfhomepic.toFixed(2);
         mfhomemotsCells[i].innerText = mfhomemots.toFixed(2);
-        mfderbyCells[i].innerText = mfderby.toFixed(2);
+        mfderbypinCells[i].innerText = mfderbypin.toFixed(2);
         mfderbypicCells[i].innerText = mfderbypic.toFixed(2);
         mfderbymotsCells[i].innerText = mfderbymots.toFixed(2);
         mfmatchCells[i].innerText = mfmatch.toFixed(2);
@@ -1285,43 +1277,43 @@ function calc() {
 			} 
             actions[i].value = "PIN";
 	} 
-	mfCells[i].classList.add("neutral");
-	mfCells[i].classList.add("normal");
+
+	mfawaypinCells[i].classList.add("normal");
 	if (action === "PIC") {
-	    if (spielort === "Neutral") { mfpicCells[i].classList.add("cool"); mfmatchCells[i].innerText = mfpic.toFixed(2);} 
+	    if (spielort === "Neutral") { mfawaypicCells[i].classList.add("cool"); mfmatchCells[i].innerText = mfawaypic.toFixed(2);} 
 	    else if ( spielort === "Home" ) { mfhomepicCells[i].classList.add("cool"); mfmatchCells[i].innerText = mfhomepic.toFixed(2); }
-	    else if ( spielort === "Away" ) { mfpicCells[i].classList.add("cool");  mfmatchCells[i].innerText = mfpic.toFixed(2);}
+	    else if ( spielort === "Away" ) { mfawaypicCells[i].classList.add("cool");  mfmatchCells[i].innerText = mfawaypic.toFixed(2);}
 	    else if ( spielort === "Derby" ) { mfderbypicCells[i].classList.add("cool"); mfmatchCells[i].innerText = mfderbypic.toFixed(2); }
-	    else { mfmatchCells[i].classList.add("cool"); mfmatchCells[i].innerText = mf.toFixed(2); }
+	    else { mfmatchCells[i].classList.add("cool"); mfmatchCells[i].innerText = mfawaypin.toFixed(2); }
             
 	} 
 	else if (action === "PIN") {
-	    if (spielort === "Neutral") { mfCells[i].classList.add("calm"); mfmatchCells[i].innerText = mf.toFixed(2); } 
-	    else if ( spielort === "Home" ) { mfhomeCells[i].classList.add("calm"); mfmatchCells[i].innerText = mfhome.toFixed(2); }
-	    else if ( spielort === "Away" ) { mfCells[i].classList.add("calm"); mfmatchCells[i].innerText = mf.toFixed(2); }
-	    else if ( spielort === "Derby" ) { mfderbyCells[i].classList.add("calm"); mfmatchCells[i].innerText = mfderby.toFixed(2); }
-	    else { mfmatchCells[i].classList.add("calm"); mfmatchCells[i].innerText = mf.toFixed(2); }
+	    if (spielort === "Neutral") { mfawaypinCells[i].classList.add("calm"); mfmatchCells[i].innerText = mfawaypin.toFixed(2); } 
+	    else if ( spielort === "Home" ) { mfhomepinCells[i].classList.add("calm"); mfmatchCells[i].innerText = mfhomepin.toFixed(2); }
+	    else if ( spielort === "Away" ) { mfawaypinCells[i].classList.add("calm"); mfmatchCells[i].innerText = mfawaypin.toFixed(2); }
+	    else if ( spielort === "Derby" ) { mfderbypinCells[i].classList.add("calm"); mfmatchCells[i].innerText = mfderbypin.toFixed(2); }
+	    else { mfmatchCells[i].classList.add("calm"); mfmatchCells[i].innerText = mfawaypin.toFixed(2); }
 	} 
 	else if (action === "MOTS") {
-	    if (spielort === "Neutral") { mfmotsCells[i].classList.add("hot"); mfmatchCells[i].innerText = mfmots.toFixed(2); } 
+	    if (spielort === "Neutral") { mfawaymotsCells[i].classList.add("hot"); mfmatchCells[i].innerText = mfawaymots.toFixed(2); } 
 	    else if ( spielort === "Home" ) { mfhomemotsCells[i].classList.add("hot"); mfmatchCells[i].innerText = mfhomemots.toFixed(2); }
-	    else if ( spielort === "Away" ) { mfmotsCells[i].classList.add("hot"); mfmatchCells[i].innerText = mfmots.toFixed(2); }
+	    else if ( spielort === "Away" ) { mfawaymotsCells[i].classList.add("hot"); mfmatchCells[i].innerText = mfawaymots.toFixed(2); }
 	    else if ( spielort === "Derby" ) { mfderbymotsCells[i].classList.add("hot"); mfmatchCells[i].innerText = mfderbymots.toFixed(2); }
-	    else { mfmatchCells[i].classList.add("hot"); mfmatchCells[i].innerText = mfmots.toFixed(2); }
+	    else { mfmatchCells[i].classList.add("hot"); mfmatchCells[i].innerText = mfawaymots.toFixed(2); }
 	} 
 	else if (action === "NORMAL") {
-	    if (spielort === "Neutral") { mfCells[i].classList.add("mormal"); mfmatchCells[i].innerText = mf.toFixed(2); } 
-	    else if ( spielort === "Home" ) { mfhomeCells[i].classList.add("mormal"); mfmatchCells[i].innerText = mfhome.toFixed(2); }
-	    else if ( spielort === "Away" ) { mfCells[i].classList.add("mormal"); mfmatchCells[i].innerText = mf.toFixed(2); }
-	    else if ( spielort === "Derby" ) { mfderbyCells[i].classList.add("mormal"); mfmatchCells[i].innerText = mfderby.toFixed(2); }
-	    else { mfmatchCells[i].classList.add("mormal"); mfmatchCells[i].innerText = mf.toFixed(2); }
+	    if (spielort === "Neutral") { mfawaypinCells[i].classList.add("mormal"); mfmatchCells[i].innerText = mfawaypin.toFixed(2); } 
+	    else if ( spielort === "Home" ) { mfhomepinCells[i].classList.add("mormal"); mfmatchCells[i].innerText = mfhomepin.toFixed(2); }
+	    else if ( spielort === "Away" ) { mfawaypinCells[i].classList.add("mormal"); mfmatchCells[i].innerText = mfawaypin.toFixed(2); }
+	    else if ( spielort === "Derby" ) { mfderbypinCells[i].classList.add("mormal"); mfmatchCells[i].innerText = mfderbypin.toFixed(2); }
+	    else { mfmatchCells[i].classList.add("mormal"); mfmatchCells[i].innerText = mfawaypin.toFixed(2); }
 	} 
 	else { 
-	    if (spielort === "Neutral") { mfCells[i].classList.add("cloud"); mfmatchCells[i].innerText = mf.toFixed(2); } 
-	    else if ( spielort === "Home" ) { mfhomeCells[i].classList.add("cloud"); mfmatchCells[i].innerText = mfhome.toFixed(2); }
-	    else if ( spielort === "Away" ) { mfCells[i].classList.add("cloud"); mfmatchCells[i].innerText = mf.toFixed(2); }
-	    else if ( spielort === "Derby" ) { mfderbyCells[i].classList.add("cloud"); mfmatchCells[i].innerText = mfderby.toFixed(2); }
-	    else { mfmatchCells[i].classList.add("cloud"); mfmatchCells[i].innerText = mf.toFixed(2); }
+	    if (spielort === "Neutral") { mfawaypinCells[i].classList.add("cloud"); mfmatchCells[i].innerText = mfawaypin.toFixed(2); } 
+	    else if ( spielort === "Home" ) { mfhomepinCells[i].classList.add("cloud"); mfmatchCells[i].innerText = mfhomepin.toFixed(2); }
+	    else if ( spielort === "Away" ) { mfawaypinCells[i].classList.add("cloud"); mfmatchCells[i].innerText = mfawaypin.toFixed(2); }
+	    else if ( spielort === "Derby" ) { mfderbypinCells[i].classList.add("cloud"); mfmatchCells[i].innerText = mfderbypin.toFixed(2); }
+	    else { mfmatchCells[i].classList.add("cloud"); mfmatchCells[i].innerText = mfawaypin.toFixed(2); }
 	} 
 	mfmatchCells[i].classList.add("normal");
     }
