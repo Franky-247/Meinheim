@@ -5,7 +5,7 @@
 <meta name="description" content="Hier könnt ihr die Hattrick Teamstimmung vorhersagen lassen."/>
 <meta name="keywords" content="hattrick, managertool, kostenlos, club, Teamstimmung, TS-Rechner. TS Predictor"/>
 
-<title>TS Planer v0.202609081335-alpha</title>
+<title>TS Planer v0.202609102347-alpha</title>
 
 <style>
 body { font-family: Arial; }
@@ -38,7 +38,7 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
             <div style="float: left; width:1000px;background: #75b777 ;background-repeat: no-repeat;">
                 <div style="text-align:left;">
 
-<h2>Hattrick Teamstimmung (TS) Planer (v0.202609081335-alpha )</h2>
+<h2>Hattrick Teamstimmung (TS) Planer (v0.202609102347-alpha )</h2>
 
 <label>Start-TS:</label>
 <input type="number" id="startTS" value="4.5" step="0.1" min="0.1" max="12">
@@ -138,6 +138,8 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
             <th>Mittelfeld Auswärts PIN</th>
             <th>Mittelfeld Auswärts PIC</th>
             <th>Mittelfeld Auswärts MOTS</th>
+            <th>Mittelfeld beim Spiel</th>
+            <th>Gegner</th>
         </tr>
     </thead>
     <tbody id="table-body"></tbody>
@@ -255,8 +257,10 @@ for (let i = 0; i < 114; i++) {
         <td class="mfderbypic">-</td>
         <td class="mfderbymots">-</td>
         <td class="mf">-</td>
-        <td class="pic">-</td>
-        <td class="mots">-</td>
+        <td class="mfpic">-</td>
+        <td class="mfmots">-</td>
+        <td class="match">-</td>
+        <td class="teamB">-</td>
     `;
     tbody.appendChild(row);
 
@@ -711,7 +715,7 @@ function importCSV() {
 
         log(1, "CSV erfolgreich importiert.");
 
-        // calc();
+        calc();
     };
 
     reader.onerror = function () {
@@ -745,215 +749,281 @@ function getCellValue(cell) {
 let tsChart = null;
 let graphikVisible = false;
 
-
 function showGraphik() {
 
     const table = document.getElementById("tsTable");
+
+    // ============================================================
+    // Hier festlegen, welche Tabellenspalten als Kurven
+    // dargestellt werden sollen.
+    // ============================================================
+
+    const graphColumns = [
+        "TS vor dem Spiel",
+        "Mittelfeld beim Spiel",
+        "FQ",
+        "Sportpsychologe"
+    ];
+
+
+    // ============================================================
+    // Überschriften der Tabelle ermitteln
+    // ============================================================
 
     const headers = Array.from(
         table.querySelectorAll("thead th")
     ).map(th => th.textContent.trim());
 
-    const eventCol = headers.indexOf("Event");
-    const tsCol = headers.indexOf("TS vor dem Spiel");
 
-    if (eventCol === -1 || tsCol === -1) {
-        alert("Spalten für Event oder TS vor dem Spiel nicht gefunden.");
+    // ============================================================
+    // Spaltennummern für die gewünschten Kurven ermitteln
+    // ============================================================
+
+    const columnIndices = graphColumns.map(columnName => {
+
+        const index = headers.indexOf(columnName);
+
+        if (index === -1) {
+            console.warn(
+                `Spalte "${columnName}" wurde nicht gefunden.`
+            );
+        }
+
+        return index;
+    });
+
+
+    // Nur tatsächlich vorhandene Spalten verwenden
+    const validColumns = graphColumns
+        .map((name, index) => ({
+            name: name,
+            index: columnIndices[index]
+        }))
+        .filter(column => column.index !== -1);
+
+
+    if (validColumns.length === 0) {
+        alert("Keine der angegebenen Grafik-Spalten wurde gefunden.");
         return;
     }
 
+
+    // ============================================================
+    // Events und Daten vorbereiten
+    // ============================================================
+
     const events = [];
-    const ts = [];
+
+    const datasets = validColumns.map(column => ({
+        label: column.name,
+        data: []
+    }));
+
+
+    // ============================================================
+    // Tabelle durchlaufen
+    // ============================================================
 
     table.querySelectorAll("tbody tr").forEach(row => {
 
         const cols = row.querySelectorAll("td");
 
-        const event = cols[eventCol].textContent.trim();
-        const value = getCellValue(cols[tsCol]);
+        // Event-Spalte suchen
+        const eventCol = headers.indexOf("Event");
 
-        if (event !== "" && value !== null) {
-            events.push(event);
-            ts.push(value);
+        if (eventCol === -1 || !cols[eventCol]) {
+            return;
         }
+
+        const event = cols[eventCol].textContent.trim();
+
+        if (event === "") {
+            return;
+        }
+
+
+        // Werte für die einzelnen Kurven auslesen
+        const values = validColumns.map(column => {
+
+            const cell = cols[column.index];
+
+            if (!cell) {
+                return null;
+            }
+
+            return getCellValue(cell);
+        });
+
+
+        // Event nur übernehmen, wenn mindestens
+        // ein gültiger Wert vorhanden ist.
+        if (values.some(value => value !== null)) {
+
+            events.push(event);
+
+            values.forEach((value, index) => {
+                datasets[index].data.push(value);
+            });
+        }
+
     });
 
+
+    // ============================================================
     // Container sichtbar machen
+    // ============================================================
+
     document.getElementById("chartContainer").style.display = "block";
 
-    // Altes Diagramm entfernen
-    // if (tsChart !== null) {
-        // tsChart.destroy();
-    // }
 
-	const ctx = document.getElementById("tsChart");
+    // ============================================================
+    // Canvas
+    // ============================================================
 
-	if (tsChart === null) {
-
-	    tsChart = new Chart(ctx, {
-
-		type: "line",
-
-		data: {
-		    labels: events,
-
-		    datasets: [{
-			label: "TS",
-			data: ts,
-
-			borderColor: "#3366cc",
-			backgroundColor: "#3366cc",
-
-			borderWidth: 1.5,
-			pointRadius: 2,
-			pointHoverRadius: 5,
-
-			tension: 0.1
-		    }]
-		},
-
-		options: {
-		    responsive: true,
-
-		    scales: {
-			x: {
-			    title: {
-				display: true,
-				text: "Event",
-				color: "#000000",
-				font: {
-				    weight: "bold"
-				}
-			    },
-			    ticks: {
-				color: "#000000"
-			    },
-			    grid: {
-				color: "rgba(0, 0, 0, 0.20)"
-			    }
-			},
-
-			y: {
-			    title: {
-				display: true,
-				text: "TS",
-				color: "#000000",
-				font: {
-				    weight: "bold"
-				}
-			    },
-			    ticks: {
-				color: "#000000"
-			    },
-			    grid: {
-				color: "rgba(0, 0, 0, 0.20)"
-			    }
-			}
-		    }
-		}
-	    });
-
-	} else {
-
-	    tsChart.data.labels = events;
-	    tsChart.data.datasets[0].data = ts;
-
-		if (tsChart === null) {
-		    // Chart erstmalig erzeugen
-		} else {
-		    // nur Daten ändern
-		    tsChart.data.labels = events;
-		    tsChart.data.datasets[0].data = ts;
-		    tsChart.update();
-		}
-
-	}
+    const ctx = document.getElementById("tsChart");
 
 
-    tsChart = new Chart(ctx, {
+    // ============================================================
+    // Farben für die verschiedenen Kurven
+    // ============================================================
 
-        type: "line",
+    const colors = [
+        "#3366cc",   // blau
+        "#dc3912",   // rot
+        "#109618",   // grün
+        "#ff9900",   // orange
+        "#990099",   // violett
+        "#0099c6",   // türkis
+        "#dd4477",   // pink
+        "#66aa00"    // hellgrün
+    ];
 
-        data: {
-            labels: events,
 
-            datasets: [{
-                label: "TS",
-                data: ts,
+    // ============================================================
+    // Chart.js-Datasets erzeugen
+    // ============================================================
 
-                borderColor: "rgb(54, 162, 235)",
-                backgroundColor: "rgba(54, 162, 235, 0.15)",
+    datasets.forEach((dataset, index) => {
 
-                borderWidth: 2,
-                pointRadius: 3,
-                pointHoverRadius: 6,
+        dataset.borderColor =
+            colors[index % colors.length];
 
-                tension: 0.1
-            }]
-        },
+        dataset.backgroundColor =
+            colors[index % colors.length];
 
-	    options: {
+        dataset.borderWidth = 1.5;
 
-    responsive: true,
+        dataset.pointRadius = 2;
 
-    scales: {
+        dataset.pointHoverRadius = 5;
 
-        x: {
-            title: {
-                display: true,
-                text: "Event",
-                color: "#000000",
-                font: {
-                    weight: "bold"
-                }
-            },
-
-            ticks: {
-                color: "#000000"
-            },
-
-            grid: {
-                color: "rgba(0, 0, 0, 0.20)"
-            }
-        },
-
-        y: {
-            title: {
-                display: true,
-                text: "TS",
-                color: "#000000",
-                font: {
-                    weight: "bold"
-                }
-            },
-
-            ticks: {
-                color: "#000000"
-            },
-
-            grid: {
-                color: "rgba(0, 0, 0, 0.20)"
-            }
-        }
-    },
-
-    plugins: {
-
-        legend: {
-            labels: {
-                color: "#000000"
-            }
-        },
-
-        tooltip: {
-            enabled: true
-        }
-    }
-}
-
+        dataset.tension = 0.1;
 
     });
+
+
+    // ============================================================
+    // Chart erstmalig erzeugen
+    // ============================================================
+
+    if (tsChart === null) {
+
+        tsChart = new Chart(ctx, {
+
+            type: "line",
+
+            data: {
+                labels: events,
+                datasets: datasets
+            },
+
+            options: {
+
+                responsive: true,
+
+                scales: {
+
+                    x: {
+
+                        title: {
+                            display: true,
+                            text: "Event",
+                            color: "#000000",
+                            font: {
+                                weight: "bold"
+                            }
+                        },
+
+                        ticks: {
+                            color: "#000000"
+                        },
+
+                        grid: {
+                            color: "rgba(0, 0, 0, 0.20)"
+                        }
+                    },
+
+
+                    y: {
+
+                        title: {
+                            display: true,
+                            text: "Wert",
+                            color: "#000000",
+                            font: {
+                                weight: "bold"
+                            }
+                        },
+
+                        ticks: {
+                            color: "#000000"
+                        },
+
+                        grid: {
+                            color: "rgba(0, 0, 0, 0.20)"
+                        }
+                    }
+                },
+
+
+                plugins: {
+
+                    legend: {
+
+                        labels: {
+                            color: "#000000"
+                        }
+                    },
+
+
+                    tooltip: {
+                        enabled: true
+                    }
+
+                }
+
+            }
+
+        });
+
+
+    } else {
+
+        // ========================================================
+        // Chart existiert bereits:
+        // Nur Daten aktualisieren
+        // ========================================================
+
+        tsChart.data.labels = events;
+
+        tsChart.data.datasets = datasets;
+
+        tsChart.update();
+
+    }
+
 }
+
 
 function exportCSV() {
 
@@ -1059,14 +1129,16 @@ function calc() {
     const fqCells = document.querySelectorAll(".fq-input");
     const psyCells = document.querySelectorAll(".psy-input");
     const mfCells = document.querySelectorAll(".mf");
-    const picCells = document.querySelectorAll(".pic");
-    const motsCells = document.querySelectorAll(".mots");
+    const mfpicCells = document.querySelectorAll(".mfpic");
+    const mfmotsCells = document.querySelectorAll(".mfmots");
     const mfhomepicCells = document.querySelectorAll(".mfhomepic");
     const mfhomemotsCells = document.querySelectorAll(".mfhomemots");
     const mfhomeCells = document.querySelectorAll(".mfhome");
     const mfderbyCells = document.querySelectorAll(".mfderby");
     const mfderbypicCells = document.querySelectorAll(".mfderbypic");
     const mfderbymotsCells = document.querySelectorAll(".mfderbymots");
+    const mfmatchCells = document.querySelectorAll(".match");
+    const teamBCells = document.querySelectorAll(".teamB");
 
     let ruhe = getRuhewert(tszielwert, defpsy);
     let factors = fqFactor(deffq);
@@ -1155,8 +1227,8 @@ function calc() {
 	// Playing PIC 		83.945%
 	// Playing MOTS 		111.49%
 	// Playing derby 		111.493% (*)    
-	let pic = mf * 0.83945;
-	let mots = mf * 1.1193;
+	let mfpic = mf * 0.83945;
+	let mfmots = mf * 1.1193;
 	let mfhome = mf * 1.19892;
 	let mfhomepic = mf * 1.19892 * 0.83945;
 	let mfhomemots = mf * 1.19892 * 1.1193;
@@ -1166,6 +1238,8 @@ function calc() {
 	let mfhmpic = mf * 1.11493;
 	let mfhmpin = mf * 1.11493;
 	let mfhmmots = mf * 1.11493;
+	let mfmatch = mf;
+	let teamB = "B";
 
 	log(1,"MF Referenz:",mf_referenz);
 	log(1,"start TS:",ruhe);
@@ -1175,14 +1249,16 @@ function calc() {
         // fqCells[i].innerText = fq.toFixed(2);
         // psyCells[i].innerText = psy.toFixed(2);
         mfCells[i].innerText = mf.toFixed(2);
-        picCells[i].innerText = pic.toFixed(2);
-        motsCells[i].innerText = mots.toFixed(2);
+        mfpicCells[i].innerText = mfpic.toFixed(2);
+        mfmotsCells[i].innerText = mfmots.toFixed(2);
         mfhomeCells[i].innerText = mfhome.toFixed(2);
         mfhomepicCells[i].innerText = mfhomepic.toFixed(2);
         mfhomemotsCells[i].innerText = mfhomemots.toFixed(2);
         mfderbyCells[i].innerText = mfderby.toFixed(2);
         mfderbypicCells[i].innerText = mfderbypic.toFixed(2);
         mfderbymotsCells[i].innerText = mfderbymots.toFixed(2);
+        mfmatchCells[i].innerText = mfmatch.toFixed(2);
+        teamBCells[i].innerText = "Team B";
 
         // Farbe
         afterCells[i].className = "after";
@@ -1209,42 +1285,45 @@ function calc() {
 			} 
             actions[i].value = "PIN";
 	} 
-	// mfCells[i].classList.add("paradise");
+	mfCells[i].classList.add("neutral");
+	mfCells[i].classList.add("normal");
 	if (action === "PIC") {
-	    if (spielort === "Neutral") { picCells[i].classList.add("cool"); } 
-	    else if ( spielort === "Home" ) { mfhomepicCells[i].classList.add("cool"); }
-	    else if ( spielort === "Away" ) { picCells[i].classList.add("cool"); }
-	    else if ( spielort === "Derby" ) { mfderbypicCells[i].classList.add("cool"); }
-	    else { mfCells[i].classList.add("normal"); }
+	    if (spielort === "Neutral") { mfpicCells[i].classList.add("cool"); mfmatchCells[i].innerText = mfpic.toFixed(2);} 
+	    else if ( spielort === "Home" ) { mfhomepicCells[i].classList.add("cool"); mfmatchCells[i].innerText = mfhomepic.toFixed(2); }
+	    else if ( spielort === "Away" ) { mfpicCells[i].classList.add("cool");  mfmatchCells[i].innerText = mfpic.toFixed(2);}
+	    else if ( spielort === "Derby" ) { mfderbypicCells[i].classList.add("cool"); mfmatchCells[i].innerText = mfderbypic.toFixed(2); }
+	    else { mfmatchCells[i].classList.add("cool"); mfmatchCells[i].innerText = mf.toFixed(2); }
+            
 	} 
 	else if (action === "PIN") {
-	    if (spielort === "Neutral") { mfCells[i].classList.add("calm"); } 
-	    else if ( spielort === "Home" ) { mfhomeCells[i].classList.add("calm"); }
-	    else if ( spielort === "Away" ) { mfCells[i].classList.add("calm"); }
-	    else if ( spielort === "Derby" ) { mfderbyCells[i].classList.add("calm"); }
-	    else { mfCells[i].classList.add("calm"); }
+	    if (spielort === "Neutral") { mfCells[i].classList.add("calm"); mfmatchCells[i].innerText = mf.toFixed(2); } 
+	    else if ( spielort === "Home" ) { mfhomeCells[i].classList.add("calm"); mfmatchCells[i].innerText = mfhome.toFixed(2); }
+	    else if ( spielort === "Away" ) { mfCells[i].classList.add("calm"); mfmatchCells[i].innerText = mf.toFixed(2); }
+	    else if ( spielort === "Derby" ) { mfderbyCells[i].classList.add("calm"); mfmatchCells[i].innerText = mfderby.toFixed(2); }
+	    else { mfmatchCells[i].classList.add("calm"); mfmatchCells[i].innerText = mf.toFixed(2); }
 	} 
 	else if (action === "MOTS") {
-	    if (spielort === "Neutral") { motsCells[i].classList.add("hot"); } 
-	    else if ( spielort === "Home" ) { mfhomemotsCells[i].classList.add("hot"); }
-	    else if ( spielort === "Away" ) { motsCells[i].classList.add("hot"); }
-	    else if ( spielort === "Derby" ) { mfderbymotsCells[i].classList.add("hot"); }
-	    else { mfCells[i].classList.add("normal"); }
+	    if (spielort === "Neutral") { mfmotsCells[i].classList.add("hot"); mfmatchCells[i].innerText = mfmots.toFixed(2); } 
+	    else if ( spielort === "Home" ) { mfhomemotsCells[i].classList.add("hot"); mfmatchCells[i].innerText = mfhomemots.toFixed(2); }
+	    else if ( spielort === "Away" ) { mfmotsCells[i].classList.add("hot"); mfmatchCells[i].innerText = mfmots.toFixed(2); }
+	    else if ( spielort === "Derby" ) { mfderbymotsCells[i].classList.add("hot"); mfmatchCells[i].innerText = mfderbymots.toFixed(2); }
+	    else { mfmatchCells[i].classList.add("hot"); mfmatchCells[i].innerText = mfmots.toFixed(2); }
 	} 
 	else if (action === "NORMAL") {
-	    if (spielort === "Neutral") { mfCells[i].classList.add("mormal"); } 
-	    else if ( spielort === "Home" ) { mfhomeCells[i].classList.add("mormal"); }
-	    else if ( spielort === "Away" ) { mfCells[i].classList.add("mormal"); }
-	    else if ( spielort === "Derby" ) { mfderbyCells[i].classList.add("mormal"); }
-	    else { mfCells[i].classList.add("mormal"); }
+	    if (spielort === "Neutral") { mfCells[i].classList.add("mormal"); mfmatchCells[i].innerText = mf.toFixed(2); } 
+	    else if ( spielort === "Home" ) { mfhomeCells[i].classList.add("mormal"); mfmatchCells[i].innerText = mfhome.toFixed(2); }
+	    else if ( spielort === "Away" ) { mfCells[i].classList.add("mormal"); mfmatchCells[i].innerText = mf.toFixed(2); }
+	    else if ( spielort === "Derby" ) { mfderbyCells[i].classList.add("mormal"); mfmatchCells[i].innerText = mfderby.toFixed(2); }
+	    else { mfmatchCells[i].classList.add("mormal"); mfmatchCells[i].innerText = mf.toFixed(2); }
 	} 
 	else { 
-	    if (spielort === "Neutral") { mfCells[i].classList.add("cloud"); } 
-	    else if ( spielort === "Home" ) { mfhomeCells[i].classList.add("cloud"); }
-	    else if ( spielort === "Away" ) { mfCells[i].classList.add("cloud"); }
-	    else if ( spielort === "Derby" ) { mfderbyCells[i].classList.add("cloud"); }
-	    else { mfCells[i].classList.add("cloud"); }
+	    if (spielort === "Neutral") { mfCells[i].classList.add("cloud"); mfmatchCells[i].innerText = mf.toFixed(2); } 
+	    else if ( spielort === "Home" ) { mfhomeCells[i].classList.add("cloud"); mfmatchCells[i].innerText = mfhome.toFixed(2); }
+	    else if ( spielort === "Away" ) { mfCells[i].classList.add("cloud"); mfmatchCells[i].innerText = mf.toFixed(2); }
+	    else if ( spielort === "Derby" ) { mfderbyCells[i].classList.add("cloud"); mfmatchCells[i].innerText = mfderby.toFixed(2); }
+	    else { mfmatchCells[i].classList.add("cloud"); mfmatchCells[i].innerText = mf.toFixed(2); }
 	} 
+	mfmatchCells[i].classList.add("normal");
     }
     if (graphikVisible) {
 	    showGraphik();
