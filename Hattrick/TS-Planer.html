@@ -5,7 +5,7 @@
 <meta name="description" content="Hier könnt ihr die Hattrick Teamstimmung vorhersagen lassen."/>
 <meta name="keywords" content="hattrick, managertool, kostenlos, club, Teamstimmung, TS-Rechner. TS Predictor"/>
 
-<title>TS Planer v0.202609111428-alpha</title>
+<title>TS Planer v0.202609121657-alpha</title>
 
 <style>
 body { font-family: Arial; }
@@ -38,7 +38,7 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
             <div style="float: left; width:1000px;background: #75b777 ;background-repeat: no-repeat;">
                 <div style="text-align:left;">
 
-<h2>Hattrick Teamstimmung (TS) Planer (v0.202609111428-alpha )</h2>
+<h2>Hattrick Teamstimmung (TS) Planer (v0.202609121657-alpha )</h2>
 
 <label>Start-TS:</label>
 <input type="number" id="startTS" value="4.5" step="0.1" min="0.1" max="12">
@@ -260,7 +260,7 @@ for (let i = 0; i < 114; i++) {
         <td class="mfawaypic">-</td>
         <td class="mfawaymots">-</td>
         <td class="match">-</td>
-        <td class="teamB">-</td>
+        <td class="gegner">-</td>
     `;
     tbody.appendChild(row);
 
@@ -608,6 +608,7 @@ function importCSV() {
         const fqIndex = headers.indexOf("FQ");
         const tiIndex = headers.indexOf("TI");
         const psyIndex = headers.indexOf("Sportpsychologe");
+        const gegnerIndex = headers.indexOf("Gegner");
 
         if (typeIndex === -1 || actionIndex === -1 || ortIndex === -1 ||
             fqIndex === -1 || tiIndex === -1 || psyIndex === -1) {
@@ -711,6 +712,16 @@ function importCSV() {
                     psyInput.value = psyWert;
                 }
             }
+            // -----------------------------
+            // Gegner
+            // -----------------------------
+	    const gegner = tr.querySelector(".gegner");
+
+		if (gegner) {
+		    const gegnerWert = csvRow[gegnerIndex]?.trim() || "-";
+		    gegner.textContent = gegnerWert;
+		}
+
         });
 
         log(1, "CSV erfolgreich importiert.");
@@ -1139,7 +1150,7 @@ function calc() {
     const mfderbypicCells = document.querySelectorAll(".mfderbypic");
     const mfderbymotsCells = document.querySelectorAll(".mfderbymots");
     const mfmatchCells = document.querySelectorAll(".match");
-    const teamBCells = document.querySelectorAll(".teamB");
+    const gegnerCells = document.querySelectorAll(".gegner");
 
     let ruhe = getRuhewert(tszielwert, defpsy);
     let factors = fqFactor(deffq);
@@ -1234,7 +1245,7 @@ function calc() {
 	let mfderbypic = mfawaypin * 1.11493 * 0.83945;
 	let mfderbymots = mfawaypin * 1.11493 * 1.1193;
 	let mfmatch = mfawaypin;
-	let teamB = "B";
+	let gegner = "B";
 
 	log(1,"MF Referenz:",mf_referenz);
 	log(1,"start TS:",ruhe);
@@ -1250,7 +1261,7 @@ function calc() {
         mfderbypicCells[i].innerText = mfderbypic.toFixed(2);
         mfderbymotsCells[i].innerText = mfderbymots.toFixed(2);
         mfmatchCells[i].innerText = mfmatch.toFixed(2);
-        teamBCells[i].innerText = "Team B";
+        // gegnerCells[i].innerText = "Team B";
 
         // Farbe
         afterCells[i].className = "after";
