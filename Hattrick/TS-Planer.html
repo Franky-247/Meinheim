@@ -5,7 +5,7 @@
 <meta name="description" content="Hier könnt ihr die Hattrick Teamstimmung vorhersagen lassen."/>
 <meta name="keywords" content="hattrick, managertool, kostenlos, club, Teamstimmung, TS-Rechner. TS Predictor"/>
 
-<title>TS Planer v0.202609121657-alpha</title>
+<title>TS Planer v0.202609131014-alpha</title>
 
 <style>
 body { font-family: Arial; }
@@ -38,10 +38,10 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
             <div style="float: left; width:1000px;background: #75b777 ;background-repeat: no-repeat;">
                 <div style="text-align:left;">
 
-<h2>Hattrick Teamstimmung (TS) Planer (v0.202609121657-alpha )</h2>
+<h2>Hattrick Teamstimmung (TS) Planer (v0.202609131014-alpha )</h2>
 
 <label>Start-TS:</label>
-<input type="number" id="startTS" value="4.5" step="0.1" min="0.1" max="12">
+<input type="number" id="startTS" value="4.5" step="0.01" min="0" max="12">
 
 <label>Ruhewert :</label>
 <input type="number" id="ruhewert" value="4.5" step="0.1" min="0" max="10">
@@ -50,7 +50,7 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
 <input type="number"
        id="mf_referenz"
        value="10.0"
-       step="0.25"
+       step="0.05"
        min="0"
        max="100.0">
 
@@ -59,6 +59,7 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
 <label>Pokal-Aus ab:</label>
 <select id="cupExit">
     <option value="99">Noch im Pokal</option>
+    <option value="0">Runde 0</option>
     <option value="1">Runde 1</option>
     <option value="2">Runde 2</option>
     <option value="3">Runde 3</option>
@@ -193,6 +194,9 @@ for (let i = 0; i < 114; i++) {
                 <option value="MiniCup">MiniCup</option>
                 <option value="Turnier">Turnier</option>
                 <option value="Reset">Reset</option>
+                <option value="Reset 80 %">Reset 80 %</option>
+                <option value="Reset 60 %">Reset 60 %</option>
+                <option value="Reset 40 %">Reset 40 %</option>
                 <option value="TI einstellen">TI einstellen</option>
                 <option value="TI-Schraube">TI-Schraube</option>
                 <option value="Nero pill">Nero pill</option>
@@ -219,7 +223,6 @@ for (let i = 0; i < 114; i++) {
                 <option value="PIN">PIN</option>
                 <option value="MOTS">MOTS</option>
             </select>
-
         </td>
 
         <td class="before">-</td>
@@ -260,7 +263,9 @@ for (let i = 0; i < 114; i++) {
         <td class="mfawaypic">-</td>
         <td class="mfawaymots">-</td>
         <td class="match">-</td>
-        <td class="gegner">-</td>
+        <td class="gegner">
+        <input type="text"
+	</td>
     `;
     tbody.appendChild(row);
 
@@ -384,7 +389,6 @@ function applyTIDefaults(changedInput) {
 
 
 function getRuhewert(ruhewert, psy) {
-    // return Math.min(5.0, 4.5 + psy * 0.1);
     return Math.min(5.0, ruhewert + psy * 0.1);
 }
 
@@ -395,7 +399,7 @@ function applyUpdate(ts, ruhe, factors) {
     let tsdrift = parseInt(document.getElementById("ts_drift").value);
     let tszielwert = parseInt(document.getElementById("ruhewert").value);
     log(1,"TS Drift:", tsdrift);
-    if (tszielwert < 5 ) {
+    if (tszielwert <= 4.5 ) {
 	    if (ts > 9.99) {
 		// Verein: Cap 9.99 beim ersten täglichen TS-Update
 		ts = 9.99;
@@ -417,7 +421,7 @@ function applyUpdate(ts, ruhe, factors) {
         factor = factors.low;
     }
 
-	// ts = ts + (ruhe - ts) * (  drift_high / (fq - ts_drift) )
+    // ts = ts + (ruhe - ts) * (  drift_high / (fq - ts_drift) )
     return ts + (ruhe - ts) * factor;
 }
 
@@ -527,6 +531,8 @@ function applySeasonDefaults() {
 // 
 
 function applyMatch(ts, action, type) {
+    	let tszielwert = parseFloat(ruhewert.value);
+
 	if (type === "Hattrick Masters") {
 		if (action === "PIC") {
 			ts = ts * 5 / 4;
@@ -534,16 +540,16 @@ function applyMatch(ts, action, type) {
 			ts = ts * 3 / 4;
 		}
         } else if (type === "Reset") {
-			let tsdrift = parseInt(document.getElementById("ts_drift").value);
-			log(1,"TS Drift:", tsdrift, "TS:", ts);
-			if (tsdrift >= 1 ) {
-    				let tszielwert = parseFloat(ruhewert.value);
-				ts = tszielwert;
-			}
-			else
-			{ // Spezialfall NT/U21-NT
-				ts = 5;
-			}
+			// Spezialfall NT/U21-NT ts = 5.0
+			ts = tszielwert;
+        } else if (type === "Reset 80 %") {
+			// Beispiel aus dem Hattrick-Handbuch: (9 - 5) * 0.8 = 3,2
+			// Die Formel reduziert die Differenz zum Ruhewert; bei TS < Ruhewert steigt die TS entsprechend.
+			ts = ts - ( ts - tszielwert ) * 0.8;
+        } else if (type === "Reset 60 %") {
+			ts = ts - ( ts - tszielwert ) * 0.6;
+        } else if (type === "Reset 40 %") {
+			ts = ts - ( ts - tszielwert ) * 0.4;
         } else if (type === "Drop") {
 			ts = Math.ceil( ts ) - 1.01;
 	}
@@ -715,12 +721,12 @@ function importCSV() {
             // -----------------------------
             // Gegner
             // -----------------------------
-	    const gegner = tr.querySelector(".gegner");
+	    const gegner = tr.querySelector(".gegner input");
 
-		if (gegner) {
-		    const gegnerWert = csvRow[gegnerIndex]?.trim() || "-";
-		    gegner.textContent = gegnerWert;
-		}
+	    if (gegner) {
+		    const gegnerWert = csvRow[gegnerIndex]?.trim() || "";
+		    gegner.value = gegnerWert;
+	    }
 
         });
 
