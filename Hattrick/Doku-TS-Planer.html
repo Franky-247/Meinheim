@@ -59,14 +59,18 @@
 <br>
 <b>Nationalmannschaften</b><br>
   - Bei Nationalmannschaften (NT) und U21-Nationalmannschaften (U21-NT) zerfällt die TS langsamer als üblich.<br>
-  - Die Berechnungslogik für NTs wird über den Ruhwert aktiviert, wenn dieser >= 5.00 eingestellt wird.
-  - Die Start-TS beträgt bei NTs <b>5,0</b>. Die FQ sollte mindestens <b>6</b> betragen.<br>
+  - Die Berechnungslogik für NTs wird über den Ruhewert aktiviert, wenn dieser > 4,50 eingestellt wird.
+  - Die Start-TS beträgt bei NTs wie der Ruhewert <b>5,0</b>. <br>
+  - Für Nationalmannschaften gibt es keinen Trainer wie bei Vereinen. 
+  - Der FQ-Wert kann im Rechner dennoch verwendet werden, um den TS-Zerfall zu kalibrieren. 
+  - Nach bisherigen Beobachtungen liefert ein FQ-Wert von 7 gute Näherungen für die NT-TS-Entwicklung.
   - Für typische NT-Turniere ist der Spieltyp <b>„Turnier“</b> vorgesehen.<br>
   - Die Spieltypen <b>„Liga“</b>, <b>„Pokal“</b> und <b>„Relegation“</b> werden ebenfalls unterstützt.<br>
-  - Der Turnierplan muss in der Regel manuell erstellt werden. Hilfreich ist es, einen bereits erstellten Plan zu exportieren und diesen anschließend zur weiteren Bearbeitung wieder zu importieren.<br>
-  - Das Event <b>1</b> sollte evtl. von <b>Reset</b> auf <b>Turnierstart</b>, <b>Turnier</b>, <b>   </b> oder <b>Update</b> geändert werden.<br>
+  - Der Turnierplan muss in der Regel manuell erstellt werden. Im Download Bereich gibt es ein Beispiel, dass man importieren kann.
+  - Hilfreich ist es, einen bereits erstellten Plan zu exportieren und diesen anschließend zur weiteren Bearbeitung wieder zu importieren.<br>
+  - Das erste Event ist im Standardplan mit „Reset“ vorbelegt. Je nach verwendetem Szenario kann dieser Eintrag angepasst oder entfernt werden.
   - Mit dem "Spieltyp" <b>Update</b> können zur Not auch Fehleinträge überschrieben werden. Das wirkt, wie ein leerer Eintrag.<br>
-  - Das Mittelfeld bei Heimspielen wirkt wie bei "Auswärts-Derby".<br>
+  - Das Mittelfeld bei Heimspielen wirkt wie bei "Auswärts-Derby" bei Vereinen.<br>
 <br>
 <br>
 <hr>

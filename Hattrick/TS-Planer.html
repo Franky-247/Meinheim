@@ -5,7 +5,7 @@
 <meta name="description" content="Hier könnt ihr die Hattrick Teamstimmung vorhersagen lassen."/>
 <meta name="keywords" content="hattrick, managertool, kostenlos, club, Teamstimmung, TS-Rechner. TS Predictor"/>
 
-<title>TS Planer v0.202609131014-alpha</title>
+<title>TS Planer v0.202609131417-alpha</title>
 
 <style>
 body { font-family: Arial; }
@@ -38,13 +38,20 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
             <div style="float: left; width:1000px;background: #75b777 ;background-repeat: no-repeat;">
                 <div style="text-align:left;">
 
-<h2>Hattrick Teamstimmung (TS) Planer (v0.202609131014-alpha )</h2>
+<h2>Hattrick Teamstimmung (TS) Planer (v0.202609131417-alpha )</h2>
 
 <label>Start-TS:</label>
 <input type="number" id="startTS" value="4.5" step="0.01" min="0" max="12">
 
-<label>Ruhewert :</label>
-<input type="number" id="ruhewert" value="4.5" step="0.1" min="0" max="10">
+<label for="ruhewert">Ruhewert:</label>
+<input type="number"
+       id="ruhewert"
+       value="4.5"
+       step="0.5"
+       min="4.5"
+       max="5"
+       title="4,5 = Vereinslogik · über 4,5 = NT-Logik">
+
 
 <label>Referenz Mittelfeld Rating:</label>
 <input type="number"
@@ -387,33 +394,31 @@ function applyTIDefaults(changedInput) {
     }
 }
 
-
-function getRuhewert(ruhewert, psy) {
-    return Math.min(5.0, ruhewert + psy * 0.1);
+function getRuhewert(tsBasiswert, psy) {
+    return Math.min(5.0, tsBasiswert + psy * 0.1);
 }
 
 // Drift pro Update
+function applyUpdate(aktuelleTS, effektiverRuhewert, factors) {
 
-function applyUpdate(ts, ruhe, factors) {
+    let tsBasiswert = parseFloat(document.getElementById("ruhewert").value);
+    // Verein: Ruhewert 4.5 / NT: Ruhewert 5.0
 
-    let tsdrift = parseInt(document.getElementById("ts_drift").value);
-    let tszielwert = parseInt(document.getElementById("ruhewert").value);
-    log(1,"TS Drift:", tsdrift);
-    if (tszielwert <= 4.5 ) {
-	    if (ts > 9.99) {
+    if ( tsBasiswert <= 4.5 ) {
+	    if (aktuelleTS > 9.99) {
 		// Verein: Cap 9.99 beim ersten täglichen TS-Update
-		ts = 9.99;
+		aktuelleTS = 9.99;
     		}
     } else {
-	    if (ts > 10.99) {
+	    if (aktuelleTS > 10.99) {
 		// NT: Cap 10.99 beim ersten täglichen TS-Update
-		ts = 10.99;
+		aktuelleTS = 10.99;
     		}
     }
 
     let factor;
 
-    if (ts > ruhe) {
+    if (aktuelleTS > effektiverRuhewert) {
         // Zerfall von oben
         factor = factors.high;
     } else {
@@ -421,8 +426,8 @@ function applyUpdate(ts, ruhe, factors) {
         factor = factors.low;
     }
 
-    // ts = ts + (ruhe - ts) * (  drift_high / (fq - ts_drift) )
-    return ts + (ruhe - ts) * factor;
+    // aktuelleTS = aktuelleTS + (effektiverRuhewert - aktuelleTS) * (  drift_high / (fq - ts_drift) )
+    return aktuelleTS + (effektiverRuhewert - aktuelleTS) * factor;
 }
 
 function applySeasonDefaults() {
@@ -531,7 +536,7 @@ function applySeasonDefaults() {
 // 
 
 function applyMatch(ts, action, type) {
-    	let tszielwert = parseFloat(ruhewert.value);
+    	let tsBasiswert = parseFloat(ruhewert.value);
 
 	if (type === "Hattrick Masters") {
 		if (action === "PIC") {
@@ -541,15 +546,15 @@ function applyMatch(ts, action, type) {
 		}
         } else if (type === "Reset") {
 			// Spezialfall NT/U21-NT ts = 5.0
-			ts = tszielwert;
+			ts = tsBasiswert;
         } else if (type === "Reset 80 %") {
 			// Beispiel aus dem Hattrick-Handbuch: (9 - 5) * 0.8 = 3,2
 			// Die Formel reduziert die Differenz zum Ruhewert; bei TS < Ruhewert steigt die TS entsprechend.
-			ts = ts - ( ts - tszielwert ) * 0.8;
+			ts = ts - ( ts - tsBasiswert ) * 0.8;
         } else if (type === "Reset 60 %") {
-			ts = ts - ( ts - tszielwert ) * 0.6;
+			ts = ts - ( ts - tsBasiswert ) * 0.6;
         } else if (type === "Reset 40 %") {
-			ts = ts - ( ts - tszielwert ) * 0.4;
+			ts = ts - ( ts - tsBasiswert ) * 0.4;
         } else if (type === "Drop") {
 			ts = Math.ceil( ts ) - 1.01;
 	}
@@ -1128,7 +1133,7 @@ function calc() {
     let oldTI = tiAfter;
 
     let ts = parseFloat(startTS.value);
-    let tszielwert = parseFloat(ruhewert.value);
+    let tsBasiswert = parseFloat(ruhewert.value);
     let deffq = 6;
     let defpsy = 0;
 
@@ -1158,7 +1163,7 @@ function calc() {
     const mfmatchCells = document.querySelectorAll(".match");
     const gegnerCells = document.querySelectorAll(".gegner");
 
-    let ruhe = getRuhewert(tszielwert, defpsy);
+    let effektiverRuhewert = getRuhewert(tsBasiswert, defpsy);
     let factors = fqFactor(deffq);
     let drift_high = parseFloat(drift_highsetInput.value);
     let drift_low = parseFloat(drift_lowsetInput.value);
@@ -1172,13 +1177,13 @@ function calc() {
 	defpsy = Number(psyCells[i].value);
 	deffq = Number(fqCells[i].value);
 
-    	ruhe = getRuhewert(tszielwert, defpsy);
+    	effektiverRuhewert = getRuhewert(tsBasiswert, defpsy);
     	factors = fqFactor(deffq);
         // Drift vor Spiel
         let updates = getUpdates(types[i].value);
 
 	    for (let j = 0; j < updates; j++) {
- 		    ts = applyUpdate(ts, ruhe, factors);
+ 		    ts = applyUpdate(ts, effektiverRuhewert, factors);
 	}
 
 	let tsBefore = ts;
@@ -1235,7 +1240,7 @@ function calc() {
         beforeCells[i].innerText = tsBefore.toFixed(2);
         afterCells[i].innerText = tsAfter.toFixed(2);
 
-	let mfawaypin = mf_referenz + mf_referenz * ( tsBefore - tszielwert ) * 0.07;
+	let mfawaypin = mf_referenz + mf_referenz * ( tsBefore - tsBasiswert ) * 0.07;
 	// Playing away 		100%
 	// Playing at home 	119.892%
 	// Playing CA 		93%
@@ -1254,7 +1259,6 @@ function calc() {
 	let gegner = "B";
 
 	log(1,"MF Referenz:",mf_referenz);
-	log(1,"start TS:",ruhe);
 	log(1,"TS: vorher",tsBefore);
 
         mfawaypinCells[i].innerText = mfawaypin.toFixed(2);
@@ -1267,7 +1271,6 @@ function calc() {
         mfderbypicCells[i].innerText = mfderbypic.toFixed(2);
         mfderbymotsCells[i].innerText = mfderbymots.toFixed(2);
         mfmatchCells[i].innerText = mfmatch.toFixed(2);
-        // gegnerCells[i].innerText = "Team B";
 
         // Farbe
         afterCells[i].className = "after";
