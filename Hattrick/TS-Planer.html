@@ -5,7 +5,7 @@
 <meta name="description" content="Hier könnt ihr die Hattrick Teamstimmung vorhersagen lassen."/>
 <meta name="keywords" content="hattrick, managertool, kostenlos, club, Teamstimmung, TS-Rechner. TS Predictor"/>
 
-<title>TS Planer v0.202609131417-alpha</title>
+<title>TS Planer v0.202609192321-alpha</title>
 
 <style>
 body { font-family: Arial; }
@@ -38,7 +38,7 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
             <div style="float: left; width:1000px;background: #75b777 ;background-repeat: no-repeat;">
                 <div style="text-align:left;">
 
-<h2>Hattrick Teamstimmung (TS) Planer (v0.202609131417-alpha )</h2>
+<h2>Hattrick Teamstimmung (TS) Planer (v0.202609192321-alpha )</h2>
 
 <label>Start-TS:</label>
 <input type="number" id="startTS" value="4.5" step="0.01" min="0" max="12">
@@ -103,7 +103,7 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
 <label>Drift High :</label>
 <input type="number"
        id="drift_high"
-       value="0.3"
+       value="0.03"
        step="0.001"
        min="0"
        max="2">
@@ -329,8 +329,11 @@ function fqFactor(fq) {
         // low: drift_low + fq * ts_drift  ,
         // low: drift_low / (fq - ts_drift),
         // low: drift_low * ( fq −1)
+	    // 0,03⋅TS / ( FQ−1 )
+        // low: drift_low * ( fq − 1 ),
+        // low:  ( drift_high * drift_high ) / (fq - 1),
 
-        high: drift_high / (fq - ts_drift),
+        high: drift_high / (fq - 1),
         low: drift_low * ( fq - 1 )  ,
     };
 
@@ -404,18 +407,6 @@ function applyUpdate(aktuelleTS, effektiverRuhewert, factors) {
     let tsBasiswert = parseFloat(document.getElementById("ruhewert").value);
     // Verein: Ruhewert 4.5 / NT: Ruhewert 5.0
 
-    if ( tsBasiswert <= 4.5 ) {
-	    if (aktuelleTS > 9.99) {
-		// Verein: Cap 9.99 beim ersten täglichen TS-Update
-		aktuelleTS = 9.99;
-    		}
-    } else {
-	    if (aktuelleTS > 10.99) {
-		// NT: Cap 10.99 beim ersten täglichen TS-Update
-		aktuelleTS = 10.99;
-    		}
-    }
-
     let factor;
 
     if (aktuelleTS > effektiverRuhewert) {
@@ -427,7 +418,22 @@ function applyUpdate(aktuelleTS, effektiverRuhewert, factors) {
     }
 
     // aktuelleTS = aktuelleTS + (effektiverRuhewert - aktuelleTS) * (  drift_high / (fq - ts_drift) )
-    return aktuelleTS + (effektiverRuhewert - aktuelleTS) * factor;
+	    // 0,03⋅TS / ( FQ−1 )
+    aktuelleTS = aktuelleTS - ( aktuelleTS - effektiverRuhewert ) * factor * aktuelleTS;
+
+    if ( tsBasiswert <= 4.5 ) {
+	    if (aktuelleTS > 9.5) {
+		// Verein: Cap 9.5 beim ersten täglichen TS-Update
+		aktuelleTS = 9.5;
+    		}
+    } else {
+	    if (aktuelleTS > 10.99) {
+		// NT: Cap 10.99 beim ersten täglichen TS-Update
+		aktuelleTS = 10.99;
+    		}
+    }
+
+    return aktuelleTS;
 }
 
 function applySeasonDefaults() {
