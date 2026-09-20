@@ -5,7 +5,7 @@
 <meta name="description" content="Hier könnt ihr die Hattrick Teamstimmung vorhersagen lassen."/>
 <meta name="keywords" content="hattrick, managertool, kostenlos, club, Teamstimmung, TS-Rechner. TS Predictor"/>
 
-<title>TS Planer v0.202609192321-alpha</title>
+<title>TS Planer v0.202609201011-alpha</title>
 
 <style>
 body { font-family: Arial; }
@@ -38,7 +38,7 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
             <div style="float: left; width:1000px;background: #75b777 ;background-repeat: no-repeat;">
                 <div style="text-align:left;">
 
-<h2>Hattrick Teamstimmung (TS) Planer (v0.202609192321-alpha )</h2>
+<h2>Hattrick Teamstimmung (TS) Planer (v0.202609201011-alpha )</h2>
 
 <label>Start-TS:</label>
 <input type="number" id="startTS" value="4.5" step="0.01" min="0" max="12">
@@ -307,14 +307,7 @@ const drift_lowsetInput = document.getElementById("drift_low");
 const tsDriftInput = document.getElementById("ts_drift");
 const mfRefInput = document.getElementById("mf_referenz");
 
-// const cupExit = document.getElementById("cup");
-
-// --- Parameter (kalibriert auf mpn-Tabelle) ---
-
 function fqFactor(fq) {
-
-	// Der Cap ist nicht eindeutig belegt.
-    // fq = Math.min(fq, 9);
 
     const drift_high  = parseFloat(drift_highsetInput.value) || 0;
     const drift_low  = parseFloat(drift_lowsetInput.value) || 0;
@@ -322,27 +315,12 @@ function fqFactor(fq) {
     const mf_referenz  = parseFloat(mfRefInput.value) || 0;
 
     const result = {
-//      high: 0.07 - fq * 0.005, // hohe FQ bremst Zerfall
-//      low:  0.02 + fq * 0.005  // hohe FQ beschleunigt Erholung
-
-        // high: drift_high - fq * ts_drift  ,
-        // low: drift_low + fq * ts_drift  ,
-        // low: drift_low / (fq - ts_drift),
-        // low: drift_low * ( fq −1)
-	    // 0,03⋅TS / ( FQ−1 )
-        // low: drift_low * ( fq − 1 ),
-        // low:  ( drift_high * drift_high ) / (fq - 1),
+//      hohe FQ bremst Zerfall
+//      hohe FQ beschleunigt Erholung
 
         high: drift_high / (fq - 1),
         low: drift_low * ( fq - 1 )  ,
     };
-
-    log(1,"FQ:", fq);
-    log(1,"Drift High :", drift_high);
-    log(1,"Drift Low :", drift_low);
-    log(1,"High Faktor:", result.high);
-    log(1,"Low Faktor:", result.low);
-    log(1,"TS Drift:", ts_drift);
 
     return result;
 }
@@ -417,8 +395,6 @@ function applyUpdate(aktuelleTS, effektiverRuhewert, factors) {
         factor = factors.low;
     }
 
-    // aktuelleTS = aktuelleTS + (effektiverRuhewert - aktuelleTS) * (  drift_high / (fq - ts_drift) )
-	    // 0,03⋅TS / ( FQ−1 )
     aktuelleTS = aktuelleTS - ( aktuelleTS - effektiverRuhewert ) * factor * aktuelleTS;
 
     if ( tsBasiswert <= 4.5 ) {
