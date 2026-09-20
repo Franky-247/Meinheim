@@ -5,7 +5,7 @@
 <meta name="description" content="Hier könnt ihr die Hattrick Teamstimmung vorhersagen lassen."/>
 <meta name="keywords" content="hattrick, managertool, kostenlos, club, Teamstimmung, TS-Rechner. TS Predictor"/>
 
-<title>TS Planer v0.202609201011-alpha</title>
+<title>TS Planer v0.202609201919-alpha</title>
 
 <style>
 body { font-family: Arial; }
@@ -38,7 +38,7 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
             <div style="float: left; width:1000px;background: #75b777 ;background-repeat: no-repeat;">
                 <div style="text-align:left;">
 
-<h2>Hattrick Teamstimmung (TS) Planer (v0.202609201011-alpha )</h2>
+<h2>Hattrick Teamstimmung (TS) Planer (v0.202609201919-alpha )</h2>
 
 <label>Start-TS:</label>
 <input type="number" id="startTS" value="4.5" step="0.01" min="0" max="12">
@@ -104,7 +104,7 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
 <input type="number"
        id="drift_high"
        value="0.03"
-       step="0.001"
+       step="0.0001"
        min="0"
        max="2">
 
@@ -116,13 +116,13 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
        min="0"
        max="1">
 
-<label>TS Drift:</label>
+<label>FQ Drift:</label>
 <input type="number"
-       id="ts_drift"
+       id="fq_drift"
        value="1"
-       step="0.01"
+       step="0.0001"
        min="0"
-       max="3.0">
+       max="1.0">
 </div>
 
 
@@ -304,25 +304,33 @@ const psy_Input = document.getElementById("psy-input");
 const ti_Input = document.getElementById(".ti-input");
 const drift_highsetInput = document.getElementById("drift_high");
 const drift_lowsetInput = document.getElementById("drift_low");
-const tsDriftInput = document.getElementById("ts_drift");
+const fqDriftInput = document.getElementById("fq_drift");
 const mfRefInput = document.getElementById("mf_referenz");
 
 function fqFactor(fq) {
 
     const drift_high  = parseFloat(drift_highsetInput.value) || 0;
     const drift_low  = parseFloat(drift_lowsetInput.value) || 0;
-    const ts_drift  = parseFloat(tsDriftInput.value) || 0;
-    const mf_referenz  = parseFloat(mfRefInput.value) || 0;
 
     const result = {
-//      hohe FQ bremst Zerfall
-//      hohe FQ beschleunigt Erholung
+//  hohe FQ bremst Zerfall
+//  hohe FQ beschleunigt Erholung
 
         high: drift_high / (fq - 1),
         low: drift_low * ( fq - 1 )  ,
     };
 
     return result;
+}
+
+// Die FQ fällt im Schnitt in 24 Wochen um 1 Stufe.
+const FQ_DRIFT_BASE = 112 / 168;
+
+function fqDrift(fq) {
+
+    const fq_drift  = parseFloat(fqDriftInput.value) || 0;
+
+    return fq - FQ_DRIFT_BASE * (1 - fq_drift);
 }
 
 function applyFQDefaults(changedInput) {
@@ -332,13 +340,22 @@ function applyFQDefaults(changedInput) {
     const rows = Array.from(tbody.querySelectorAll("tr"));
     const startIndex = rows.indexOf(row);
 
+    let fqDefault = newFQ;
+
     for (let i = startIndex + 1; i < rows.length; i++) {
         const input = rows[i].querySelector(".fq-input");
 
-		if (input) {
-		    input.value = newFQ;
-		}
+	// FQ Zerfall findet beim TU statt
+        if ( ( i + 2 ) % 7 === 0) {
+		fqDefault = fqDrift(fqDefault);
+        } 
+
+	if (input) {
+	    // input.value = newFQ;
+	    input.value = fqDefault;
+	}
     }
+        // calc();
 }
 
 
@@ -1150,7 +1167,7 @@ function calc() {
     let drift_high = parseFloat(drift_highsetInput.value);
     let drift_low = parseFloat(drift_lowsetInput.value);
     let mf_referenz = parseFloat(mfRefInput.value);
-    let ts_drift = parseFloat(tsDriftInput.value);
+    let fq_drift = parseFloat(fqDriftInput.value);
 
 	log(1,beforeCells.length, afterCells.length);
 	log(1,"calc läuft");
@@ -1364,7 +1381,8 @@ document.getElementById("csvBtn")
 
 startTS.addEventListener("input", calc);
 ruhewert.addEventListener("input", calc);
-tsDriftInput.addEventListener("input", calc);
+// Kein Live-Recalc: FQ-Drift wird beim Ändern  der FQ in einer Zeile angewendet.
+// fqDriftInput.addEventListener("input", calc);
 mfRefInput.addEventListener("input", calc);
 drift_highsetInput.addEventListener("input", calc);
 drift_lowsetInput.addEventListener("input", calc);
