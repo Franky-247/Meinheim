@@ -5,7 +5,7 @@
 <meta name="description" content="Hier könnt ihr die Hattrick Teamstimmung vorhersagen lassen."/>
 <meta name="keywords" content="hattrick, managertool, kostenlos, club, Teamstimmung, TS-Rechner. TS Predictor"/>
 
-<title>TS Planer v0.202609201919-alpha</title>
+<title>TS Planer v0.202609211151-alpha</title>
 
 <style>
 body { font-family: Arial; }
@@ -27,7 +27,8 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
 .cool       { background: #b8d8fa; }
 .normal     { background: #78f7c5; }
 .hot        { background: #ffb366; }
-.neutral    { background: #75b77f; }
+.neutral    { background: #75b777; }
+.backgrnd   { background: #75b77f; }
 
 
 </style>
@@ -38,7 +39,7 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
             <div style="float: left; width:1000px;background: #75b777 ;background-repeat: no-repeat;">
                 <div style="text-align:left;">
 
-<h2>Hattrick Teamstimmung (TS) Planer (v0.202609201919-alpha )</h2>
+<h2>Hattrick Teamstimmung (TS) Planer (v0.202609211151-alpha )</h2>
 
 <label>Start-TS:</label>
 <input type="number" id="startTS" value="4.5" step="0.01" min="0" max="12">
@@ -195,8 +196,11 @@ for (let i = 0; i < 114; i++) {
                 <option value="Friendly">Friendly</option>
                 <option value="Pokal">Pokal</option>
                 <option value="Liga">Liga</option>
-                <option value="Relegation">Relegation</option>
+                <option value="Challenger-Pokal">Challenger-Pokal</option>
+                <option value="Trost-Pokal">Trost-Pokal</option>
+                <option value="Ligapokal">Ligapokal</option>
                 <option value="Hattrick Masters">Hattrick Masters</option>
+                <option value="Relegation">Relegation</option>
                 <option value="FedCup">FedCup</option>
                 <option value="MiniCup">MiniCup</option>
                 <option value="Turnier">Turnier</option>
@@ -209,6 +213,7 @@ for (let i = 0; i < 114; i++) {
                 <option value="Nero pill">Nero pill</option>
                 <option value="Drop">Drop</option>
                 <option value="Update">Update</option>
+                <option value="TU">TU</option>
                 <option value="Turnierstart">Turnierstart</option>
             </select>
         </td>
@@ -308,14 +313,15 @@ const fqDriftInput = document.getElementById("fq_drift");
 const mfRefInput = document.getElementById("mf_referenz");
 
 function fqFactor(fq) {
+    // Begrenze fq auf mindestens 1.01 ( wg. Div0 )
+    fq = Math.max(1.01, fq);
 
-    const drift_high  = parseFloat(drift_highsetInput.value) || 0;
-    const drift_low  = parseFloat(drift_lowsetInput.value) || 0;
+    const drift_high = parseFloat(drift_highsetInput.value) || 0;
+    const drift_low = parseFloat(drift_lowsetInput.value) || 0;
 
     const result = {
-//  hohe FQ bremst Zerfall
-//  hohe FQ beschleunigt Erholung
-
+    //  hohe FQ bremst Zerfall
+    //  hohe FQ beschleunigt Erholung
         high: drift_high / (fq - 1),
         low: drift_low * ( fq - 1 )  ,
     };
@@ -327,11 +333,13 @@ function fqFactor(fq) {
 const FQ_DRIFT_BASE = 112 / 168;
 
 function fqDrift(fq) {
+    const fq_drift = parseFloat(fqDriftInput.value) || 0;
 
-    const fq_drift  = parseFloat(fqDriftInput.value) || 0;
-
-    return fq - FQ_DRIFT_BASE * (1 - fq_drift);
+    fq = fq - FQ_DRIFT_BASE * (1 - fq_drift);
+    fq = Math.max(1.01, fq); // Begrenze fq auf mindestens 1.01
+    return fq;
 }
+
 
 function applyFQDefaults(changedInput) {
     const newFQ = Number(changedInput.value);
@@ -351,11 +359,9 @@ function applyFQDefaults(changedInput) {
         } 
 
 	if (input) {
-	    // input.value = newFQ;
 	    input.value = fqDefault;
 	}
     }
-        // calc();
 }
 
 
@@ -569,6 +575,7 @@ function applyMatch(ts, action, type) {
 }
 
 function applyTISchraube(ts, oldTI, newTI) {
+        oldTI = Math.max(0.001, oldTI);
 	const NERO_EXPONENT = Math.log(1.2) / Math.log(0.7);
 	return ts * (newTI / oldTI) ** NERO_EXPONENT;
 }
@@ -771,14 +778,11 @@ let tsChart = null;
 let graphikVisible = false;
 
 function showGraphik() {
-
     const table = document.getElementById("tsTable");
-
     // ============================================================
     // Hier festlegen, welche Tabellenspalten als Kurven
     // dargestellt werden sollen.
     // ============================================================
-
     const graphColumns = [
         "TS vor dem Spiel",
         "TS nach dem Spiel",
@@ -786,7 +790,6 @@ function showGraphik() {
         "FQ",
         "Sportpsychologe"
     ];
-
 
     // ============================================================
     // Überschriften der Tabelle ermitteln
@@ -796,24 +799,19 @@ function showGraphik() {
         table.querySelectorAll("thead th")
     ).map(th => th.textContent.trim());
 
-
     // ============================================================
     // Spaltennummern für die gewünschten Kurven ermitteln
     // ============================================================
 
     const columnIndices = graphColumns.map(columnName => {
-
         const index = headers.indexOf(columnName);
-
         if (index === -1) {
             console.warn(
                 `Spalte "${columnName}" wurde nicht gefunden.`
             );
         }
-
         return index;
     });
-
 
     // Nur tatsächlich vorhandene Spalten verwenden
     const validColumns = graphColumns
@@ -823,92 +821,64 @@ function showGraphik() {
         }))
         .filter(column => column.index !== -1);
 
-
     if (validColumns.length === 0) {
         alert("Keine der angegebenen Grafik-Spalten wurde gefunden.");
         return;
     }
-
 
     // ============================================================
     // Events und Daten vorbereiten
     // ============================================================
 
     const events = [];
-
     const datasets = validColumns.map(column => ({
         label: column.name,
         data: []
     }));
-
 
     // ============================================================
     // Tabelle durchlaufen
     // ============================================================
 
     table.querySelectorAll("tbody tr").forEach(row => {
-
         const cols = row.querySelectorAll("td");
-
         // Event-Spalte suchen
         const eventCol = headers.indexOf("Event");
-
         if (eventCol === -1 || !cols[eventCol]) {
             return;
         }
-
         const event = cols[eventCol].textContent.trim();
-
         if (event === "") {
             return;
         }
-
-
         // Werte für die einzelnen Kurven auslesen
         const values = validColumns.map(column => {
-
             const cell = cols[column.index];
-
             if (!cell) {
                 return null;
             }
-
             return getCellValue(cell);
         });
-
-
         // Event nur übernehmen, wenn mindestens
         // ein gültiger Wert vorhanden ist.
         if (values.some(value => value !== null)) {
-
             events.push(event);
-
             values.forEach((value, index) => {
                 datasets[index].data.push(value);
             });
         }
-
     });
-
-
     // ============================================================
     // Container sichtbar machen
     // ============================================================
-
     document.getElementById("chartContainer").style.display = "block";
-
-
     // ============================================================
     // Canvas
     // ============================================================
-
     const ctx = document.getElementById("tsChart");
-
-
     // ============================================================
     // Farben für die verschiedenen Kurven
     // ============================================================
-
     const colors = [
         "#3366cc",   // blau
         "#dc3912",   // rot
@@ -919,54 +889,33 @@ function showGraphik() {
         "#dd4477",   // pink
         "#66aa00"    // hellgrün
     ];
-
-
     // ============================================================
     // Chart.js-Datasets erzeugen
     // ============================================================
-
     datasets.forEach((dataset, index) => {
-
         dataset.borderColor =
             colors[index % colors.length];
-
         dataset.backgroundColor =
             colors[index % colors.length];
-
         dataset.borderWidth = 1.5;
-
         dataset.pointRadius = 2;
-
         dataset.pointHoverRadius = 5;
-
         dataset.tension = 0.1;
-
     });
-
-
     // ============================================================
     // Chart erstmalig erzeugen
     // ============================================================
-
     if (tsChart === null) {
-
         tsChart = new Chart(ctx, {
-
             type: "line",
-
             data: {
                 labels: events,
                 datasets: datasets
             },
-
             options: {
-
                 responsive: true,
-
                 scales: {
-
                     x: {
-
                         title: {
                             display: true,
                             text: "Event",
@@ -975,19 +924,14 @@ function showGraphik() {
                                 weight: "bold"
                             }
                         },
-
                         ticks: {
                             color: "#000000"
                         },
-
                         grid: {
                             color: "rgba(0, 0, 0, 0.20)"
                         }
                     },
-
-
                     y: {
-
                         title: {
                             display: true,
                             text: "Wert",
@@ -996,56 +940,36 @@ function showGraphik() {
                                 weight: "bold"
                             }
                         },
-
                         ticks: {
                             color: "#000000"
                         },
-
                         grid: {
                             color: "rgba(0, 0, 0, 0.20)"
                         }
                     }
                 },
-
-
                 plugins: {
-
                     legend: {
-
                         labels: {
                             color: "#000000"
                         }
                     },
-
-
                     tooltip: {
                         enabled: true
                     }
-
                 }
-
             }
-
         });
-
-
     } else {
-
         // ========================================================
         // Chart existiert bereits:
         // Nur Daten aktualisieren
         // ========================================================
-
         tsChart.data.labels = events;
-
         tsChart.data.datasets = datasets;
-
         tsChart.update();
-
     }
-
 }
-
 
 function exportCSV() {
 
@@ -1063,44 +987,29 @@ function exportCSV() {
 
 	// Zeilen
 	const rows = table.querySelectorAll("tbody tr");
-
 	rows.forEach(row => {
-
 	    const cols = row.querySelectorAll("td");
-
 	    const rowData = Array.from(cols).map(col => {
-
 		const field = col.querySelector("input, select, textarea");
-
 		if (field) {
 		    return field.value;
 		}
-
 		return col.textContent.trim();
 	    });
-
 	    csv.push(rowData.join(";"));
 	});
-
-
     // CSV-Datei erzeugen
     const blob = new Blob(
         [csv.join("\n")],
         { type: "text/csv;charset=utf-8;" }
     );
-
     const url = URL.createObjectURL(blob);
-
     const a = document.createElement("a");
-
     a.href = url;
     a.download = "ts-export.csv";
-
     a.click();
-
     URL.revokeObjectURL(url);
 }
-
 
 function toggleGraphik() {
 
@@ -1110,19 +1019,131 @@ function toggleGraphik() {
     graphikVisible = !graphikVisible;
 
     if (graphikVisible) {
-
         container.style.display = "block";
         button.textContent = "Hide Graphik";
-
         showGraphik();
-
     } else {
-
         container.style.display = "none";
         button.textContent = "Show Graphik";
     }
 }
-	    
+
+const mfawaypinCells = document.querySelectorAll(".mfawaypin");
+const mfawaypicCells = document.querySelectorAll(".mfawaypic");
+const mfawaymotsCells = document.querySelectorAll(".mfawaymots");
+const mfhomepicCells = document.querySelectorAll(".mfhomepic");
+const mfhomemotsCells = document.querySelectorAll(".mfhomemots");
+const mfhomepinCells = document.querySelectorAll(".mfhomepin");
+const mfderbypinCells = document.querySelectorAll(".mfderbypin");
+const mfderbypicCells = document.querySelectorAll(".mfderbypic");
+const mfderbymotsCells = document.querySelectorAll(".mfderbymots");
+const mfmatchCells = document.querySelectorAll(".match");
+
+let mfawaypin = 1;
+// Playing away 		100%
+// Playing at home 	119.892%
+// Playing CA 		93%
+// Playing PIC 		83.945%
+// Playing MOTS 		111.49%
+// Playing derby 		111.493% (*)    
+let mfawaypic = mfawaypin * 0.83945;
+let mfawaymots = mfawaypin * 1.1193;
+let mfhomepin = mfawaypin * 1.19892;
+let mfhomepic = mfawaypin * 1.19892 * 0.83945;
+let mfhomemots = mfawaypin * 1.19892 * 1.1193;
+let mfderbypin = mfawaypin * 1.11493;
+let mfderbypic = mfawaypin * 1.11493 * 0.83945;
+let mfderbymots = mfawaypin * 1.11493 * 1.1193;
+let mfmatch = mfawaypin;
+
+const actionMappings = {
+    "PIC": {
+        class: "cool",
+        cells: {
+            Neutral: mfawaypicCells,
+            Home: mfhomepicCells,
+            Away: mfawaypicCells,
+            Derby: mfderbypicCells
+        }
+    },
+
+    "PIN": {
+        class: "calm",
+        cells: {
+            Neutral: mfawaypinCells,
+            Home: mfhomepinCells,
+            Away: mfawaypinCells,
+            Derby: mfderbypinCells
+        }
+    },
+
+    "MOTS": {
+        class: "hot",
+        cells: {
+            Neutral: mfawaymotsCells,
+            Home: mfhomemotsCells,
+            Away: mfawaymotsCells,
+            Derby: mfderbymotsCells
+        }
+    },
+
+    "NORMAL": {
+        class: "normal",
+        cells: {
+            Neutral: mfawaypinCells,
+            Home: mfhomepinCells,
+            Away: mfawaypinCells,
+            Derby: mfderbypinCells
+        }
+    },
+
+    "": {
+        class: "cloud",
+        cells: {
+            "": mfmatchCells,          // <-- fehlt bisher
+            Neutral: mfmatchCells,
+            Home: mfhomepinCells,
+            Away: mfawaypinCells,
+            Derby: mfderbypinCells
+        }
+    },
+
+    "default": {
+        class: "cloud",
+        cells: {
+            "": mfmatchCells,
+            Neutral: mfmatchCells,
+            Home: mfhomepinCells,
+            Away: mfawaypinCells,
+            Derby: mfderbypinCells
+        }
+    }
+};
+
+function updateCell(i, action = "", spielort = "") {
+    // Fallback für leere action oder spielort
+    const mapping = actionMappings[action] || actionMappings[""];
+    const cells = mapping.cells[spielort] || mapping.cells[""] || mapping.cells.default || mfmatchCells;
+
+    const styleClass = mapping.class;
+
+    // Alle relevanten Zellen zurücksetzen
+    [mfawaypinCells[i], mfhomepinCells[i], mfawaypicCells[i], mfhomepicCells[i], mfawaymotsCells[i], mfhomemotsCells[i], mfderbypinCells[i], mfderbypicCells[i], mfderbymotsCells[i], mfmatchCells[i]]
+        .forEach(cell => cell.classList.remove("normal", "cool", "calm", "hot", "cloud"));
+
+    // Neue Klasse hinzufügen
+    cells[i].classList.add(styleClass);
+
+    // Text aktualisieren (Fallback auf mfawaypin/mfmatch, falls action oder spielort leer sind)
+    let value = mfawaypin;
+    if (action === "PIC") value = spielort === "Neutral" ? mfawaypic : spielort === "Home" ? mfhomepic : spielort === "Away" ? mfawaypic : spielort === "Derby" ? mfderbypic : mfawaypic;
+    else if (action === "PIN") value = spielort === "Neutral" ? mfawaypin : spielort === "Home" ? mfhomepin : spielort === "Away" ? mfawaypin : spielort === "Derby" ? mfderbypin : mfawaypin;
+    else if (action === "MOTS") value = spielort === "Neutral" ? mfawaymots : spielort === "Home" ? mfhomemots : spielort === "Away" ? mfawaymots : spielort === "Derby" ? mfderbymots : mfawaymots;
+    else if (action === "NORMAL") value = spielort === "Neutral" ? mfawaypin : spielort === "Home" ? mfhomepin : spielort === "Away" ? mfawaypin : spielort === "Derby" ? mfderbypin : mfawaypin;
+
+    mfmatchCells[i].innerText = value.toFixed(2);
+}
+
 // Hauptberechnung
 function calc() {
 
@@ -1150,16 +1171,6 @@ function calc() {
     const tiCells = document.querySelectorAll(".ti-input");
     const fqCells = document.querySelectorAll(".fq-input");
     const psyCells = document.querySelectorAll(".psy-input");
-    const mfawaypinCells = document.querySelectorAll(".mfawaypin");
-    const mfawaypicCells = document.querySelectorAll(".mfawaypic");
-    const mfawaymotsCells = document.querySelectorAll(".mfawaymots");
-    const mfhomepicCells = document.querySelectorAll(".mfhomepic");
-    const mfhomemotsCells = document.querySelectorAll(".mfhomemots");
-    const mfhomepinCells = document.querySelectorAll(".mfhomepin");
-    const mfderbypinCells = document.querySelectorAll(".mfderbypin");
-    const mfderbypicCells = document.querySelectorAll(".mfderbypic");
-    const mfderbymotsCells = document.querySelectorAll(".mfderbymots");
-    const mfmatchCells = document.querySelectorAll(".match");
     const gegnerCells = document.querySelectorAll(".gegner");
 
     let effektiverRuhewert = getRuhewert(tsBasiswert, defpsy);
@@ -1169,8 +1180,8 @@ function calc() {
     let mf_referenz = parseFloat(mfRefInput.value);
     let fq_drift = parseFloat(fqDriftInput.value);
 
-	log(1,beforeCells.length, afterCells.length);
-	log(1,"calc läuft");
+    log(1,beforeCells.length, afterCells.length);
+    log(1,"calc läuft");
 
     for (let i = 0; i < 114; i++) {
 	defpsy = Number(psyCells[i].value);
@@ -1186,6 +1197,17 @@ function calc() {
 	}
 
 	let tsBefore = ts;
+	mfawaypin = mf_referenz + mf_referenz * ( tsBefore - tsBasiswert ) * 0.07;
+	mfawaypic = mfawaypin * 0.83945;
+	mfawaymots = mfawaypin * 1.1193;
+	mfhomepin = mfawaypin * 1.19892;
+	mfhomepic = mfawaypin * 1.19892 * 0.83945;
+	mfhomemots = mfawaypin * 1.19892 * 1.1193;
+	mfderbypin = mfawaypin * 1.11493;
+	mfderbypic = mfawaypin * 1.11493 * 0.83945;
+	mfderbymots = mfawaypin * 1.11493 * 1.1193;
+	mfmatch = mfawaypin;
+
 
         let action = actions[i].value;
         let type = types[i].value;
@@ -1225,38 +1247,18 @@ function calc() {
 		}
 	}
 
-    // normale Berechnung ...
-
-    tiBefore = tiAfter;
+        // normale Berechnung ...
+        tiBefore = tiAfter;
 
         // Clamp
         ts = Math.max(0.5, Math.min(13.99, ts));
-
         let tsAfter = ts;
-
 
         // Ausgabe
         beforeCells[i].innerText = tsBefore.toFixed(2);
         afterCells[i].innerText = tsAfter.toFixed(2);
 
-	let mfawaypin = mf_referenz + mf_referenz * ( tsBefore - tsBasiswert ) * 0.07;
-	// Playing away 		100%
-	// Playing at home 	119.892%
-	// Playing CA 		93%
-	// Playing PIC 		83.945%
-	// Playing MOTS 		111.49%
-	// Playing derby 		111.493% (*)    
-	let mfawaypic = mfawaypin * 0.83945;
-	let mfawaymots = mfawaypin * 1.1193;
-	let mfhomepin = mfawaypin * 1.19892;
-	let mfhomepic = mfawaypin * 1.19892 * 0.83945;
-	let mfhomemots = mfawaypin * 1.19892 * 1.1193;
-	let mfderbypin = mfawaypin * 1.11493;
-	let mfderbypic = mfawaypin * 1.11493 * 0.83945;
-	let mfderbymots = mfawaypin * 1.11493 * 1.1193;
-	let mfmatch = mfawaypin;
 	let gegner = "B";
-
 	log(1,"MF Referenz:",mf_referenz);
 	log(1,"TS: vorher",tsBefore);
 
@@ -1296,50 +1298,12 @@ function calc() {
 			} 
             actions[i].value = "PIN";
 	} 
-
-	mfawaypinCells[i].classList.add("normal");
-	if (action === "PIC") {
-	    if (spielort === "Neutral") { mfawaypicCells[i].classList.add("cool"); mfmatchCells[i].innerText = mfawaypic.toFixed(2);} 
-	    else if ( spielort === "Home" ) { mfhomepicCells[i].classList.add("cool"); mfmatchCells[i].innerText = mfhomepic.toFixed(2); }
-	    else if ( spielort === "Away" ) { mfawaypicCells[i].classList.add("cool");  mfmatchCells[i].innerText = mfawaypic.toFixed(2);}
-	    else if ( spielort === "Derby" ) { mfderbypicCells[i].classList.add("cool"); mfmatchCells[i].innerText = mfderbypic.toFixed(2); }
-	    else { mfmatchCells[i].classList.add("cool"); mfmatchCells[i].innerText = mfawaypin.toFixed(2); }
-            
-	} 
-	else if (action === "PIN") {
-	    if (spielort === "Neutral") { mfawaypinCells[i].classList.add("calm"); mfmatchCells[i].innerText = mfawaypin.toFixed(2); } 
-	    else if ( spielort === "Home" ) { mfhomepinCells[i].classList.add("calm"); mfmatchCells[i].innerText = mfhomepin.toFixed(2); }
-	    else if ( spielort === "Away" ) { mfawaypinCells[i].classList.add("calm"); mfmatchCells[i].innerText = mfawaypin.toFixed(2); }
-	    else if ( spielort === "Derby" ) { mfderbypinCells[i].classList.add("calm"); mfmatchCells[i].innerText = mfderbypin.toFixed(2); }
-	    else { mfmatchCells[i].classList.add("calm"); mfmatchCells[i].innerText = mfawaypin.toFixed(2); }
-	} 
-	else if (action === "MOTS") {
-	    if (spielort === "Neutral") { mfawaymotsCells[i].classList.add("hot"); mfmatchCells[i].innerText = mfawaymots.toFixed(2); } 
-	    else if ( spielort === "Home" ) { mfhomemotsCells[i].classList.add("hot"); mfmatchCells[i].innerText = mfhomemots.toFixed(2); }
-	    else if ( spielort === "Away" ) { mfawaymotsCells[i].classList.add("hot"); mfmatchCells[i].innerText = mfawaymots.toFixed(2); }
-	    else if ( spielort === "Derby" ) { mfderbymotsCells[i].classList.add("hot"); mfmatchCells[i].innerText = mfderbymots.toFixed(2); }
-	    else { mfmatchCells[i].classList.add("hot"); mfmatchCells[i].innerText = mfawaymots.toFixed(2); }
-	} 
-	else if (action === "NORMAL") {
-	    if (spielort === "Neutral") { mfawaypinCells[i].classList.add("mormal"); mfmatchCells[i].innerText = mfawaypin.toFixed(2); } 
-	    else if ( spielort === "Home" ) { mfhomepinCells[i].classList.add("mormal"); mfmatchCells[i].innerText = mfhomepin.toFixed(2); }
-	    else if ( spielort === "Away" ) { mfawaypinCells[i].classList.add("mormal"); mfmatchCells[i].innerText = mfawaypin.toFixed(2); }
-	    else if ( spielort === "Derby" ) { mfderbypinCells[i].classList.add("mormal"); mfmatchCells[i].innerText = mfderbypin.toFixed(2); }
-	    else { mfmatchCells[i].classList.add("mormal"); mfmatchCells[i].innerText = mfawaypin.toFixed(2); }
-	} 
-	else { 
-	    if (spielort === "Neutral") { mfawaypinCells[i].classList.add("cloud"); mfmatchCells[i].innerText = mfawaypin.toFixed(2); } 
-	    else if ( spielort === "Home" ) { mfhomepinCells[i].classList.add("cloud"); mfmatchCells[i].innerText = mfhomepin.toFixed(2); }
-	    else if ( spielort === "Away" ) { mfawaypinCells[i].classList.add("cloud"); mfmatchCells[i].innerText = mfawaypin.toFixed(2); }
-	    else if ( spielort === "Derby" ) { mfderbypinCells[i].classList.add("cloud"); mfmatchCells[i].innerText = mfderbypin.toFixed(2); }
-	    else { mfmatchCells[i].classList.add("cloud"); mfmatchCells[i].innerText = mfawaypin.toFixed(2); }
-	} 
-	mfmatchCells[i].classList.add("normal");
+        log(1,"i:", i, "action:", action, "spielort:", spielort );
+	updateCell(i, action, spielort);
     }
     if (graphikVisible) {
 	    showGraphik();
     }
-
 }
 
 // Events
