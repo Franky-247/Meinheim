@@ -5,7 +5,7 @@
 <meta name="description" content="Hier könnt ihr die Hattrick Teamstimmung vorhersagen lassen."/>
 <meta name="keywords" content="hattrick, managertool, kostenlos, club, Teamstimmung, TS-Rechner. TS Predictor"/>
 
-<title>TS Planer v0.202609211151-alpha</title>
+<title>TS Planer v0.202609221550-alpha</title>
 
 <style>
 body { font-family: Arial; }
@@ -39,7 +39,7 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
             <div style="float: left; width:1000px;background: #75b777 ;background-repeat: no-repeat;">
                 <div style="text-align:left;">
 
-<h2>Hattrick Teamstimmung (TS) Planer (v0.202609211151-alpha )</h2>
+<h2>Hattrick Teamstimmung (TS) Planer (v0.202609221550-alpha )</h2>
 
 <label>Start-TS:</label>
 <input type="number" id="startTS" value="4.5" step="0.01" min="0" max="12">
@@ -101,21 +101,13 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
 <br>
 <div id="expert-options" hidden>
 
-<label>Drift High :</label>
+<label>TS Drift :</label>
 <input type="number"
-       id="drift_high"
+       id="ts_drift"
        value="0.03"
        step="0.0001"
        min="0"
        max="2">
-
-<label>Drift Low:</label>
-<input type="number"
-       id="drift_low"
-       value="0.0095"
-       step="0.00001"
-       min="0"
-       max="1">
 
 <label>FQ Drift:</label>
 <input type="number"
@@ -125,7 +117,6 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
        min="0"
        max="1.0">
 </div>
-
 
 <table id="tsTable" border="1">
     <thead> <tr> <th>Woche</th>
@@ -163,7 +154,7 @@ const params = new URLSearchParams(window.location.search);
 const DEBUG = Number(params.get("debug") || 0);
 const EXPERT = Number(params.get("expert") || 0);
 const FQ = Number(params.get("fq") || 6,5 );
-const DRIFT = Number(params.get("drift_high") || 0,3 );
+const DRIFT = Number(params.get("ts_drift") || 0,3 );
 
 function log(level, ...args) {
     if (DEBUG >= level) {
@@ -307,8 +298,7 @@ const ruhewert = document.getElementById("ruhewert");
 const fq_Input = document.getElementById("fq-input");
 const psy_Input = document.getElementById("psy-input");
 const ti_Input = document.getElementById(".ti-input");
-const drift_highsetInput = document.getElementById("drift_high");
-const drift_lowsetInput = document.getElementById("drift_low");
+const ts_driftsetInput = document.getElementById("ts_drift");
 const fqDriftInput = document.getElementById("fq_drift");
 const mfRefInput = document.getElementById("mf_referenz");
 
@@ -316,14 +306,13 @@ function fqFactor(fq) {
     // Begrenze fq auf mindestens 1.01 ( wg. Div0 )
     fq = Math.max(1.01, fq);
 
-    const drift_high = parseFloat(drift_highsetInput.value) || 0;
-    const drift_low = parseFloat(drift_lowsetInput.value) || 0;
-
+    const ts_drift = parseFloat(ts_driftsetInput.value) || 0;
+    
     const result = {
     //  hohe FQ bremst Zerfall
     //  hohe FQ beschleunigt Erholung
-        high: drift_high / (fq - 1),
-        low: drift_low * ( fq - 1 )  ,
+        high: ts_drift / (fq - 1),
+        low: ts_drift / 6 * ( fq - 1 )  ,
     };
 
     return result;
@@ -1175,8 +1164,7 @@ function calc() {
 
     let effektiverRuhewert = getRuhewert(tsBasiswert, defpsy);
     let factors = fqFactor(deffq);
-    let drift_high = parseFloat(drift_highsetInput.value);
-    let drift_low = parseFloat(drift_lowsetInput.value);
+    let ts_drift = parseFloat(ts_driftsetInput.value);
     let mf_referenz = parseFloat(mfRefInput.value);
     let fq_drift = parseFloat(fqDriftInput.value);
 
@@ -1348,8 +1336,7 @@ ruhewert.addEventListener("input", calc);
 // Kein Live-Recalc: FQ-Drift wird beim Ändern  der FQ in einer Zeile angewendet.
 // fqDriftInput.addEventListener("input", calc);
 mfRefInput.addEventListener("input", calc);
-drift_highsetInput.addEventListener("input", calc);
-drift_lowsetInput.addEventListener("input", calc);
+ts_driftsetInput.addEventListener("input", calc);
 cupExit.addEventListener("change", () => {
     applySeasonDefaults();
     calc();
