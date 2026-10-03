@@ -5,7 +5,7 @@
 <meta name="description" content="Hier könnt ihr die Hattrick Teamstimmung vorhersagen lassen."/>
 <meta name="keywords" content="hattrick, managertool, kostenlos, club, Teamstimmung, TS-Rechner. TS Predictor"/>
 
-<title>TS Planer v0.202609221550-alpha</title>
+<title>TS Planer v0.202610030925-alpha</title>
 
 <style>
 body { font-family: Arial; }
@@ -39,7 +39,7 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
             <div style="float: left; width:1000px;background: #75b777 ;background-repeat: no-repeat;">
                 <div style="text-align:left;">
 
-<h2>Hattrick Teamstimmung (TS) Planer (v0.202609221550-alpha )</h2>
+<h2>Hattrick Teamstimmung (TS) Planer (v0.202610030925-alpha )</h2>
 
 <label>Start-TS:</label>
 <input type="number" id="startTS" value="4.5" step="0.01" min="0" max="12">
@@ -78,10 +78,12 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
     <option value="8">Runde 8</option>
     <option value="9">Runde 9</option>
     <option value="10">Runde 10</option>
-    <option value="11">Achtelfinale</option>
-    <option value="12">Viertelfinale</option>
-    <option value="13">Halbfinale</option>
-    <option value="14">Finale</option>
+    <option value="11">Runde 11</option>
+    <option value="12">Runde 12</option>
+    <option value="13">Runde 13</option>
+    <option value="14">Runde 14</option>
+    <option value="15">Runde 15</option>
+    <option value="16">Runde 16</option>
 </select>
 
 <label>Hattrick Masters-Aus ab:</label>
@@ -116,6 +118,22 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
        step="0.0001"
        min="0"
        max="1.0">
+
+<label>PIC Faktor:</label>
+<input type="number"
+       id="pic_factor"
+       value="1.334"
+       step="0.001"
+       min="1"
+       max="2">
+
+<label>MOTS Faktor:</label>
+<input type="number"
+       id="mots_factor"
+       value="0.5228672"
+       step="0.0001"
+       min="0"
+       max="1">
 </div>
 
 <table id="tsTable" border="1">
@@ -301,6 +319,8 @@ const ti_Input = document.getElementById(".ti-input");
 const ts_driftsetInput = document.getElementById("ts_drift");
 const fqDriftInput = document.getElementById("fq_drift");
 const mfRefInput = document.getElementById("mf_referenz");
+const pic_factorInput = document.getElementById("pic_factor");
+const mots_factorInput = document.getElementById("mots_factor");
 
 function fqFactor(fq) {
     // Begrenze fq auf mindestens 1.01 ( wg. Div0 )
@@ -531,6 +551,8 @@ function applySeasonDefaults() {
 
 function applyMatch(ts, action, type) {
     	let tsBasiswert = parseFloat(ruhewert.value);
+        let pic = parseFloat(document.getElementById("pic_factor").value);
+        let mots = parseFloat(document.getElementById("mots_factor").value);
 
 	if (type === "Hattrick Masters") {
 		if (action === "PIC") {
@@ -555,9 +577,11 @@ function applyMatch(ts, action, type) {
 	else
 	{
 		if (action === "PIC") {
-			ts = ts * 4 / 3;
+			// ts = ts * 4 / 3;
+			ts = ts * pic;
 		    } else if (action === "MOTS") {
-			ts = ts / 2;
+			// ts = ts / 2;
+			ts = ts * mots;
 		}
 	}
     return ts;
@@ -1035,14 +1059,22 @@ let mfawaypin = 1;
 // Playing PIC 		83.945%
 // Playing MOTS 		111.49%
 // Playing derby 		111.493% (*)    
-let mfawaypic = mfawaypin * 0.83945;
-let mfawaymots = mfawaypin * 1.1193;
-let mfhomepin = mfawaypin * 1.19892;
-let mfhomepic = mfawaypin * 1.19892 * 0.83945;
-let mfhomemots = mfawaypin * 1.19892 * 1.1193;
-let mfderbypin = mfawaypin * 1.11493;
-let mfderbypic = mfawaypin * 1.11493 * 0.83945;
-let mfderbymots = mfawaypin * 1.11493 * 1.1193;
+// let mfawaypic = mfawaypin * 0.83945;
+// let mfawaymots = mfawaypin * 1.1193;
+// let mfhomepin = mfawaypin * 1.19892;
+// let mfhomepic = mfawaypin * 1.19892 * 0.83945;
+// let mfhomemots = mfawaypin * 1.19892 * 1.1193;
+// let mfderbypin = mfawaypin * 1.11493;
+// let mfderbypic = mfawaypin * 1.11493 * 0.83945;
+// let mfderbymots = mfawaypin * 1.11493 * 1.1193;
+let mfawaypic = mfawaypin * 0.5 ^ 0.25;
+let mfawaymots = mfawaypin * 1.5 ^ 0.25;
+let mfhomepin = mfawaypin * 1 * 12 / 10
+let mfhomepic = mfawaypin * 12 / 10 * 0.5 ^ 0.25;
+let mfhomemots = mfawaypin * 12 / 10 * 12 / 10;
+let mfderbypin = mfawaypin * 1 * 11 / 10;
+let mfderbypic = mfawaypin * 11 / 10 *  0.5 ^ 0.25;
+let mfderbymots = mfawaypin * 11 / 10 * 1.5 ^ 0.25;
 let mfmatch = mfawaypin;
 
 const actionMappings = {
@@ -1186,14 +1218,22 @@ function calc() {
 
 	let tsBefore = ts;
 	mfawaypin = mf_referenz + mf_referenz * ( tsBefore - tsBasiswert ) * 0.07;
-	mfawaypic = mfawaypin * 0.83945;
-	mfawaymots = mfawaypin * 1.1193;
-	mfhomepin = mfawaypin * 1.19892;
-	mfhomepic = mfawaypin * 1.19892 * 0.83945;
-	mfhomemots = mfawaypin * 1.19892 * 1.1193;
-	mfderbypin = mfawaypin * 1.11493;
-	mfderbypic = mfawaypin * 1.11493 * 0.83945;
-	mfderbymots = mfawaypin * 1.11493 * 1.1193;
+	// mfawaypic = mfawaypin * 0.83945;
+	 mfawaypic = mfawaypin * 0.5 ^ 0.25;
+	// mfawaymots = mfawaypin * 1.1193;
+	 mfawaymots = mfawaypin * 1.5 ^ 0.25;
+	// mfhomepin = mfawaypin * 1.19892;
+	 mfhomepin = mfawaypin * 1 * 12 / 10
+	// mfhomepic = mfawaypin * 1.19892 * 0.83945;
+	 mfhomepic = mfawaypin * 12 / 10 * 0.5 ^ 0.25;
+	// mfhomemots = mfawaypin * 1.19892 * 1.1193;
+	 mfhomemots = mfawaypin * 12 / 10 * 1.5 ^ 0.25;
+	// mfderbypin = mfawaypin * 1.11493;
+	 mfderbypin = mfawaypin * 1 * 11 / 10;
+	// mfderbypic = mfawaypin * 1.11493 * 0.83945;
+	 mfderbypic = mfawaypin * 11 / 10 *  0.5 ^ 0.25;
+	// mfderbymots = mfawaypin * 1.11493 * 1.1193;
+	 mfderbymots = mfawaypin * 11 / 10 * 1.5 ^ 0.25;
 	mfmatch = mfawaypin;
 
 
@@ -1239,7 +1279,7 @@ function calc() {
         tiBefore = tiAfter;
 
         // Clamp
-        ts = Math.max(0.5, Math.min(13.99, ts));
+        ts = Math.max(0.01, Math.min(13.99, ts));
         let tsAfter = ts;
 
         // Ausgabe
@@ -1333,6 +1373,8 @@ document.getElementById("csvBtn")
 
 startTS.addEventListener("input", calc);
 ruhewert.addEventListener("input", calc);
+pic_factor.addEventListener("input", calc);
+mots_factor.addEventListener("input", calc);
 // Kein Live-Recalc: FQ-Drift wird beim Ändern  der FQ in einer Zeile angewendet.
 // fqDriftInput.addEventListener("input", calc);
 mfRefInput.addEventListener("input", calc);
@@ -1374,8 +1416,6 @@ calc();
         <li><a class='nav-link' href='http://www.ht-links.de/TISchrauber.php'>TI-Schrauber zur Berechnung der optimalen Trainingsintensität</a></li>
         <li><a class='nav-link' href='https://ht.8ic.ro/trainingintensity'>Training Intensity bei HT Utilities</a></li>
         <li><a class='nav-link' href='/hattrick/ht-stamina'>Hattrick Konditionstabelle</a></li>
-        <li><a class='nav-link' href='/hattrick/TS-Rechner.html'>Hattrick Team Spirit (TS) Rechner</a></li>
-        <li><a class='nav-link' href='/hattrick/TS-Predictor.html'>Hattrick Team Spirit (TS) Predictor</a></li>
         <li><a class='nav-link' href='/hattrick/TS-subskill-calculator.htm'>Hattrick Team Spirit (TS) Subskill Calculator</a></li>
         <li><a class='nav-link' href='/hattrick/SV-subskill-calculator.htm'>Hattrick Selbstvertrauen ( SV ) Subskill Calculator </a></li>
 </ul>
