@@ -5,7 +5,7 @@
 <meta name="description" content="Hier könnt ihr die Hattrick Teamstimmung vorhersagen lassen."/>
 <meta name="keywords" content="hattrick, managertool, kostenlos, club, Teamstimmung, TS-Rechner. TS Predictor"/>
 
-<title>TS Planer v0.202610030925-alpha</title>
+<title>TS Planer v0.202610031150-alpha</title>
 
 <style>
 body { font-family: Arial; }
@@ -39,7 +39,7 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
             <div style="float: left; width:1000px;background: #75b777 ;background-repeat: no-repeat;">
                 <div style="text-align:left;">
 
-<h2>Hattrick Teamstimmung (TS) Planer (v0.202610030925-alpha )</h2>
+<h2>Hattrick Teamstimmung (TS) Planer (v0.202610031150-alpha )</h2>
 
 <label>Start-TS:</label>
 <input type="number" id="startTS" value="4.5" step="0.01" min="0" max="12">
@@ -1218,22 +1218,14 @@ function calc() {
 
 	let tsBefore = ts;
 	mfawaypin = mf_referenz + mf_referenz * ( tsBefore - tsBasiswert ) * 0.07;
-	// mfawaypic = mfawaypin * 0.83945;
-	 mfawaypic = mfawaypin * 0.5 ^ 0.25;
-	// mfawaymots = mfawaypin * 1.1193;
-	 mfawaymots = mfawaypin * 1.5 ^ 0.25;
-	// mfhomepin = mfawaypin * 1.19892;
-	 mfhomepin = mfawaypin * 1 * 12 / 10
-	// mfhomepic = mfawaypin * 1.19892 * 0.83945;
-	 mfhomepic = mfawaypin * 12 / 10 * 0.5 ^ 0.25;
-	// mfhomemots = mfawaypin * 1.19892 * 1.1193;
-	 mfhomemots = mfawaypin * 12 / 10 * 1.5 ^ 0.25;
-	// mfderbypin = mfawaypin * 1.11493;
-	 mfderbypin = mfawaypin * 1 * 11 / 10;
-	// mfderbypic = mfawaypin * 1.11493 * 0.83945;
-	 mfderbypic = mfawaypin * 11 / 10 *  0.5 ^ 0.25;
-	// mfderbymots = mfawaypin * 1.11493 * 1.1193;
-	 mfderbymots = mfawaypin * 11 / 10 * 1.5 ^ 0.25;
+	mfawaypic = mfawaypin * 0.83945;
+	mfawaymots = mfawaypin * 1.1193;
+	mfhomepin = mfawaypin * 1.19892;
+	mfhomepic = mfawaypin * 1.19892 * 0.83945;
+	mfhomemots = mfawaypin * 1.19892 * 1.1193;
+	mfderbypin = mfawaypin * 1.11493;
+	mfderbypic = mfawaypin * 1.11493 * 0.83945;
+	mfderbymots = mfawaypin * 1.11493 * 1.1193;
 	mfmatch = mfawaypin;
 
 
