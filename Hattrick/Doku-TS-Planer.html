@@ -312,6 +312,80 @@ pause -1
 
 <br>
 <hr>
+
+<h3>Referenz Mittelfeld Rating</h3>
+
+<p>
+  Das <strong>„Mittelfeld Auswärts PIN“</strong> dient als Referenz für die
+  Berechnung des Mittelfeldratings. Ausgehend von diesem Referenzwert werden
+  die verschiedenen Kombinationen aus <strong>Spielort</strong> und
+  <strong>Attitude</strong> (PIC / PIN / MOTS) berechnet.
+</p>
+
+<p>
+  Das Mittelfeldrating für ein Spiel wird dabei immer anhand der
+  <strong>aktuellen Teamstimmung (TS)</strong> berechnet. Dadurch kann
+  abgelesen werden, welches Mittelfeldrating unter den jeweiligen
+  Bedingungen zu erwarten ist.
+</p>
+
+<p>Der Plan zeigt dafür folgende Varianten:</p>
+
+<ul>
+  <li>Mittelfeld Heimspiel PIN</li>
+  <li>Mittelfeld Heimspiel PIC</li>
+  <li>Mittelfeld Heimspiel MOTS</li>
+  <li>Mittelfeld Auswärts-Derby PIN</li>
+  <li>Mittelfeld Auswärts-Derby PIC</li>
+  <li>Mittelfeld Auswärts-Derby MOTS</li>
+  <li>Mittelfeld Auswärts PIN</li>
+  <li>Mittelfeld Auswärts PIC</li>
+  <li>Mittelfeld Auswärts MOTS</li>
+</ul>
+
+<p>
+  Die Spalte <strong>„Mittelfeld beim Spiel“</strong> zeigt anschließend
+  den Wert, der aufgrund der aktuell eingestellten
+  <strong>Spielort- und Attitude-Einstellungen</strong> für das Spiel
+  gültig ist.
+</p>
+
+<p>
+  Die aktuell verwendete Kombination wird zusätzlich
+  <strong>farblich hervorgehoben</strong>. So ist auf einen Blick erkennbar,
+  aus welcher der berechneten Varianten das aktuelle Mittelfeldrating
+  übernommen wird.
+</p>
+
+<p>
+  Nach einem <strong>Reset</strong> sollte in Zeile 1 beim
+  <strong>„Mittelfeld Auswärts PIN“</strong> der eingestellte
+  <strong>MF-Referenzwert</strong> stehen.
+</p>
+
+<p>
+  Der Referenzwert kann so gewählt werden, dass das Team diesen Wert bei
+  <strong>Auswärts + PIN</strong> und einem <strong>TS von 4,5</strong>
+  erreicht. Damit können die übrigen Werte als Hochrechnung des
+  Referenzwerts betrachtet werden.
+</p>
+
+<p>
+  <strong>Beispiel:</strong><br>
+  Wird als MF-Referenzwert <strong>10</strong> gewählt, entspricht
+  <strong>Auswärts + PIN</strong> bei TS 4,5 dem Wert <strong>10</strong>.
+  Die anderen Felder zeigen, wie sich das Mittelfeldrating abhängig von
+  Spielort und Attitude verändert.
+</p>
+
+<p>
+  Der <strong>TS-Wert 4,5</strong> ist der Ruhewert, auf den die
+  Teamstimmung zu Beginn einer neuen Saison durch den Saison-Reset
+  zurückgesetzt wird.
+</p>
+
+<br>
+<hr>
 <h3>Weiterführende Rechner &amp; Informationen</h3>
 
 <ul>
