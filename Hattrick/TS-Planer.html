@@ -5,7 +5,7 @@
 <meta name="description" content="Hier könnt ihr die Hattrick Teamstimmung vorhersagen lassen."/>
 <meta name="keywords" content="hattrick, managertool, kostenlos, club, Teamstimmung, TS-Rechner. TS Predictor"/>
 
-<title>TS Planer v0.202610031150-alpha</title>
+<title>TS Planer v0.202610031250-alpha</title>
 
 <style>
 body { font-family: Arial; }
@@ -39,7 +39,7 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
             <div style="float: left; width:1000px;background: #75b777 ;background-repeat: no-repeat;">
                 <div style="text-align:left;">
 
-<h2>Hattrick Teamstimmung (TS) Planer (v0.202610031150-alpha )</h2>
+<h2>Hattrick Teamstimmung (TS) Planer (v0.202610031250-alpha )</h2>
 
 <label>Start-TS:</label>
 <input type="number" id="startTS" value="4.5" step="0.01" min="0" max="12">
@@ -1059,22 +1059,18 @@ let mfawaypin = 1;
 // Playing PIC 		83.945%
 // Playing MOTS 		111.49%
 // Playing derby 		111.493% (*)    
-// let mfawaypic = mfawaypin * 0.83945;
-// let mfawaymots = mfawaypin * 1.1193;
-// let mfhomepin = mfawaypin * 1.19892;
-// let mfhomepic = mfawaypin * 1.19892 * 0.83945;
-// let mfhomemots = mfawaypin * 1.19892 * 1.1193;
-// let mfderbypin = mfawaypin * 1.11493;
-// let mfderbypic = mfawaypin * 1.11493 * 0.83945;
-// let mfderbymots = mfawaypin * 1.11493 * 1.1193;
-let mfawaypic = mfawaypin * 0.5 ^ 0.25;
-let mfawaymots = mfawaypin * 1.5 ^ 0.25;
-let mfhomepin = mfawaypin * 1 * 12 / 10
-let mfhomepic = mfawaypin * 12 / 10 * 0.5 ^ 0.25;
-let mfhomemots = mfawaypin * 12 / 10 * 12 / 10;
-let mfderbypin = mfawaypin * 1 * 11 / 10;
-let mfderbypic = mfawaypin * 11 / 10 *  0.5 ^ 0.25;
-let mfderbymots = mfawaypin * 11 / 10 * 1.5 ^ 0.25;
+let mfpic =  0.5 ** 0.25;
+let mfmots =  1.5 ** 0.25;
+let mfhome =  12 / 10;
+let mfderby =  11 / 10;
+let mfawaypic = mfawaypin * mfpic;
+let mfawaymots = mfawaypin * mfmots;
+let mfhomepin = mfawaypin * mfhome;
+let mfhomepic = mfawaypin * mfhome * mfpic;
+let mfhomemots = mfawaypin * mfhome * mfmots;
+let mfderbypin = mfawaypin * mfderby;
+let mfderbypic = mfawaypin * mfderby * mfpic;
+let mfderbymots = mfawaypin * mfderby * mfmots;
 let mfmatch = mfawaypin;
 
 const actionMappings = {
@@ -1218,14 +1214,32 @@ function calc() {
 
 	let tsBefore = ts;
 	mfawaypin = mf_referenz + mf_referenz * ( tsBefore - tsBasiswert ) * 0.07;
-	mfawaypic = mfawaypin * 0.83945;
-	mfawaymots = mfawaypin * 1.1193;
-	mfhomepin = mfawaypin * 1.19892;
-	mfhomepic = mfawaypin * 1.19892 * 0.83945;
-	mfhomemots = mfawaypin * 1.19892 * 1.1193;
-	mfderbypin = mfawaypin * 1.11493;
-	mfderbypic = mfawaypin * 1.11493 * 0.83945;
-	mfderbymots = mfawaypin * 1.11493 * 1.1193;
+	// mfawaypic = mfawaypin * 0.83945;
+	// mfawaymots = mfawaypin * 1.1193;
+	// mfhomepin = mfawaypin * 1.19892;
+	// mfhomepic = mfawaypin * 1.19892 * 0.83945;
+	// mfhomemots = mfawaypin * 1.19892 * 1.1193;
+	// mfderbypin = mfawaypin * 1.11493;
+	// mfderbypic = mfawaypin * 1.11493 * 0.83945;
+	// mfderbymots = mfawaypin * 1.11493 * 1.1193;
+	 mfpic =  0.5 ** 0.25;
+	 mfmots =  1.5 ** 0.25;
+	 mfhome =  12 / 10;
+	 mfderby =  11 / 10;
+	 mfawaypic = mfawaypin * mfpic;
+	 mfawaymots = mfawaypin * mfmots;
+	 mfhomepin = mfawaypin * mfhome;
+	 mfhomepic = mfawaypin * mfhome * mfpic;
+	 mfhomemots = mfawaypin * mfhome * mfmots;
+	 mfderbypin = mfawaypin * mfderby;
+	 mfderbypic = mfawaypin * mfderby * mfpic;
+	 mfderbymots = mfawaypin * mfderby * mfmots;
+	 mfmatch = mfawaypin;
+
+	    log(1, "mfpic:", mfpic);
+	    log(1, "mfmots:", mfmots);
+	    log(1, "mfhome:", mfhome);
+	    log(1, "mfderby:", mfderby);
 	mfmatch = mfawaypin;
 
 
@@ -1397,6 +1411,7 @@ calc();
 
 <ul>
 	<li><a href="export-DE.csv" download>U21-DE-EM-Spielplan herunterladen</a></li>
+	<li><a href="export-HFI-example.csv" download>Beispiel-Spielplan HFI-Team herunterladen</a></li>
 
 </ul>
 
