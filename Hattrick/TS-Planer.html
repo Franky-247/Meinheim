@@ -5,7 +5,7 @@
 <meta name="description" content="Hier könnt ihr die Hattrick Teamstimmung vorhersagen lassen."/>
 <meta name="keywords" content="hattrick, managertool, kostenlos, club, Teamstimmung, TS-Rechner. TS Predictor"/>
 
-<title>TS Planer v0.202610042020-alpha</title>
+<title>TS Planer v0.202610051056-alpha</title>
 
 <style>
 body { font-family: Arial; }
@@ -39,7 +39,7 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
             <div style="float: left; width:1000px;background: #75b777 ;background-repeat: no-repeat;">
                 <div style="text-align:left;">
 
-<h2>Hattrick Teamstimmung (TS) Planer (v0.202610042020-alpha )</h2>
+<h2>Hattrick Teamstimmung (TS) Planer (v0.202610051056-alpha )</h2>
 
 <label>Start-TS:</label>
 <input type="number" id="startTS" value="4.5" step="0.01" min="0" max="12">
@@ -101,17 +101,53 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
 </select>
 <br>
 <br>
+<label>Expert Options</label>
+
+<br>
 <div id="expert-options" hidden>
 
-<label>TS Drift :</label>
+<br>
+<style>
+.factor-grid {
+    display: grid;
+    grid-template-columns: 280px 100px;
+    gap: 8px 10px;
+    align-items: center;
+}
+
+.factor-grid label {
+    text-align: right;
+}
+
+.factor-grid input {
+    width: 100px;
+    box-sizing: border-box;
+}
+</style>
+
+<div class="factor-grid">
+    <label for="ts_drift">
+    TS Drift :
+    <span class="info"
+          title="Aktueller Default Wert: 0,0333; klassisch: 0,03.">
+        &#9432;
+    </span>
+</label>
 <input type="number"
        id="ts_drift"
-       value="0.03333333"
+       value="0.0333"
        step="0.0001"
        min="0"
-       max="2">
+       max="2"
+       title="Aktueller Default Wert: 0,0333; klassisch: 0,03.">
 
-<label>FQ Drift:</label>
+    <label for="fq_drift">
+    FQ Drift :
+    <span class="info"
+          title="Aktueller Default Wert: 1 :d.h. kein automatischer Abfall der FQ.">
+        &#9432;
+    </span>
+</label>
 <input type="number"
        id="fq_drift"
        value="1"
@@ -119,22 +155,91 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
        min="0"
        max="1.0">
 
-<label>PIC Faktor:</label>
+    <label for="ts-factor">
+    TS Faktor :
+    <span class="info"
+          title="Aktueller Default Wert: 0,07.">
+        &#9432;
+    </span>
+</label>
+<input type="number"
+       id="ts_factor"
+       value="0.07"
+       step="0.0001"
+       min="0"
+       max="1">
+
+
+    <label for="pic-factor">
+    PIC Faktor :
+    <span class="info"
+          title="Aktueller Default Wert: 1,3333333. Historischer Wert: 4/3.">
+        &#9432;
+    </span>
+</label>
 <input type="number"
        id="pic_factor"
        value="1.3333333"
-       step="0.001"
+       step="0.0001"
        min="1"
        max="2">
 
-<label>MOTS Faktor:</label>
+    <label for="mots-factor">
+    MOTS Faktor :
+    </span>
+    <span class="info"
+          title="Aktueller Default Wert: 0,5228672. Historischer Wert: 0,5.">
+        &#9432;
+    </span>
+</label>
 <input type="number"
        id="mots_factor"
        value="0.5228672"
        step="0.0001"
        min="0"
        max="1">
+
+    <label for="mf_home_factor">
+    Home Faktor für das Mittelfeld:
+    <span class="info"
+          title="Aktueller Default Wert: 1,20000. Historischer Wiki-Wert: 1,19892.">
+        &#9432;
+    </span>
+</label>
+
+    <input type="number"
+           id="mf_home_factor"
+           value="1.2"
+           step="0.0001"
+           min="1"
+           max="2">
+
+    <label for="mf_derby_factor">Derby Faktor für das Mittelfeld:</label>
+    <input type="number"
+           id="mf_derby_factor"
+           value="1.1"
+           step="0.0001"
+           min="1"
+           max="2">
+
+    <label for="mf_pic_factor">PIC Faktor für das Mittelfeld:</label>
+    <input type="number"
+           id="mf_pic_factor"
+           value="0.84"
+           step="0.0001"
+           min="0"
+           max="1">
+
+    <label for="mf_mots_factor">MOTS Faktor für das Mittelfeld:</label>
+    <input type="number"
+           id="mf_mots_factor"
+           value="1.1"
+           step="0.0001"
+           min="1"
+           max="2">
+
 </div>
+<br>
 
 <table id="tsTable" border="1">
     <thead> <tr> <th>Woche</th>
@@ -1213,7 +1318,9 @@ function calc() {
 	}
 
 	let tsBefore = ts;
-	mfawaypin = mf_referenz + mf_referenz * ( tsBefore - tsBasiswert ) * 0.07;
+        tsfactor = parseFloat(document.getElementById("ts_factor").value);
+	// mfawaypin = mf_referenz + mf_referenz * ( tsBefore - tsBasiswert ) * 0.07;
+	mfawaypin = mf_referenz + mf_referenz * ( tsBefore - tsBasiswert ) * tsfactor;
 	// mfawaypic = mfawaypin * 0.83945;
 	// mfawaymots = mfawaypin * 1.1193;
 	// mfhomepin = mfawaypin * 1.19892;
@@ -1226,6 +1333,10 @@ function calc() {
 	 mfmots =  1.5 ** 0.25;
 	 mfhome =  12 / 10;
 	 mfderby =  11 / 10;
+         mfpic = parseFloat(document.getElementById("mf_pic_factor").value);
+         mfmots = parseFloat(document.getElementById("mf_mots_factor").value);
+         mfhome = parseFloat(document.getElementById("mf_home_factor").value);
+         mfderby = parseFloat(document.getElementById("mf_derby_factor").value);
 	 mfawaypic = mfawaypin * mfpic;
 	 mfawaymots = mfawaypin * mfmots;
 	 mfhomepin = mfawaypin * mfhome;
