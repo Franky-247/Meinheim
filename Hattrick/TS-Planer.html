@@ -5,7 +5,7 @@
 <meta name="description" content="Hier könnt ihr die Hattrick Teamstimmung vorhersagen lassen."/>
 <meta name="keywords" content="hattrick, managertool, kostenlos, club, Teamstimmung, TS-Rechner. TS Predictor"/>
 
-<title>TS Planer v0.202610051400-alpha</title>
+<title>TS Planer v0.202610071000-alpha</title>
 
 <style>
 body { font-family: Arial; }
@@ -30,6 +30,15 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
 .neutral    { background: #75b777; }
 .backgrnd   { background: #75b77f; }
 
+.slider-field {
+    white-space: nowrap;
+}
+
+.slider-field input[type="range"] {
+    width: 200px;
+    vertical-align: middle;
+    accent-color: #78f7c5;
+}
 
 </style>
 </head>
@@ -39,7 +48,7 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
             <div style="float: left; width:1000px;background: #75b777 ;background-repeat: no-repeat;">
                 <div style="text-align:left;">
 
-<h2>Hattrick Teamstimmung (TS) Planer (v0.202610051400-alpha )</h2>
+<h2>Hattrick Teamstimmung (TS) Planer (v0.202610071000-alpha )</h2>
 
 <label>Start-TS:</label>
 <input type="number" id="startTS" value="4.5" step="0.01" min="0" max="12">
@@ -53,14 +62,58 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
        max="5"
        title="4,5 = Vereinslogik · über 4,5 = NT-Logik">
 
+<label for="mf_referenz">Referenz Mittelfeld Rating:</label>
 
-<label>Referenz Mittelfeld Rating:</label>
-<input type="number"
-       id="mf_referenz"
-       value="10.0"
-       step="0.01"
-       min="0"
-       max="100.0">
+<span class="slider-field">
+    <input type="number"
+           id="mf_referenz"
+           value="10.00"
+           step="0.01"
+           min="0"
+           max="50"
+           title="Mittelfeld Auswärts PIN und TS bei Ruhewert (4,5 oder 5,0)">
+
+    <input type="range"
+           id="mf_referenz_slider"
+           min="0"
+           max="50"
+           step="0.25"
+           value="10">
+</span>
+
+<script>
+
+function setupSlider(numberId, sliderId) {
+    const numberInput = document.getElementById(numberId);
+    const slider = document.getElementById(sliderId);
+
+    // Slider -> Zahlenfeld
+    slider.addEventListener("input", function () {
+    numberInput.value = this.value;
+    calc();
+});
+
+    // Zahlenfeld -> Slider
+    // Erst wenn die Eingabe abgeschlossen wurde.
+    numberInput.addEventListener("change", function () {
+        let value = Number(this.value);
+
+        if (isNaN(value)) {
+            return;
+        }
+
+        const min = Number(this.min);
+        const max = Number(this.max);
+
+        value = Math.max(min, Math.min(max, value));
+
+        this.value = value;
+        slider.value = value;
+    });
+}
+
+setupSlider("mf_referenz", "mf_referenz_slider");
+</script>
 
 <br>
 <br>
