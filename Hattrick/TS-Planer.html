@@ -5,7 +5,7 @@
 <meta name="description" content="Hier könnt ihr die Hattrick Teamstimmung vorhersagen lassen."/>
 <meta name="keywords" content="hattrick, managertool, kostenlos, club, Teamstimmung, TS-Rechner. TS Predictor"/>
 
-<title>TS Planer v0.202610071000-alpha</title>
+<title>TS Planer v0.202610091200-alpha</title>
 
 <style>
 body { font-family: Arial; }
@@ -48,7 +48,7 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
             <div style="float: left; width:1000px;background: #75b777 ;background-repeat: no-repeat;">
                 <div style="text-align:left;">
 
-<h2>Hattrick Teamstimmung (TS) Planer (v0.202610071000-alpha )</h2>
+<h2>Hattrick Teamstimmung (TS) Planer (v0.202610091200-alpha )</h2>
 
 <label>Start-TS:</label>
 <input type="number" id="startTS" value="4.5" step="0.01" min="0" max="12">
@@ -176,6 +176,51 @@ setupSlider("mf_referenz", "mf_referenz_slider");
     width: 100px;
     box-sizing: border-box;
 }
+
+    #ts-default-legend {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 40px;
+    row-gap: 8px;
+    margin-bottom: 12px;
+}
+
+#ts-optional-legend {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px 16px;
+    margin-top: 8px;
+}
+
+#ts-optional-legend > div {
+    min-width: 0;
+}
+
+.ts-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 4px 0;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.ts-legend-swatch {
+    display: inline-block;
+    flex: 0 0 20px;
+    height: 3px;
+}
+
+.ts-legend-item.ts-hidden {
+    opacity: 0.45;
+}
+
+@media (max-width: 650px) {
+    #ts-optional-legend {
+        grid-template-columns: 1fr;
+    }
+}
+
 </style>
 
 <div class="factor-grid">
@@ -462,10 +507,34 @@ for (let i = 0; i < 114; i++) {
 <input type="file" id="csv_import" accept=".csv">
 
 <div id="chartContainer" style="display: none;">
+<br>
+<br>
+<hr>
+
+
+<div id="ts-default-legend"></div>
+
     <h3>Verlauf</h3>
     <canvas id="tsChart"></canvas>
+
+<div id="ts-optional-legend">
+    <div>
+        <strong>Heimspiel</strong>
+        <div id="ts-home-legend"></div>
+    </div>
+
+    <div>
+        <strong>Auswärts-Derby</strong>
+        <div id="ts-derby-legend"></div>
+    </div>
+
+    <div>
+        <strong>Auswärts</strong>
+        <div id="ts-away-legend"></div>
+    </div>
 </div>
 
+</div>
 
 <script>
 
@@ -955,15 +1024,99 @@ function showGraphik() {
     // Hier festlegen, welche Tabellenspalten als Kurven
     // dargestellt werden sollen.
     // ============================================================
-    const graphColumns = [
-        "TS vor dem Spiel",
-        "TS nach dem Spiel",
-        "Mittelfeld beim Spiel",
-        "FQ",
-        "Sportpsychologe"
-    ];
 
-    // ============================================================
+// Standardkurven – oberhalb der Grafik
+const defaultColumns = [
+    "TS vor dem Spiel",
+    "TS nach dem Spiel",
+    "Mittelfeld beim Spiel",
+    "FQ",
+    "Sportpsychologe"
+];
+
+// Optionale Kurven – unterhalb der Grafik
+const homeColumns = [
+    "Mittelfeld Heimspiel PIN",
+    "Mittelfeld Heimspiel PIC",
+    "Mittelfeld Heimspiel MOTS"
+];
+
+const derbyColumns = [
+    "Mittelfeld Auswärts-Derby PIN",
+    "Mittelfeld Auswärts-Derby PIC",
+    "Mittelfeld Auswärts-Derby MOTS"
+];
+
+const awayColumns = [
+    "Mittelfeld Auswärts PIN",
+    "Mittelfeld Auswärts PIC",
+    "Mittelfeld Auswärts MOTS"
+];
+
+const defaultVisible = new Set(defaultColumns);
+
+// Alle verfügbaren Kurven für die bisherige Verarbeitung
+const graphColumns = [
+    ...defaultColumns,
+    ...homeColumns,
+    ...derbyColumns,
+    ...awayColumns
+];
+
+function renderTsLegend(containerId, columns) {
+    const container = document.getElementById(containerId);
+    if (!container || !tsChart) return;
+
+    container.replaceChildren();
+
+    columns.forEach(name => {
+        const index = tsChart.data.datasets.findIndex(
+            dataset => dataset.label === name
+        );
+
+        if (index === -1) return;
+
+        const dataset = tsChart.data.datasets[index];
+        const item = document.createElement("div");
+        item.className = "ts-legend-item";
+
+        const swatch = document.createElement("span");
+        swatch.className = "ts-legend-swatch";
+        swatch.style.backgroundColor =
+            String(dataset.borderColor ?? "#777");
+
+        const label = document.createElement("span");
+        label.textContent = name;
+
+        item.append(swatch, label);
+
+        const updateItem = () => {
+            const visible = tsChart.isDatasetVisible(index);
+            item.classList.toggle("ts-hidden", !visible);
+        };
+
+        item.addEventListener("click", () => {
+            tsChart.setDatasetVisibility(
+                index,
+                !tsChart.isDatasetVisible(index)
+            );
+            tsChart.update();
+            updateAllTsLegends();
+        });
+
+        container.appendChild(item);
+        updateItem();
+    });
+}
+
+function updateAllTsLegends() {
+
+    renderTsLegend("ts-default-legend", defaultColumns);
+    renderTsLegend("ts-home-legend", homeColumns);
+    renderTsLegend("ts-derby-legend", derbyColumns);
+    renderTsLegend("ts-away-legend", awayColumns);
+}
+
     // Überschriften der Tabelle ermitteln
     // ============================================================
 
@@ -1005,8 +1158,10 @@ function showGraphik() {
     const events = [];
     const datasets = validColumns.map(column => ({
         label: column.name,
-        data: []
-    }));
+         data: [],
+       hidden: !defaultVisible.has(column.name)
+
+}));
 
     // ============================================================
     // Tabelle durchlaufen
@@ -1120,27 +1275,57 @@ function showGraphik() {
                         }
                     }
                 },
-                plugins: {
-                    legend: {
-                        labels: {
-                            color: "#000000"
-                        }
-                    },
-                    tooltip: {
-                        enabled: true
-                    }
-                }
+		    plugins: {
+		    legend: {
+			display: false
+		    },
+		    tooltip: {
+			enabled: true
+		    }
+		}
             }
         });
     } else {
-        // ========================================================
-        // Chart existiert bereits:
-        // Nur Daten aktualisieren
-        // ========================================================
-        tsChart.data.labels = events;
-        tsChart.data.datasets = datasets;
-        tsChart.update();
+	// ========================================================
+	// Chart existiert bereits:
+	// Sichtbarkeit der bisherigen Kurven merken
+	// ========================================================
+	const visibility = new Map();
+
+	tsChart.data.datasets.forEach((dataset, index) => {
+	    visibility.set(
+		dataset.label,
+		tsChart.isDatasetVisible(index)
+	    );
+	});
+
+	// ========================================================
+	// Neue Daten übernehmen und Sichtbarkeit wiederherstellen
+	// ========================================================
+	tsChart.data.labels = events;
+
+	tsChart.data.datasets = datasets;
+
+	tsChart.data.datasets.forEach((dataset, index) => {
+	    if (visibility.has(dataset.label)) {
+		// Bisherige Auswahl wiederherstellen
+		tsChart.setDatasetVisibility(
+		    index,
+		    visibility.get(dataset.label)
+		);
+	    } else {
+		// Neue Kurven entsprechend dem Default anzeigen
+		tsChart.setDatasetVisibility(
+		    index,
+		    defaultVisible.has(dataset.label)
+		);
+	    }
+	});
+
+	tsChart.update();
+	updateAllTsLegends();
     }
+    updateAllTsLegends();
 }
 
 function exportCSV() {
@@ -1188,14 +1373,21 @@ function toggleGraphik() {
     const container = document.getElementById("chartContainer");
     const button = document.getElementById("GraphikBtn");
 
+    const defaultLegend = document.getElementById("ts-default-legend");
+    const optionalLegend = document.getElementById("ts-optional-legend");
+
     graphikVisible = !graphikVisible;
 
     if (graphikVisible) {
         container.style.display = "block";
+        defaultLegend.style.display = "flex";
+        optionalLegend.style.display = "grid";
         button.textContent = "Hide Graphik";
         showGraphik();
     } else {
         container.style.display = "none";
+        defaultLegend.style.display = "none";
+        optionalLegend.style.display = "none";
         button.textContent = "Show Graphik";
     }
 }
@@ -1566,12 +1758,8 @@ applySeasonDefaults();
 calc();
 
 </script>
-
-<br>
 <hr>
 <br>
-
-
 <h3>Downloads</h3>
 
 <ul>
