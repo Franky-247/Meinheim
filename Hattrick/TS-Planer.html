@@ -5,7 +5,7 @@
 <meta name="description" content="Hier könnt ihr die Hattrick Teamstimmung vorhersagen lassen."/>
 <meta name="keywords" content="hattrick, managertool, kostenlos, club, Teamstimmung, TS-Rechner. TS Predictor"/>
 
-<title>TS Planer v0.202610091200-alpha</title>
+<title>TS Planer v0.202610100500-alpha</title>
 
 <style>
 body { font-family: Arial; }
@@ -48,7 +48,7 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
             <div style="float: left; width:1000px;background: #75b777 ;background-repeat: no-repeat;">
                 <div style="text-align:left;">
 
-<h2>Hattrick Teamstimmung (TS) Planer (v0.202610091200-alpha )</h2>
+<h2>Hattrick Teamstimmung (TS) Planer (v0.202610100500-alpha )</h2>
 
 <label>Start-TS:</label>
 <input type="number" id="startTS" value="4.5" step="0.01" min="0" max="12">
@@ -237,12 +237,12 @@ setupSlider("mf_referenz", "mf_referenz_slider");
        step="0.0001"
        min="0"
        max="2"
-       title="Aktueller Default Wert: 0,0333; klassisch: 0,03.">
+       title="Aktueller Default Wert: 0,0333; MPN: 0,03.">
 
     <label for="fq_drift">
     FQ Drift :
     <span class="info"
-          title="Aktueller Default Wert: 1 :d.h. kein automatischer Abfall der FQ.">
+          title="Aktueller Default Wert: 1 :d.h. kein automatischer Abfall der FQ. Bei 0,9375 fällt die FQ in 24 Wochen um eine Stufe.">
         &#9432;
     </span>
 </label>
@@ -256,7 +256,7 @@ setupSlider("mf_referenz", "mf_referenz_slider");
     <label for="ts-factor">
     TS Faktor :
     <span class="info"
-          title="Aktueller Default Wert: 0,07.">
+          title="Aktueller Default Wert: 0,07 ( 7 % pro Stufe TS über dem Ruhewert ).">
         &#9432;
     </span>
 </label>
@@ -286,7 +286,7 @@ setupSlider("mf_referenz", "mf_referenz_slider");
     MOTS Faktor :
     </span>
     <span class="info"
-          title="Aktueller Default Wert: 0,5228672. Historischer Wert: 0,5.">
+          title="Aktueller Default Wert: 0,5228672. Historischer Wert: 0,5 ( 1/2 ).">
         &#9432;
     </span>
 </label>
@@ -300,7 +300,7 @@ setupSlider("mf_referenz", "mf_referenz_slider");
     <label for="mf_home_factor">
     Home Faktor für das Mittelfeld:
     <span class="info"
-          title="Aktueller Default Wert: 1,20000. Historischer Wiki-Wert: 1,19892.">
+          title="Aktueller Default Wert: 1,20000 ( 12 / 10 ). Historischer Wiki-Wert: 1,19892.">
         &#9432;
     </span>
 </label>
@@ -312,7 +312,13 @@ setupSlider("mf_referenz", "mf_referenz_slider");
            min="1"
            max="2">
 
-    <label for="mf_derby_factor">Derby Faktor für das Mittelfeld:</label>
+    <label for="mf_derby_factor">
+    Derby Faktor für das Mittelfeld:
+    <span class="info"
+          title="Aktueller Default Wert: 1,1000. ( 11/10 ).">
+        &#9432;
+    </span>
+</label>
     <input type="number"
            id="mf_derby_factor"
            value="1.1"
@@ -320,18 +326,30 @@ setupSlider("mf_referenz", "mf_referenz_slider");
            min="1"
            max="2">
 
-    <label for="mf_pic_factor">PIC Faktor für das Mittelfeld:</label>
+    <label for="mf_pic_factor">
+    PIC Faktor für das Mittelfeld:
+    <span class="info"
+          title="Aktueller Default Wert: 0,8409.">
+        &#9432;
+    </span>
+</label>
     <input type="number"
            id="mf_pic_factor"
-           value="0.84"
+           value="0.8409"
            step="0.0001"
            min="0"
            max="1">
 
-    <label for="mf_mots_factor">MOTS Faktor für das Mittelfeld:</label>
+    <label for="mf_mots_factor">
+    MOTS Faktor für das Mittelfeld:
+    <span class="info"
+          title="Aktueller Default Wert: 1,1082">
+        &#9432;
+    </span>
+</label>
     <input type="number"
            id="mf_mots_factor"
-           value="1.1"
+           value="1.1082"
            step="0.0001"
            min="1"
            max="2">
@@ -1583,14 +1601,16 @@ function calc() {
          mfmots = parseFloat(document.getElementById("mf_mots_factor").value);
          mfhome = parseFloat(document.getElementById("mf_home_factor").value);
          mfderby = parseFloat(document.getElementById("mf_derby_factor").value);
+	    // MF(LS,h,MOTS) = 1 + (MF(n,a,PIC)-1) x 0.96 x 1.1 x 1.316.
 	 mfawaypic = mfawaypin * mfpic;
-	 mfawaymots = mfawaypin * mfmots;
-	 mfhomepin = mfawaypin * mfhome;
-	 mfhomepic = mfawaypin * mfhome * mfpic;
-	 mfhomemots = mfawaypin * mfhome * mfmots;
-	 mfderbypin = mfawaypin * mfderby;
-	 mfderbypic = mfawaypin * mfderby * mfpic;
-	 mfderbymots = mfawaypin * mfderby * mfmots;
+	 mfawaypic = 1 + (mfawaypin - 1 ) * mfpic;
+	 mfawaymots = 1 + (mfawaypin - 1 ) * mfmots;
+	 mfhomepin = 1 + (mfawaypin - 1 ) * mfhome;
+	 mfhomepic = 1 + (mfawaypin - 1 ) * mfhome * mfpic;
+	 mfhomemots = 1 + (mfawaypin - 1 ) * mfhome * mfmots;
+	 mfderbypin = 1 + (mfawaypin - 1 ) * mfderby;
+	 mfderbypic = 1 + (mfawaypin - 1 ) * mfderby * mfpic;
+	 mfderbymots = 1 + (mfawaypin - 1 ) * mfderby * mfmots;
 	 mfmatch = mfawaypin;
 
 	    log(1, "mfpic:", mfpic);
