@@ -5,7 +5,7 @@
 <meta name="description" content="Hier könnt ihr die Hattrick Teamstimmung vorhersagen lassen."/>
 <meta name="keywords" content="hattrick, managertool, kostenlos, club, Teamstimmung, TS-Rechner. TS Predictor"/>
 
-<title>TS Planer v0.202610100500-alpha</title>
+<title>TS Planer v0.202610111230-alpha</title>
 
 <style>
 body { font-family: Arial; }
@@ -48,7 +48,7 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
             <div style="float: left; width:1000px;background: #75b777 ;background-repeat: no-repeat;">
                 <div style="text-align:left;">
 
-<h2>Hattrick Teamstimmung (TS) Planer (v0.202610100500-alpha )</h2>
+<h2>Hattrick Teamstimmung (TS) Planer (v0.202610111230-alpha )</h2>
 
 <label>Start-TS:</label>
 <input type="number" id="startTS" value="4.5" step="0.01" min="0" max="12">
@@ -432,6 +432,7 @@ for (let i = 0; i < 114; i++) {
                 <option value="Ligapokal">Ligapokal</option>
                 <option value="Hattrick Masters">Hattrick Masters</option>
                 <option value="Relegation">Relegation</option>
+                <option value="Finale">Finale</option>
                 <option value="FedCup">FedCup</option>
                 <option value="MiniCup">MiniCup</option>
                 <option value="Turnier">Turnier</option>
@@ -443,6 +444,7 @@ for (let i = 0; i < 114; i++) {
                 <option value="TI-Schraube">TI-Schraube</option>
                 <option value="Nero pill">Nero pill</option>
                 <option value="Drop">Drop</option>
+                <option value="Rise">Rise</option>
                 <option value="Update">Update</option>
                 <option value="TU">TU</option>
                 <option value="Turnierstart">Turnierstart</option>
@@ -819,15 +821,23 @@ function applyMatch(ts, action, type) {
 			ts = ts - ( ts - tsBasiswert ) * 0.4;
         } else if (type === "Drop") {
 			ts = Math.ceil( ts ) - 1.01;
-	}
-	else
-	{
+        } else if (type === "Rise") {
+			ts = Math.floor( ts ) + 1;
+        } else if (type === "Finale") {
 		if (action === "PIC") {
 			// ts = ts * 4 / 3;
 			ts = ts * pic;
 		    } else if (action === "MOTS") {
 			// ts = ts / 2;
 			ts = ts * mots;
+		}
+	}
+	else
+	{
+		if (action === "PIC") {
+			ts = ts * 4 / 3;
+		    } else if (action === "MOTS") {
+			ts = ts / 2;
 		}
 	}
     return ts;
@@ -1601,8 +1611,8 @@ function calc() {
          mfmots = parseFloat(document.getElementById("mf_mots_factor").value);
          mfhome = parseFloat(document.getElementById("mf_home_factor").value);
          mfderby = parseFloat(document.getElementById("mf_derby_factor").value);
-	    // MF(LS,h,MOTS) = 1 + (MF(n,a,PIC)-1) x 0.96 x 1.1 x 1.316.
-	 mfawaypic = mfawaypin * mfpic;
+	 // MF(LS,h,MOTS) = 1 + (MF(n,a,PIC)-1) x 0.96 x 1.1 x 1.316.
+	 // old: mfawaypic = mfawaypin * mfpic;
 	 mfawaypic = 1 + (mfawaypin - 1 ) * mfpic;
 	 mfawaymots = 1 + (mfawaypin - 1 ) * mfmots;
 	 mfhomepin = 1 + (mfawaypin - 1 ) * mfhome;
@@ -1613,10 +1623,10 @@ function calc() {
 	 mfderbymots = 1 + (mfawaypin - 1 ) * mfderby * mfmots;
 	 mfmatch = mfawaypin;
 
-	    log(1, "mfpic:", mfpic);
-	    log(1, "mfmots:", mfmots);
-	    log(1, "mfhome:", mfhome);
-	    log(1, "mfderby:", mfderby);
+	 log(1, "mfpic:", mfpic);
+	 log(1, "mfmots:", mfmots);
+	 log(1, "mfhome:", mfhome);
+	 log(1, "mfderby:", mfderby);
 	mfmatch = mfawaypin;
 
 
