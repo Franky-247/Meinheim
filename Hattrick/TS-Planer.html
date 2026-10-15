@@ -5,7 +5,7 @@
 <meta name="description" content="Hier könnt ihr die Hattrick Teamstimmung vorhersagen lassen."/>
 <meta name="keywords" content="hattrick, managertool, kostenlos, club, Teamstimmung, TS-Rechner. TS Predictor"/>
 
-<title>TS Planer v0.202610111230-alpha</title>
+<title>TS Planer v0.202610152155-alpha</title>
 
 <style>
 body { font-family: Arial; }
@@ -47,8 +47,12 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
         <div id="mainwindow" style="width:1170px;margin:auto;">
             <div style="float: left; width:1000px;background: #75b777 ;background-repeat: no-repeat;">
                 <div style="text-align:left;">
-
-<h2>Hattrick Teamstimmung (TS) Planer (v0.202610111230-alpha )</h2>
+			
+ <marquee width="640" scrollamount="1" scrolldelay="24">
+ ..:: <b> Traue keinem Tool, das du nicht selbst programmiert hast – und deinem eigenen erst, wenn du es getestet hast!  </b>  ::..
+</marquee>
+<br>
+<h2>Hattrick Teamstimmung (TS) Planer (v0.202610152155-alpha )</h2>
 
 <label>Start-TS:</label>
 <input type="number" id="startTS" value="4.5" step="0.01" min="0" max="12">
@@ -227,17 +231,17 @@ setupSlider("mf_referenz", "mf_referenz_slider");
     <label for="ts_drift">
     TS Drift :
     <span class="info"
-          title="Aktueller Default Wert: 0,0333; klassisch: 0,03.">
+          title="Aktueller Default Wert: 0,0334; klassisch: 0,03.">
         &#9432;
     </span>
 </label>
 <input type="number"
        id="ts_drift"
-       value="0.0333"
+       value="0.0334"
        step="0.0001"
        min="0"
        max="2"
-       title="Aktueller Default Wert: 0,0333; MPN: 0,03.">
+       title="Aktueller Default Wert: 0,0334; MPN: 0,03.">
 
     <label for="fq_drift">
     FQ Drift :
@@ -845,7 +849,8 @@ function applyMatch(ts, action, type) {
 
 function applyTISchraube(ts, oldTI, newTI) {
         oldTI = Math.max(0.001, oldTI);
-	const NERO_EXPONENT = Math.log(1.2) / Math.log(0.7);
+	// const NERO_EXPONENT = Math.log(1.2) / Math.log(0.7);
+	const NERO_EXPONENT = -0.5;
 	return ts * (newTI / oldTI) ** NERO_EXPONENT;
 }
 
@@ -1657,7 +1662,7 @@ function calc() {
 
 	tiAfter = Number(tiCells[i].value);
 
-        if ( ( i + 2 ) % 7 === 0) {
+        if ( ( i + 3 ) % 7 === 0) {
 
 		// Die effektive TI muß ein "tägliches Update" vor dem TU eingestellt werden !
  		tiAfter = Number(tiCells[i-1].value);
