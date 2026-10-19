@@ -5,7 +5,7 @@
 <meta name="description" content="Hier könnt ihr die Hattrick Teamstimmung vorhersagen lassen."/>
 <meta name="keywords" content="hattrick, managertool, kostenlos, club, Teamstimmung, TS-Rechner. TS Predictor"/>
 
-<title>TS Planer v0.202610152155-alpha</title>
+<title>TS Planer v0.202610191303-alpha</title>
 
 <style>
 body { font-family: Arial; }
@@ -52,7 +52,7 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
  ..:: <b> Traue keinem Tool, das du nicht selbst programmiert hast – und deinem eigenen erst, wenn du es getestet hast!  </b>  ::..
 </marquee>
 <br>
-<h2>Hattrick Teamstimmung (TS) Planer (v0.202610152155-alpha )</h2>
+<h2>Hattrick Teamstimmung (TS) Planer (v0.202610191303-alpha )</h2>
 
 <label>Start-TS:</label>
 <input type="number" id="startTS" value="4.5" step="0.01" min="0" max="12">
@@ -489,7 +489,7 @@ for (let i = 0; i < 114; i++) {
 	 <td class="fq">
         <input type="number"
                class="fq-input"
-               value="6.5"
+               value="6.0"
                step="0.01"
                min="1"
                max="8">
@@ -841,7 +841,8 @@ function applyMatch(ts, action, type) {
 		if (action === "PIC") {
 			ts = ts * 4 / 3;
 		    } else if (action === "MOTS") {
-			ts = ts / 2;
+			// ts = ts / 2;
+			ts = ts * mots;
 		}
 	}
     return ts;
