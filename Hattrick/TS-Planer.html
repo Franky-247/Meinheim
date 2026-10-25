@@ -154,7 +154,7 @@ setupSlider("mf_referenz", "mf_referenz_slider");
     <option value="6">Achtelfinale</option>
     <option value="7">Viertelfinale</option>
     <option value="8">Halbfinale</option>
-    <option value="9">Finale</option>
+    <option value="9">Special Match</option>
 </select>
 <br>
 
@@ -273,9 +273,9 @@ setupSlider("mf_referenz", "mf_referenz_slider");
 
 
     <label for="pic-factor">
-    PIC Faktor :
+    Special Match PIC Faktor :
     <span class="info"
-          title="Aktueller Default Wert: 1,3333333. Historischer Wert: 4/3.">
+          title="Aktueller Default Wert für ein Special Match: 1,3333333, sonst wird als historischer Wert: 4/3 verwendet.">
         &#9432;
     </span>
 </label>
@@ -287,10 +287,10 @@ setupSlider("mf_referenz", "mf_referenz_slider");
        max="2">
 
     <label for="mots-factor">
-    MOTS Faktor :
+    Special Match MOTS Faktor :
     </span>
     <span class="info"
-          title="Aktueller Default Wert: 0,5228672. Historischer Wert: 0,5 ( 1/2 ).">
+          title="Aktueller Default Wert für ein Special Match: 0,5228672 sonst wird als historischer Wert: 0,5 ( 1/2 ) verwendet.">
         &#9432;
     </span>
 </label>
@@ -436,7 +436,7 @@ for (let i = 0; i < 114; i++) {
                 <option value="Ligapokal">Ligapokal</option>
                 <option value="Hattrick Masters">Hattrick Masters</option>
                 <option value="Relegation">Relegation</option>
-                <option value="Finale">Finale</option>
+                <option value="Special Match">Special Match</option>
                 <option value="FedCup">FedCup</option>
                 <option value="MiniCup">MiniCup</option>
                 <option value="Turnier">Turnier</option>
@@ -827,7 +827,7 @@ function applyMatch(ts, action, type) {
 			ts = Math.ceil( ts ) - 1.01;
         } else if (type === "Rise") {
 			ts = Math.floor( ts ) + 1;
-        } else if (type === "Finale") {
+        } else if (type === "Special Match") {
 		if (action === "PIC") {
 			// ts = ts * 4 / 3;
 			ts = ts * pic;
@@ -841,8 +841,7 @@ function applyMatch(ts, action, type) {
 		if (action === "PIC") {
 			ts = ts * 4 / 3;
 		    } else if (action === "MOTS") {
-			// ts = ts / 2;
-			ts = ts * mots;
+			ts = ts / 2;
 		}
 	}
     return ts;
