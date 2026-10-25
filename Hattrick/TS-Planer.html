@@ -5,7 +5,7 @@
 <meta name="description" content="Hier könnt ihr die Hattrick Teamstimmung vorhersagen lassen."/>
 <meta name="keywords" content="hattrick, managertool, kostenlos, club, Teamstimmung, TS-Rechner. TS Predictor"/>
 
-<title>TS Planer v0.202610191303-alpha</title>
+<title>TS Planer v0.202610252232-alpha</title>
 
 <style>
 body { font-family: Arial; }
@@ -52,7 +52,7 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
  ..:: <b> Traue keinem Tool, das du nicht selbst programmiert hast – und deinem eigenen erst, wenn du es getestet hast!  </b>  ::..
 </marquee>
 <br>
-<h2>Hattrick Teamstimmung (TS) Planer (v0.202610191303-alpha )</h2>
+<h2>Hattrick Teamstimmung (TS) Planer (v0.202610252232-alpha )</h2>
 
 <label>Start-TS:</label>
 <input type="number" id="startTS" value="4.5" step="0.01" min="0" max="12">
@@ -1546,6 +1546,19 @@ function updateCell(i, action = "", spielort = "") {
     mfmatchCells[i].innerText = value.toFixed(2);
 }
 
+function getTSFactor(tsBefore, tsBasiswert) {
+    const delta = tsBefore - tsBasiswert;
+    let tsfactor = parseFloat(document.getElementById("ts_factor").value);
+
+    if (delta < 0) {
+	log(1,"TS-Faktor vorher: ",tsfactor);
+        tsfactor = tsfactor - Math.pow(tsfactor, Math.PI / 2) * delta;
+	log(1,"TS-Faktor nachher: ",tsfactor);
+    }
+
+    return tsfactor;
+}
+
 // Hauptberechnung
 function calc() {
 
@@ -1600,7 +1613,8 @@ function calc() {
 	let tsBefore = ts;
         tsfactor = parseFloat(document.getElementById("ts_factor").value);
 	// mfawaypin = mf_referenz + mf_referenz * ( tsBefore - tsBasiswert ) * 0.07;
-	mfawaypin = mf_referenz + mf_referenz * ( tsBefore - tsBasiswert ) * tsfactor;
+	     // \[ \boxed{ MF(TS)=10\left[1+0{,}07\Delta TS-0{,}01455(\Delta TS)^2\right] } \]
+	mfawaypin = mf_referenz + mf_referenz * ( tsBefore - tsBasiswert ) * getTSFactor(tsBefore, tsBasiswert);
 	// mfawaypic = mfawaypin * 0.83945;
 	// mfawaymots = mfawaypin * 1.1193;
 	// mfhomepin = mfawaypin * 1.19892;
