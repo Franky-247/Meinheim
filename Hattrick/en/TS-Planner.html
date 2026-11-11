@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="description" content="Hier könnt ihr die Hattrick Teamstimmung vorhersagen lassen."/>
+<meta name="keywords" content="hattrick, managertool, kostenlos, club, Teamstimmung, TS-Rechner. TS Predictor"/>
+
+<title>TS Planner v0.202611110355-alpha</title>
+
+<style>
+body { font-family: Arial; }
+table { border-collapse: collapse; margin-top: 10px; }
+td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
+
+.paradise   { background: #b7f7b7; }
+.cloud      { background: #c8f7c5; }
+.delirious  { background: #d9f7c8; }
+.satisfied  { background: #e5f5c8; }
+.content    { background: #eff3c4; }
+.calm       { background: #f5f0b8; }
+.composed   { background: #fff3a6; }
+.irritated  { background: #ffd580; }
+.furious    { background: #ffb366; }
+.murderous  { background: #ff8080; }
+.cold       { background: #b8d8ff; }
+
+.cool       { background: #b8d8fa; }
+.normal     { background: #78f7c5; }
+.hot        { background: #ffb366; }
+.neutral    { background: #75b777; }
+.backgrnd   { background: #75b77f; }
+
+.slider-field {
+    white-space: nowrap;
+}
+
+.slider-field input[type="range"] {
+    width: 200px;
+    vertical-align: middle;
+    accent-color: #78f7c5;
+}
+
+</style>
+</head>
+    <body style="background: #75b677 repeat-x; height: 100%;">
+        <div style="width:100%;">
+        <div id="mainwindow" style="width:1170px;margin:auto;">
+            <div style="float: left; width:1000px;background: #75b777 ;background-repeat: no-repeat;">
+                <div style="text-align:left;">
+			
+ <marquee width="640" scrollamount="1" scrolldelay="24">
+ ..:: <b> 11.11.2026   </b>  ::..
+</marquee>
+<br>
+
+<h1>Hattrick Team Spirit (TS) Planner</h1>
+
+<p><strong>Version:</strong> v0.202611110355-alpha</p>
+
+<hr>
+
+
+<label>Start-TS:</label>
+<input type="number" id="startTS" value="4.5" step="0.01" min="0" max="12">
+
+<label for="ruhewert">Ruhewert:</label>
+<input type="number"
+       id="ruhewert"
+       value="4.5"
+       step="0.5"
+       min="4.5"
+       max="5"
+       title="4,5 = Vereinslogik · über 4,5 = NT-Logik">
+
+<label for="mf_referenz">Referenz Mittelfeld Rating:</label>
+
+<span class="slider-field">
+    <input type="number"
+           id="mf_referenz"
+           value="10.00"
+           step="0.01"
+           min="0"
+           max="50"
+           title="Mittelfeld Auswärts PIN und TS bei Ruhewert (4,5 oder 5,0)">
+
+    <input type="range"
+           id="mf_referenz_slider"
+           min="0"
+           max="50"
+           step="0.25"
+           value="10">
+</span>
+
+<br>
+<br>
+<label>Pokal-Aus ab:</label>
+<select id="cupExit">
+    <option value="99">still in the cup</option>
+    <option value="0">Round 0</option>
+    <option value="1">Round 1</option>
+    <option value="2">Round 2</option>
+    <option value="3">Round 3</option>
+    <option value="4">Round 4</option>
+    <option value="5">Round 5</option>
+    <option value="6">Round 6</option>
+    <option value="7">Round 7</option>
+    <option value="8">Round 8</option>
+    <option value="9">Round 9</option>
+    <option value="10">Round 10</option>
+    <option value="11">Round 11</option>
+    <option value="12">Round 12</option>
+    <option value="13">Round 13</option>
+    <option value="14">Round 14</option>
+    <option value="15">Round 15</option>
+    <option value="16">Round 16</option>
+</select>
+
+<label>Hattrick Masters-Aus ab:</label>
+<select id="hmExit">
+    <option value="0">out</option>
+    <option value="1">Round 1</option>
+    <option value="2">Round 2</option>
+    <option value="3">Round 3</option>
+    <option value="4">Round 4</option>
+    <option value="5">Round 5</option>
+    <option value="6">Achtelfinale</option>
+    <option value="7">Quarter final</option>
+    <option value="8">Semi final</option>
+    <option value="9">Final</option>
+</select>
+<br>
+
+<br>
+<div id="expert-options" hidden>
+
+<br>
+<label>Expert Options</label>
+<br>
+<style>
+.factor-grid {
+    display: grid;
+    grid-template-columns: 280px 100px;
+    gap: 8px 10px;
+    align-items: center;
+}
+
+.factor-grid label {
+    text-align: right;
+}
+
+.factor-grid input {
+    width: 100px;
+    box-sizing: border-box;
+}
+
+    #ts-default-legend {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 40px;
+    row-gap: 8px;
+    margin-bottom: 12px;
+}
+
+#ts-optional-legend {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px 16px;
+    margin-top: 8px;
+}
+
+#ts-optional-legend > div {
+    min-width: 0;
+}
+
+.ts-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 4px 0;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.ts-legend-swatch {
+    display: inline-block;
+    flex: 0 0 20px;
+    height: 3px;
+}
+
+.ts-legend-item.ts-hidden {
+    opacity: 0.45;
+}
+
+@media (max-width: 650px) {
+    #ts-optional-legend {
+        grid-template-columns: 1fr;
+    }
+}
+
+</style>
+
+<div class="factor-grid">
+    <label for="ts_drift">
+    TS Drift :
+    <span class="info"
+          title="Aktueller Default Wert: 0,0334; klassisch: 0,03.">
+        &#9432;
+    </span>
+</label>
+<input type="number"
+       id="ts_drift"
+       value="0.0334"
+       step="0.0001"
+       min="0"
+       max="2"
+       title="Aktueller Default Wert: 0,0334; MPN: 0,03.">
+
+    <label for="fq_drift">
+    FQ Drift :
+    <span class="info"
+          title="Aktueller Default Wert: 1 :d.h. kein automatischer Abfall der FQ. Bei 0,9375 fällt die FQ in 24 Wochen um eine Stufe.">
+        &#9432;
+    </span>
+</label>
+<input type="number"
+       id="fq_drift"
+       value="1"
+       step="0.0001"
+       min="0"
+       max="1.0">
+
+    <label for="ts-factor">
+    TS Faktor :
+    <span class="info"
+          title="Aktueller Default Wert: 0,07 ( 7 % pro Stufe TS über dem Ruhewert ).">
+        &#9432;
+    </span>
+</label>
+<input type="number"
+       id="ts_factor"
+       value="0.07"
+       step="0.0001"
+       min="0"
+       max="1">
+
+
+    <label for="pic-factor">
+    Special Match PIC Faktor :
+    <span class="info"
+          title="Aktueller Default Wert für ein Special Match: 1,3333333, sonst wird als historischer Wert: 4/3 verwendet.">
+        &#9432;
+    </span>
+</label>
+<input type="number"
+       id="pic_factor"
+       value="1.3333333"
+       step="0.0001"
+       min="1"
+       max="2">
+
+    <label for="mots-factor">
+    Special Match MOTS Faktor :
+    </span>
+    <span class="info"
+          title="Aktueller Default Wert für ein Special Match: 0,5228672 sonst wird als historischer Wert: 0,5 ( 1/2 ) verwendet.">
+        &#9432;
+    </span>
+</label>
+<input type="number"
+       id="mots_factor"
+       value="0.5228672"
+       step="0.0001"
+       min="0"
+       max="1">
+
+    <label for="mf_home_factor">
+    Home Faktor für das Mittelfeld:
+    <span class="info"
+          title="Aktueller Default Wert: 1,20000 ( 12 / 10 ). Historischer Wiki-Wert: 1,19892.">
+        &#9432;
+    </span>
+</label>
+
+    <input type="number"
+           id="mf_home_factor"
+           value="1.2"
+           step="0.0001"
+           min="1"
+           max="2">
+
+    <label for="mf_derby_factor">
+    Derby Faktor für das Mittelfeld:
+    <span class="info"
+          title="Aktueller Default Wert: 1,1000. ( 11/10 ).">
+        &#9432;
+    </span>
+</label>
+    <input type="number"
+           id="mf_derby_factor"
+           value="1.1"
+           step="0.0001"
+           min="1"
+           max="2">
+
+    <label for="mf_pic_factor">
+    PIC Faktor für das Mittelfeld:
+    <span class="info"
+          title="Aktueller Default Wert: 0,8409.">
+        &#9432;
+    </span>
+</label>
+    <input type="number"
+           id="mf_pic_factor"
+           value="0.8409"
+           step="0.0001"
+           min="0"
+           max="1">
+
+    <label for="mf_mots_factor">
+    MOTS Faktor für das Mittelfeld:
+    <span class="info"
+          title="Aktueller Default Wert: 1,1082">
+        &#9432;
+    </span>
+</label>
+    <input type="number"
+           id="mf_mots_factor"
+           value="1.1082"
+           step="0.0001"
+           min="1"
+           max="2">
+
+</div>
+</div>
+<br>
+
+<table id="tsTable" border="1">
+    <thead> <tr> <th>Woche</th>
+            <th>Event</th>
+            <th>Spieltyp</th>
+            <th>Spielort</th>
+            <th>TS Einsatz</th>
+            <th>TS vor dem Spiel</th>
+            <th>TS nach dem Spiel</th>
+            <th>TI</th>
+            <th>FQ</th>
+            <th>Sportpsychologe</th>
+            <th>Mittelfeld Heimspiel PIN</th>
+            <th>Mittelfeld Heimspiel PIC</th>
+            <th>Mittelfeld Heimspiel MOTS</th>
+            <th>Mittelfeld Auswärts-Derby PIN</th>
+            <th>Mittelfeld Auswärts-Derby PIC</th>
+            <th>Mittelfeld Auswärts-Derby MOTS</th>
+            <th>Mittelfeld Auswärts PIN</th>
+            <th>Mittelfeld Auswärts PIC</th>
+            <th>Mittelfeld Auswärts MOTS</th>
+            <th>Mittelfeld beim Spiel</th>
+            <th>Gegner</th>
+        </tr>
+    </thead>
+    <tbody id="table-body"></tbody>
+</table>
+
+<p><b>1 Saison: 32 Spiele (16 Wochen × 2 Spiele) und 7 Updates pro Woche</b></p>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+
+const tbody = document.getElementById("table-body");
+
+for (let i = 0; i < 114; i++) {
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+
+	<td class="week">${Math.ceil((i  ) / 7)}</td>
+        <td class="upd">${Math.ceil((i + 1) / 1)}</td>
+
+        <td>
+            <select class="type">
+                <option value=""></option>
+                <option value="Friendly">Friendly</option>
+                <option value="Pokal">Pokal</option>
+                <option value="Liga">Liga</option>
+                <option value="Challenger-Pokal">Challenger-Pokal</option>
+                <option value="Trost-Pokal">Trost-Pokal</option>
+                <option value="Ligapokal">Ligapokal</option>
+                <option value="Hattrick Masters">Hattrick Masters</option>
+                <option value="Relegation">Relegation</option>
+                <option value="Special Match">Special Match</option>
+                <option value="FedCup">FedCup</option>
+                <option value="MiniCup">MiniCup</option>
+                <option value="Turnier">Turnier</option>
+                <option value="Reset">Reset</option>
+                <option value="Reset 80 %">Reset 80 %</option>
+                <option value="Reset 60 %">Reset 60 %</option>
+                <option value="Reset 40 %">Reset 40 %</option>
+                <option value="TI einstellen">TI einstellen</option>
+                <option value="TI-Schraube">TI-Schraube</option>
+                <option value="Nero pill">Nero pill</option>
+                <option value="Drop">Drop</option>
+                <option value="Rise">Rise</option>
+                <option value="Update">Update</option>
+                <option value="TU">TU</option>
+                <option value="Turnierstart">Turnierstart</option>
+            </select>
+        </td>
+
+        <td>
+            <select class="ort">
+                <option value="Neutral">Neutral</option>
+                <option value="Home">Home</option>
+                <option value="Derby">Derby</option>
+                <option value="Away">Away</option>
+                <option value=""></option>
+            </select>
+        </td>
+        <td>
+            <select class="action">
+                <option value=""></option>
+                <option value="NORMAL">NORMAL</option>
+                <option value="PIC">PIC</option>
+                <option value="PIN">PIN</option>
+                <option value="MOTS">MOTS</option>
+            </select>
+        </td>
+
+        <td class="before">-</td>
+        <td class="after">-</td>
+
+	 <td class="ti">
+        <input type="number"
+               class="ti-input"
+               value="100"
+               step="1"
+               min="0"
+               max="100">
+    </td>
+
+	 <td class="fq">
+        <input type="number"
+               class="fq-input"
+               value="6.0"
+               step="0.01"
+               min="1"
+               max="8">
+    </td>
+	 <td class="psy">
+        <input type="number"
+               class="psy-input"
+               value="0"
+               step="1"
+               min="0"
+               max="5">
+    </td>
+        <td class="mfhomepin">-</td>
+        <td class="mfhomepic">-</td>
+        <td class="mfhomemots">-</td>
+        <td class="mfderbypin">-</td>
+        <td class="mfderbypic">-</td>
+        <td class="mfderbymots">-</td>
+        <td class="mfawaypin">-</td>
+        <td class="mfawaypic">-</td>
+        <td class="mfawaymots">-</td>
+        <td class="match">-</td>
+        <td class="gegner">
+        <input type="text"
+	</td>
+    `;
+    tbody.appendChild(row);
+
+}
+</script>
+
+<script src="../TS-Planner.js"></script>
+<script>
+log(1, "DEBUG:", DEBUG);
+log(1, "EXPERT:", EXPERT);
+</script>
+
+</body>
+</html>
+
+</table>
+
+<button id="GraphikBtn">Show Graphik</button>
+<button id="csvBtn">CSV Export</button>
+<input type="file" id="csv_import" accept=".csv">
+
+<div id="chartContainer" style="display: none;">
+<br>
+<br>
+<hr>
+
+
+<div id="ts-default-legend"></div>
+
+    <h3>Verlauf</h3>
+    <canvas id="tsChart"></canvas>
+
+<div id="ts-optional-legend">
+    <div>
+        <strong>Heimspiel</strong>
+        <div id="ts-home-legend"></div>
+    </div>
+
+    <div>
+        <strong>Auswärts-Derby</strong>
+        <div id="ts-derby-legend"></div>
+    </div>
+
+    <div>
+        <strong>Auswärts</strong>
+        <div id="ts-away-legend"></div>
+    </div>
+</div>
+
+</div>
+
+<script>
+
+
+
+// Events
+document.querySelectorAll("select").forEach(el => el.addEventListener("change", calc));
+
+document.querySelectorAll(".ti-input").forEach(el =>
+    el.addEventListener("change", () => {
+        log(1,"TI geändert:", el.value);
+        applyTIDefaults(el);
+        calc();
+    })
+);
+
+document.querySelectorAll(".fq-input").forEach(el =>
+    el.addEventListener("change", () => {
+        log(1,"FQ geändert:", el.value);
+        applyFQDefaults(el);
+        calc();
+    })
+);
+
+document.querySelectorAll(".psy-input").forEach(el =>
+    el.addEventListener("change", () => {
+        log(1,"Sportpsychologe geändert:", el.value);
+        applyPSYDefaults(el);
+        calc();
+    })
+);
+
+document
+    .getElementById("csv_import")
+    .addEventListener("change", importCSV);
+
+document.getElementById("GraphikBtn")
+    .addEventListener("click", toggleGraphik);
+
+document.getElementById("csvBtn")
+    .addEventListener("click", exportCSV);
+
+startTS.addEventListener("input", calc);
+ruhewert.addEventListener("input", calc);
+pic_factor.addEventListener("input", calc);
+mots_factor.addEventListener("input", calc);
+// Kein Live-Recalc: FQ-Drift wird beim Ändern  der FQ in einer Zeile angewendet.
+// fqDriftInput.addEventListener("input", calc);
+mfRefInput.addEventListener("input", calc);
+ts_driftsetInput.addEventListener("input", calc);
+cupExit.addEventListener("change", () => {
+    applySeasonDefaults();
+    calc();
+});
+hmExit.addEventListener("change", () => {
+    applySeasonDefaults();
+    calc();
+});
+
+// Initial
+document.getElementById("expert-options").hidden = EXPERT <= 0;
+
+applySeasonDefaults();
+calc();
+
+</script>
+<hr>
+<br>
+<h3>Downloads</h3>
+
+<ul>
+	<li><a href="export-DE.csv" download>U21-DE-EM-Spielplan herunterladen</a></li>
+	<li><a href="export-HFI-example.csv" download>Beispiel-Spielplan HFI-Team herunterladen</a></li>
+
+</ul>
+
+<h3>Weiterführende Rechner &amp; Informationen</h3>
+
+<ul>
+        <li><a class='nav-link' href='/hattrick/en/Doku-TS-Planner.html'>Documentation for the Hattrick Team Spirit (TS) Planner</a></li>
+        <li><a class='nav-link' href='/hattrick/Doku-TS-Planer.html'>Dokumentation für den Hattrick Teamstimmung (TS) Planer</a></li>
+        <li><a class='nav-link' href='/hattrick/TS-Planer.html'>Hattrick Teamstimmung (TS) Planer</a></li>
+        <li><a class='nav-link' href='http://www.ht-links.de/TISchrauber.php'>TI-Schrauber zur Berechnung der optimalen Trainingsintensität</a></li>
+        <li><a class='nav-link' href='https://ht.8ic.ro/trainingintensity'>Training Intensity bei HT Utilities</a></li>
+        <li><a class='nav-link' href='/hattrick/ht-stamina'>Hattrick Konditionstabelle</a></li>
+        <li><a class='nav-link' href='/hattrick/TS-subskill-calculator.htm'>Hattrick Team Spirit (TS) Subskill Calculator</a></li>
+        <li><a class='nav-link' href='/hattrick/SV-subskill-calculator.htm'>Hattrick Selbstvertrauen ( SV ) Subskill Calculator </a></li>
+</ul>
+
+<br>
+
+</body>
+</html>

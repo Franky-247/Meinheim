@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Hier könnt ihr die Hattrick Teamstimmung vorhersagen lassen."/>
+<meta name="keywords" content="hattrick, managertool, kostenlos, club, Teamstimmung, TS-Rechner. TS Predictor"/>
+
+<title>Hattrick Team Spirit (TS) Planner - Documentation</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        max-width: 1100px;
+        margin: 30px auto;
+        padding: 0 20px;
+        color: #333;
+    }
+
+    h1, h2, h3, h4 {
+        color: #245580;
+    }
+
+    h1 {
+        border-bottom: 2px solid #245580;
+        padding-bottom: 10px;
+    }
+
+    h2 {
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 6px;
+        margin-top: 35px;
+    }
+
+    h3 {
+        margin-top: 25px;
+    }
+
+    p {
+        margin: 12px 0;
+    }
+
+    ul, ol {
+        padding-left: 25px;
+    }
+
+    li {
+        margin-bottom: 5px;
+    }
+
+    code, pre {
+        background: #f4f4f4;
+        border-radius: 4px;
+    }
+
+    code {
+        padding: 2px 5px;
+    }
+
+    pre {
+        padding: 15px;
+        overflow-x: auto;
+        border-left: 4px solid #245580;
+    }
+
+    .note {
+        background: #f0f6fb;
+        border-left: 4px solid #245580;
+        padding: 12px 16px;
+        margin: 15px 0;
+    }
+
+    .important {
+        background: #fff8e5;
+        border-left: 4px solid #e5a000;
+        padding: 12px 16px;
+        margin: 15px 0;
+    }
+
+    hr {
+        border: 0;
+        border-top: 1px solid #ddd;
+        margin: 30px 0;
+    }
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        margin: 15px 0;
+    }
+
+    th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+
+    th {
+        background: #f0f4f8;
+    }
+</style>
+</head>
+
+<body>
+
+<h1>Hattrick Team Spirit (TS) Planner</h1>
+
+<p><strong>Version:</strong> v0.202611110355-alpha</p>
+
+<hr>
+
+<h2>Match Settings</h2>
+
+<h3>Match Attitudes</h3>
+
+<ul>
+    <li><strong>PIC</strong> = Play It Cool (conserve energy)</li>
+    <li><strong>NORMAL</strong> = Normal match settings</li>
+    <li><strong>MOTS</strong> = Match of the Season</li>
+</ul>
+
+<h3>Effects on Team Spirit (TS)</h3>
+
+<h4>League / Cup / Relegation</h4>
+
+<ul>
+    <li>PIC: TS increases by +1/3.</li>
+    <li>MOTS: TS is halved.</li>
+    <li>In export mode, these factors can be adjusted.</li>
+</ul>
+
+<h4>Friendly / Challenger Cup / Consolation Cup</h4>
+
+<ul>
+    <li>PIC and MOTS have no effect on TS.</li>
+    <li>In Hattrick, friendly matches are always played as NORMAL.</li>
+</ul>
+
+<h4>Hattrick Masters</h4>
+
+<ul>
+    <li>PIC and MOTS have a smaller effect on TS than usual.</li>
+    <li>
+        Team settings:
+        <ul>
+            <li>
+                Playing Match of the Season (MOTS) or Play It Cool (PIC)
+                results in a smaller decrease or increase in Team Spirit
+                than in normal matches.
+            </li>
+            <li>
+                TS decreases by approximately 1/3 or increases by
+                approximately 1/4.
+            </li>
+            <li>
+                However, the effect during the match is the same as
+                in a normal match.
+            </li>
+        </ul>
+    </li>
+</ul>
+
+<h3>Important Information About Cup Matches</h3>
+
+<ul>
+    <li>
+        Effects on TS, confidence and fan mood only apply to:
+        <ul>
+            <li>National Cup</li>
+            <li>League Cup</li>
+        </ul>
+    </li>
+    <li>Other cup competitions count as friendly matches.</li>
+    <li>
+        Therefore, always select the match type
+        <strong>Friendly</strong> for Challenger Cup and Consolation Cup
+        matches.
+    </li>
+</ul>
+
+<h3>Eliminated from the Cup</h3>
+
+<p>
+    Select the round from which your team was eliminated or is expected
+    to be eliminated from the main cup competition.
+</p>
+
+<h3>Eliminated from Hattrick Masters</h3>
+
+<p>
+    Select the round from which your team was eliminated or is expected
+    to be eliminated from Hattrick Masters, or select
+    <strong>Not participating anymore</strong>.
+</p>
+
+<h3>National Teams</h3>
+
+<ul>
+    <li>
+        For national teams (NT) and U21 national teams (U21 NT),
+        Team Spirit decays more slowly than usual.
+    </li>
+    <li>
+        The calculation logic for national teams is activated through
+        the resting value when it is set to a value greater than 4.50.
+    </li>
+    <li>
+        The starting TS for national teams is 5.0, just like the
+        resting value.
+    </li>
+    <li>
+        National teams do not have a coach in the same way club teams do.
+    </li>
+    <li>
+        Nevertheless, the coach Leadership (FQ) value can be used in
+        the calculator to calibrate TS decay.
+    </li>
+    <li>
+        Based on current observations, an FQ value of 8 provides
+        a good approximation of national team TS development.
+    </li>
+    <li>
+        The match type <strong>Tournament</strong> is intended for
+        typical national team tournaments.
+    </li>
+    <li>
+        The match types <strong>League</strong>,
+        <strong>Cup</strong> and <strong>Relegation</strong>
+        are also supported.
+    </li>
+    <li>
+        The tournament schedule generally needs to be created manually.
+        An example that can be imported is available in the download area.
+    </li>
+    <li>
+        It is useful to export an existing schedule and then import it
+        again for further editing.
+    </li>
+    <li>
+        The first event in the default schedule is preset to
+        <strong>Reset</strong>. Depending on the scenario,
+        this entry can be modified or removed.
+    </li>
+    <li>
+        The new <strong>Match Type</strong> update can also be used
+        to overwrite incorrect entries when necessary.
+        This works like an empty entry.
+    </li>
+    <li>
+        The midfield rating in home matches behaves in the same way
+        as in away derbies for club teams.
+    </li>
+</ul>
+
+<hr>
+
+<h2>Team Spirit (TS)</h2>
+
+<p>
+    Team Spirit (TS) directly influences midfield strength and is
+    therefore one of the most important factors determining a team's
+    overall performance.
+</p>
+
+<p>
+    At the beginning of a season, the default resting value is
+    <strong>composed (TS 4.5)</strong>.
+    With a Sports Psychologist, this resting value can be permanently
+    increased to a maximum of TS 5.0.
+</p>
+
+<p>
+    TS affects the playmaking performance of all players contributing
+    to the midfield rating. The higher the Team Spirit, the stronger
+    the resulting midfield rating.
+</p>
+
+<h3>General Guidelines</h3>
+
+<ul>
+    <li>
+        Each TS level above "composed" adds approximately
+        <strong>+7%</strong> to midfield ratings.
+    </li>
+    <li>
+        Each TS level below "composed" causes a penalty of slightly
+        more than <strong>-7%</strong>.
+    </li>
+</ul>
+
+<h3>Factors Affecting Team Spirit</h3>
+
+<h4>Coach Leadership</h4>
+
+<p>
+    A coach with high Leadership helps stabilize Team Spirit and
+    slows down its decay.
+</p>
+
+<h4>Match Attitude</h4>
+
+<p>
+    The selected match attitude has a significant impact:
+</p>
+
+<ul>
+    <li>Play It Cool (PIC) increases TS by approximately 33%.</li>
+    <li>Match of the Season (MOTS) decreases TS by approximately 50%.</li>
+</ul>
+
+<h4>Transfers</h4>
+
+<p>
+    Player transfers can negatively affect Team Spirit.
+    A Team Spirit drop following a transfer can be simulated
+    using a <code>Drop</code> entry.
+</p>
+
+<h4>Sports Psychologists</h4>
+
+<p>
+    Sports Psychologists help maintain Team Spirit at a higher level.
+</p>
+
+<div class="note">
+    <strong>Note:</strong>
+    <p>
+        The actual TS value achievable before league and cup matches
+        may vary slightly depending on the country, update times
+        and player transfers.
+    </p>
+</div>
+
+<h3>Team Spirit Levels</h3>
+
+<table>
+    <thead>
+        <tr>
+            <th>Level</th>
+            <th>Team Spirit Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td>10</td><td>Paradise on Earth!</td></tr>
+        <tr><td>9</td><td>Walking on clouds</td></tr>
+        <tr><td>8</td><td>Delirious</td></tr>
+        <tr><td>7</td><td>Satisfied</td></tr>
+        <tr><td>6</td><td>Content</td></tr>
+        <tr><td>5</td><td>Calm</td></tr>
+        <tr><td>4</td><td>Composed</td></tr>
+        <tr><td>3</td><td>Irritated</td></tr>
+        <tr><td>2</td><td>Furious</td></tr>
+        <tr><td>1</td><td>Murderous</td></tr>
+        <tr><td>0</td><td>Like the Cold War</td></tr>
+    </tbody>
+</table>
+
+<h2>Example: Calculating Hidden Team Spirit (TS)</h2>
+
+<p>
+    In the lineup simulator, only integer TS values are available
+    for selection.
+</p>
+
+<p>
+    Internally, however, Hattrick works with more precise intermediate
+    values. These can be approximated by observing changes in the
+    midfield rating (MF).
+</p>
+
+<h3>Example</h3>
+
+<ul>
+    <li>TS "Content" = 6.5 → MF = 10.50</li>
+    <li>TS "Satisfied" = 7.5 → MF = 11.25</li>
+</ul>
+
+<p>
+    A difference of 1.0 TS point therefore results in a change
+    of 0.75 MF points.
+</p>
+
+<p>
+    If the Sandbox mode displays an MF value of 10.75 for the
+    current skill level, the calculation is as follows:
+</p>
+
+<h4>1. Calculate the Difference</h4>
+
+<pre>10.75 - 10.50 = 0.25</pre>
+
+<h4>2. Calculate the TS Fraction Using Proportional Scaling</h4>
+
+<pre>TS fraction = 0.25 / 0.75 = 0.333</pre>
+
+<h4>3. Add the Fraction to the Starting TS</h4>
+
+<pre>6.5 + 0.333 = 6.83</pre>
+
+<h4>Result</h4>
+
+<div class="note">
+    <strong>TS ≈ 6.83</strong>
+</div>
+
+<p>
+    This calculation is based on linear interpolation between
+    two known TS/MF values.
+</p>
+
+<hr>
+
+<h2>Training Intensity Adjustment</h2>
+
+<p>
+    One short-term way to increase Team Spirit is to reduce
+    Training Intensity (TI).
+</p>
+
+<p>The general rule is:</p>
+
+<ul>
+    <li>Lower Training Intensity → Higher Team Spirit</li>
+    <li>Higher Training Intensity → Lower Team Spirit</li>
+</ul>
+
+<p>
+    This method is often used before particularly important matches,
+    such as relegation matches or decisive cup games.
+</p>
+
+<h3>Formula</h3>
+
+<pre>TS = TS * pow(newTI / oldTI, -0.5115)</pre>
+
+<h3>Important Disadvantages</h3>
+
+<ul>
+    <li>Loss of training effectiveness.</li>
+    <li>Risk of a drop in player form.</li>
+    <li>
+        Negative effects on long-term background form.
+    </li>
+</ul>
+
+<div class="important">
+    The Training Intensity adjustment should therefore only be used
+    in exceptional circumstances.
+</div>
+
+<h3>Timing of the Adjustment</h3>
+
+<p>
+    For this measure to take effect, Training Intensity must be reduced
+    before the last daily update preceding the training update.
+</p>
+
+<p>
+    To minimize training losses, it is recommended to increase
+    Training Intensity again immediately after the match.
+</p>
+
+<hr>
+
+<h3>Example: Graphical Comparison of Multiple TS Plans</h3>
+
+<p>
+    Exported CSV files can also be analyzed graphically using
+    external programs.
+</p>
+
+<p>
+    One example is Gnuplot, which can be used to compare several
+    TS plans with each other.
+</p>
+
+<p>
+    The following example uses three exported TS plans and displays
+    their midfield development across all events in a single graph.
+</p>
+
+<p>
+    In addition, the midfield development for PIN, PIC and MOTS
+    is displayed for the plan <code>ts-export-3.csv</code>.
+</p>
+
+<h4>Run the Gnuplot Script</h4>
+
+<pre><code>gnuplot ts-export.gp</code></pre>
+
+<h4>Contents of ts-export.gp</h4>
+
+<pre><code>set terminal wxt
+
+set datafile separator ";"
+
+set title "MF across Events"
+set xlabel "Event"
+set ylabel "Value"
+set grid
+set autoscale
+
+plot 'ts-export-1.csv' using 2:11 with linespoints title 'MF PIN PIC PIC', \
+     'ts-export-2.csv' using 2:11 with linespoints title 'MF PIN PIN PIC', \
+     'ts-export-3.csv' using 2:11 with linespoints title 'MF PIC PIC PIC', \
+     'ts-export-3.csv' using 2:17 with linespoints title 'MF Away PIN', \
+     'ts-export-3.csv' using 2:18 with linespoints title 'MF Away PIC', \
+     'ts-export-3.csv' using 2:19 with linespoints title 'MF Away MOTS'
+
+pause -1</code></pre>
+
+<p>
+    The labels <code>PIN PIN PIC</code>,
+    <code>PIN PIC PIC</code> and
+    <code>PIC PIC PIC</code> identify the TS strategies used.
+</p>
+
+<p>
+    This is just an example of more advanced data analysis.
+    Gnuplot offers many additional possibilities for visualizing
+    and analyzing data.
+</p>
+
+<p>
+    Users interested in creating such analyses can find further
+    information in the Gnuplot documentation.
+</p>
+
+<p>
+    The CSV files must be located in the same directory as the
+    Gnuplot file unless different paths are specified in the script.
+</p>
+
+<hr>
+
+<h3>CSV Import</h3>
+
+<p>
+    Exported CSV files can also be edited using external programs.
+</p>
+
+<p>
+    For example, you can enter the opponent's team name in the
+    <code>Opponent</code> column so that it will be displayed
+    after importing the file.
+</p>
+
+<hr>
+
+<h3>Chart</h3>
+
+<p>
+    Individual curves can be shown or hidden by clicking their
+    corresponding legend symbol (colored rectangle).
+</p>
+
+<hr>
+
+<h3>Midfield Rating Reference</h3>
+
+<p>
+    <strong>Midfield Away PIN</strong> serves as the reference
+    for calculating midfield ratings.
+</p>
+
+<p>
+    Based on this reference value, the different combinations
+    of venue and match attitude (PIC / PIN / MOTS) are calculated.
+</p>
+
+<p>
+    The midfield rating for a match is always calculated using
+    the current Team Spirit (TS).
+</p>
+
+<p>
+    This makes it possible to see which midfield rating can be
+    expected under the respective conditions.
+</p>
+
+<h3>Available Variants</h3>
+
+<ul>
+    <li>Midfield Home PIN</li>
+    <li>Midfield Home PIC</li>
+    <li>Midfield Home MOTS</li>
+    <li>Midfield Away Derby PIN</li>
+    <li>Midfield Away Derby PIC</li>
+    <li>Midfield Away Derby MOTS</li>
+    <li>Midfield Away PIN</li>
+    <li>Midfield Away PIC</li>
+    <li>Midfield Away MOTS</li>
+</ul>
+
+<p>
+    The column <strong>Midfield in Match</strong> subsequently
+    displays the value applicable to the match based on the
+    currently selected venue and match attitude.
+</p>
+
+<p>
+    The currently selected combination is additionally highlighted
+    using colors.
+</p>
+
+<p>
+    This makes it easy to identify which calculated variant
+    is being used for the current midfield rating.
+</p>
+
+<p>
+    After a reset, row 1 should display the configured MF reference
+    value in the <strong>Midfield Away PIN</strong> column.
+</p>
+
+<h3>Choosing the Reference Value</h3>
+
+<p>
+    The reference value can be selected so that the team achieves
+    this value when playing Away + PIN with a TS of 4.5.
+</p>
+
+<p>
+    The remaining values can then be interpreted as projections
+    based on this reference value.
+</p>
+
+<p>
+    <strong>Example:</strong>
+</p>
+
+<p>
+    If the MF reference value is set to 10, Away + PIN at TS 4.5
+    will correspond to a value of 10.
+</p>
+
+<p>
+    The other fields show how the midfield rating changes depending
+    on Team Spirit (TS), venue and selected match attitude.
+</p>
+
+<p>
+    The TS value of 4.5 represents the resting value to which
+    Team Spirit is reset at the beginning of a new season
+    by the seasonal reset.
+</p>
+
+<h3>Determining the Reference Value from a Known Match</h3>
+
+<p>
+    The reference value does not necessarily have to come from
+    a match played with Away + PIN at TS 4.5.
+</p>
+
+<p>
+    An already completed reference match can also be used,
+    provided that the following information is known:
+</p>
+
+<ul>
+    <li>Team Spirit (TS)</li>
+    <li>Venue</li>
+    <li>Match attitude (PIN / PIC / MOTS)</li>
+    <li>Actual midfield rating achieved</li>
+</ul>
+
+<p>
+    The reference value is then adjusted so that the corresponding
+    combination of TS, venue and match attitude in the table
+    matches the known midfield rating of the reference match.
+</p>
+
+<p>
+    The remaining columns can subsequently be used to determine
+    the midfield ratings that would result from other combinations
+    of TS, venue and match attitude.
+</p>
+
+<p>
+    The reference value therefore remains based on the defined
+    standard of Away + PIN at TS 4.5.
+</p>
+
+<p>
+    However, the reference match itself does not need to meet
+    these conditions.
+</p>
+
+<h4>Example</h4>
+
+<p>
+    A team achieved a midfield rating of 11.00 in a known match
+    with a specific TS, venue and match attitude.
+</p>
+
+<p>
+    The reference value is adjusted until the corresponding
+    column in the table displays 11.00 for exactly these conditions.
+</p>
+
+<p>
+    The same table can then be used to determine which midfield
+    rating would have been expected under alternative conditions.
+</p>
+
+<p>
+    This means that any known match can be used as a reference,
+    provided that TS, venue, match attitude and midfield rating
+    are known.
+</p>
+
+<p>
+    Using this method, midfield ratings can essentially be
+    converted to alternative conditions for a match.
+</p>
+
+<hr>
+
+<h3>Further Calculators &amp; Information</h3>
+
+<ul>
+        <li><a class='nav-link' href='/hattrick/en/TS-Planner.html'>Hattrick Team Spirit (TS) Planner</a></li>
+        <li><a class='nav-link' href='/hattrick/ht-stamina'>Hattrick Konditionstabelle</a></li>
+        <li><a class='nav-link' href='/hattrick/TS-Planer.html'>Hattrick Teamstimmung (TS) Planer</a></li>
+        <li><a class='nav-link' href='/hattrick/TS-subskill-calculator.htm'>Hattrick Team Spirit (TS) Subskill Calculator</a></li>
+        <li><a class='nav-link' href='/hattrick/SV-subskill-calculator.htm'>Hattrick Selbstvertrauen ( SV ) Subskill Calculator </a></li>
+        <li><a class='nav-link' href='http://www.ht-links.de/TISchrauber.php'>TI-Schrauber zur Berechnung der optimalen Trainingsintensität</a></li>
+        <li><a class='nav-link' href='https://ht.8ic.ro/trainingintensity'>Training Intensity bei HT Utilities</a></li>
+</ul>
+
+</body>
+</html>
+
