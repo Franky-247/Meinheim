@@ -5,7 +5,7 @@
 <meta name="description" content="Hier könnt ihr die Hattrick Teamstimmung vorhersagen lassen."/>
 <meta name="keywords" content="hattrick, managertool, kostenlos, club, Teamstimmung, TS-Rechner. TS Predictor"/>
 
-<title>TS Planner v0.202611110355-alpha</title>
+<title>TS Planner v0.202611251345-alpha</title>
 
 <style>
 body { font-family: Arial; }
@@ -55,7 +55,7 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
 
 <h1>Hattrick Team Spirit (TS) Planner</h1>
 
-<p><strong>Version:</strong> v0.202611110355-alpha</p>
+<p><strong>Version:</strong> v0.202611251345-alpha</p>
 
 <hr>
 
@@ -203,13 +203,13 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
     <label for="ts_drift">
     TS Drift :
     <span class="info"
-          title="Aktueller Default Wert: 0,0334; klassisch: 0,03.">
+          title="Aktueller Default Wert: 0,03; klassisch: 0,03.">
         &#9432;
     </span>
 </label>
 <input type="number"
        id="ts_drift"
-       value="0.0334"
+       value="0.03"
        step="0.0001"
        min="0"
        max="2"
@@ -218,13 +218,13 @@ td, th { padding: 4px 6px; border: 1px solid #ccc; text-align: center; }
     <label for="fq_drift">
     FQ Drift :
     <span class="info"
-          title="Aktueller Default Wert: 1 :d.h. kein automatischer Abfall der FQ. Bei 0,9375 fällt die FQ in 24 Wochen um eine Stufe.">
+          title="Aktueller Default Wert: 0.9375. Bei 1 gibt es keine automatischen Abfall der FQ. Bei 0,9375 fällt die FQ in 24 Wochen um eine Stufe.">
         &#9432;
     </span>
 </label>
 <input type="number"
        id="fq_drift"
-       value="1"
+       value="0.9375"
        step="0.0001"
        min="0"
        max="1.0">
@@ -471,7 +471,7 @@ for (let i = 0; i < 114; i++) {
 }
 </script>
 
-<script src="../TS-Planner.js"></script>
+<script src="/hattrick/TS-Planner.js"></script>
 <script>
 log(1, "DEBUG:", DEBUG);
 log(1, "EXPERT:", EXPERT);
